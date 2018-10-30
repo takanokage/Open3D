@@ -65,14 +65,6 @@ TEST(ScalableTSDFVolume, Constructor)
 // ----------------------------------------------------------------------------
 //
 // ----------------------------------------------------------------------------
-TEST(ScalableTSDFVolume, DISABLED_Destructor)
-{
-    unit_test::NotImplemented();
-}
-
-// ----------------------------------------------------------------------------
-//
-// ----------------------------------------------------------------------------
 TEST(ScalableTSDFVolume, DISABLED_MemberData)
 {
     unit_test::NotImplemented();
