@@ -32,6 +32,8 @@ using namespace open3d;
 using namespace std;
 using namespace unit_test;
 
+using VolumeUnit = ScalableTSDFVolume::VolumeUnit;
+
 // ----------------------------------------------------------------------------
 //
 // ----------------------------------------------------------------------------
@@ -71,9 +73,34 @@ TEST(ScalableTSDFVolume, DISABLED_MemberData)
 // ----------------------------------------------------------------------------
 //
 // ----------------------------------------------------------------------------
-TEST(ScalableTSDFVolume, DISABLED_Reset)
+TEST(ScalableTSDFVolume, Reset)
 {
-    unit_test::NotImplemented();
+    TSDFVolumeColorType color_type = TSDFVolumeColorType::Gray32;
+    int depth_sampling_stride = 4;
+    int volume_unit_resolution = 16;
+    double voxel_length = 0.75;
+    double sdf_trunc = 0.75;
+
+    ScalableTSDFVolume tsdf_volume(voxel_length,
+                                   sdf_trunc,
+                                   color_type,
+                                   volume_unit_resolution,
+                                   depth_sampling_stride);
+
+    EXPECT_EQ(0, tsdf_volume.volume_units_.size());
+
+    Eigen::Vector3i key = { 0, 0, 0 };
+    VolumeUnit volume_unit;
+
+    pair<Eigen::Vector3i, VolumeUnit> entry(key, volume_unit);
+
+    tsdf_volume.volume_units_.insert(entry);
+
+    EXPECT_EQ(1, tsdf_volume.volume_units_.size());
+
+    tsdf_volume.Reset();
+
+    EXPECT_EQ(0, tsdf_volume.volume_units_.size());
 }
 
 // ----------------------------------------------------------------------------
