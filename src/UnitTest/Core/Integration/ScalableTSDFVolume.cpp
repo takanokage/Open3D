@@ -56,6 +56,8 @@ TEST(ScalableTSDFVolume, Constructor)
     EXPECT_EQ(volume_unit_resolution, tsdf_volume.volume_unit_resolution_);
     EXPECT_NEAR(voxel_length, tsdf_volume.voxel_length_, THRESHOLD_1E_6);
     EXPECT_NEAR(sdf_trunc, tsdf_volume.sdf_trunc_, THRESHOLD_1E_6);
+
+    EXPECT_EQ(0, tsdf_volume.volume_units_.size());
 }
 
 // ----------------------------------------------------------------------------
