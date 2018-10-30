@@ -107,35 +107,3 @@ TEST(ScalableTSDFVolume, DISABLED_ExtractVoxelPointCloud)
 {
     unit_test::NotImplemented();
 }
-
-// ----------------------------------------------------------------------------
-//
-// ----------------------------------------------------------------------------
-TEST(ScalableTSDFVolume, DISABLED_LocateVolumeUnit)
-{
-    unit_test::NotImplemented();
-}
-
-// ----------------------------------------------------------------------------
-//
-// ----------------------------------------------------------------------------
-TEST(ScalableTSDFVolume, DISABLED_OpenVolumeUnit)
-{
-    unit_test::NotImplemented();
-}
-
-// ----------------------------------------------------------------------------
-//
-// ----------------------------------------------------------------------------
-TEST(ScalableTSDFVolume, DISABLED_GetNormalAt)
-{
-    unit_test::NotImplemented();
-}
-
-// ----------------------------------------------------------------------------
-//
-// ----------------------------------------------------------------------------
-TEST(ScalableTSDFVolume, DISABLED_GetTSDFAt)
-{
-    unit_test::NotImplemented();
-}
