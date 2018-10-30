@@ -37,11 +37,12 @@ using namespace unit_test;
 // ----------------------------------------------------------------------------
 TEST(ScalableTSDFVolume, Constructor)
 {
+    TSDFVolumeColorType color_type = TSDFVolumeColorType::Gray32;
+    int depth_sampling_stride = 4;
+    int volume_unit_length = 12;
+    int volume_unit_resolution = 16;
     double voxel_length = 0.75;
     double sdf_trunc = 0.75;
-    TSDFVolumeColorType color_type = TSDFVolumeColorType::Gray32;
-    int volume_unit_resolution = 16;
-    int depth_sampling_stride = 4;
 
     ScalableTSDFVolume tsdf_volume(voxel_length,
                                    sdf_trunc,
@@ -49,9 +50,12 @@ TEST(ScalableTSDFVolume, Constructor)
                                    volume_unit_resolution,
                                    depth_sampling_stride);
 
-    EXPECT_EQ(volume_unit_resolution, tsdf_volume.volume_unit_resolution_);
-    EXPECT_NEAR(12.0, tsdf_volume.volume_unit_length_, THRESHOLD_1E_6);
+    EXPECT_EQ(color_type, tsdf_volume.color_type_);
     EXPECT_EQ(depth_sampling_stride, tsdf_volume.depth_sampling_stride_);
+    EXPECT_NEAR(volume_unit_length, tsdf_volume.volume_unit_length_, THRESHOLD_1E_6);
+    EXPECT_EQ(volume_unit_resolution, tsdf_volume.volume_unit_resolution_);
+    EXPECT_NEAR(voxel_length, tsdf_volume.voxel_length_, THRESHOLD_1E_6);
+    EXPECT_NEAR(sdf_trunc, tsdf_volume.sdf_trunc_, THRESHOLD_1E_6);
 }
 
 // ----------------------------------------------------------------------------
