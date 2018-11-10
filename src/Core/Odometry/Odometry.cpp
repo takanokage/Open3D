@@ -28,10 +28,14 @@
 
 #include <Eigen/Dense>
 #include <Core/Geometry/Image.h>
+#include <Core/Geometry/RGBDImage.h>
+#include <Core/Odometry/RGBDOdometryJacobian.h>
 #include <Core/Utility/Eigen.h>
 #include <Core/Utility/Timer.h>
 
 namespace open3d {
+
+namespace {
 
 std::tuple<std::shared_ptr<Image>, std::shared_ptr<Image>>
         InitializeCorrespondenceMap(int width, int height)
@@ -51,7 +55,7 @@ std::tuple<std::shared_ptr<Image>, std::shared_ptr<Image>>
     return std::make_tuple(correspondence_map, depth_buffer);
 }
 
-void AddElementToCorrespondenceMap(
+inline void AddElementToCorrespondenceMap(
         Image &correspondence_map, Image &depth_buffer,
         int u_s, int v_s, int u_t, int v_t, float transformed_d_t) {
     int exist_u_t, exist_v_t;
@@ -315,7 +319,7 @@ void NormalizeIntensity(Image &image_s, Image &image_t,
     LinearTransformImage(image_t, 0.5 / mean_t, 0.0);
 }
 
-std::shared_ptr<RGBDImage> PackRGBDImage(
+inline std::shared_ptr<RGBDImage> PackRGBDImage(
     const Image &color, const Image &depth) {
     return std::make_shared<RGBDImage>(RGBDImage(color, depth));
 }
@@ -335,13 +339,13 @@ std::shared_ptr<Image> PreprocessDepth(
     return depth_processed;
 }
 
-bool CheckImagePair(const Image &image_s, const Image &image_t)
+inline bool CheckImagePair(const Image &image_s, const Image &image_t)
 {
     return (image_s.width_ == image_t.width_ &&
             image_s.height_ == image_t.height_);
 }
 
-bool CheckRGBDImagePair(const RGBDImage &source, const RGBDImage &target)
+inline bool CheckRGBDImagePair(const RGBDImage &source, const RGBDImage &target)
 {
     return (CheckImagePair(source.color_, target.color_) &&
             CheckImagePair(source.depth_, target.depth_) &&
@@ -480,6 +484,8 @@ std::tuple<bool, Eigen::Matrix4d> ComputeMultiscale(
     }
     return std::make_tuple(true, result_odo);
 }
+
+}    // unnamed namespace
 
 std::tuple<bool, Eigen::Matrix4d, Eigen::Matrix6d>
         ComputeRGBDOdometry(const RGBDImage &source, const RGBDImage &target,
