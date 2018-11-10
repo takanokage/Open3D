@@ -28,11 +28,6 @@
 
 #include "Core/Geometry/PointCloud.h"
 
-using namespace Eigen;
-using namespace open3d;
-using namespace std;
-using namespace unit_test;
-
 // ----------------------------------------------------------------------------
 //
 // ----------------------------------------------------------------------------
@@ -40,3 +35,4 @@ TEST(AccumulatedPoint, DISABLED_Default)
 {
     unit_test::NotImplemented();
 }
+// ----------------------------------------------------------------------------
