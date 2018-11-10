@@ -35,4 +35,3 @@ TEST(AccumulatedPoint, DISABLED_Default)
 {
     unit_test::NotImplemented();
 }
-// ----------------------------------------------------------------------------
