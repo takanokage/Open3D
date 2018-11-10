@@ -52,11 +52,20 @@ TEST(PinholeCameraTrajectory, ConvertToFromJsonValue)
     int width = 640;
     int height = 480;
 
-    src.intrinsic_.width_ = width;
-    src.intrinsic_.height_ = height;
-    src.intrinsic_.intrinsic_matrix_ = Eigen::Matrix3d::Random();
+    src.parameters_.resize(2);
 
-    src.extrinsic_.push_back(Eigen::Matrix4d::Random());
+    for (size_t i = 0; i < src.parameters_.size(); i++)
+    {
+        PinholeCameraParameters src_params = src.parameters_[i];
+
+        PinholeCameraIntrinsic intrinsic;
+        intrinsic.width_ = width;
+        intrinsic.height_ = height;
+        intrinsic.intrinsic_matrix_ = Eigen::Matrix3d::Random();
+
+        src.parameters_[i].intrinsic_ = intrinsic;
+        src.parameters_[i].extrinsic_ = Eigen::Matrix4d::Random();
+    }
 
     Json::Value value;
     bool output = src.ConvertToJsonValue(value);
@@ -65,11 +74,19 @@ TEST(PinholeCameraTrajectory, ConvertToFromJsonValue)
     output = dst.ConvertFromJsonValue(value);
     EXPECT_TRUE(output);
 
-    EXPECT_EQ(src.intrinsic_.width_, dst.intrinsic_.width_);
-    EXPECT_EQ(src.intrinsic_.height_, dst.intrinsic_.height_);
+    EXPECT_EQ(src.parameters_.size(), dst.parameters_.size());
 
-    ExpectEQ(src.intrinsic_.intrinsic_matrix_,
-             dst.intrinsic_.intrinsic_matrix_);
+    for (size_t i = 0; i < src.parameters_.size(); i++)
+    {
+        PinholeCameraParameters src_params = src.parameters_[i];
+        PinholeCameraParameters dst_params = dst.parameters_[i];
 
-    ExpectEQ(src.extrinsic_[0], dst.extrinsic_[0]);
+        EXPECT_EQ(src_params.intrinsic_.width_, dst_params.intrinsic_.width_);
+        EXPECT_EQ(src_params.intrinsic_.height_, dst_params.intrinsic_.height_);
+
+        ExpectEQ(src_params.intrinsic_.intrinsic_matrix_,
+                dst_params.intrinsic_.intrinsic_matrix_);
+
+        ExpectEQ(src_params.extrinsic_, dst_params.extrinsic_);
+    }
 }
