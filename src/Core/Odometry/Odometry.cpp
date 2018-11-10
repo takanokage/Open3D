@@ -403,7 +403,7 @@ std::tuple<bool, Eigen::Matrix4d> DoSingleIteration(
     auto correspondence = ComputeCorrespondence(
             intrinsic, extrinsic_initial, source.depth_, target.depth_, option);
     int corresps_count = (int)correspondence->size();
-
+    
     auto f_lambda = [&]
             (int i, std::vector<Eigen::Vector6d> &J_r, std::vector<double> &r) {
         jacobian_method.ComputeJacobianAndResidual(i, J_r, r,
