@@ -24,10 +24,14 @@
 // IN THE SOFTWARE.
 // ----------------------------------------------------------------------------
 
+#include "PinholeCameraIntrinsic.h"
 #include "PinholeCameraTrajectory.h"
 
 #include <json/json.h>
 #include <Core/Utility/Console.h>
+
+// DEBUG CODE
+// #include<iostream>
 
 namespace open3d{
 
@@ -41,21 +45,48 @@ PinholeCameraTrajectory::~PinholeCameraTrajectory()
 
 bool PinholeCameraTrajectory::ConvertToJsonValue(Json::Value &value) const
 {
-    Json::Value trajectory_array;
-    for (const auto &status : extrinsic_) {
-        Json::Value status_object;
-        if (EigenMatrix4dToJsonArray(status, status_object) == false) {
-            return false;
-        }
-        trajectory_array.append(status_object);
-    }
+/*  ORIGINAL CODE
     value["class_name"] = "PinholeCameraTrajectory";
     value["version_major"] = 1;
     value["version_minor"] = 0;
-    value["extrinsic"] = trajectory_array;
-    if (intrinsic_.ConvertToJsonValue(value["intrinsic"]) == false) {
-        return false;
+    Json::Value parameters_array;
+    for (const auto &status : parameters_) {
+        Json::Value parameters, intrinsic, extrinsic, status_object;
+        if (status.intrinsic_.ConvertToJsonValue(status_object) == false) {
+            return false;
+        }
+        intrinsic["intrinsic"] = status_object;
+        printf("OK!\n");
+        if (EigenMatrix4dToJsonArray(
+                status.extrinsic_, status_object) == false) {
+            return false;
+        }
+        printf("OK!\n");
+        extrinsic["extrinsic"] = status_object;
+        parameters.append(intrinsic);
+        parameters.append(extrinsic);
+        parameters_array.append(parameters);
     }
+    value["parameters"] = parameters_array;
+
+    std::cout << value << std::endl << std::endl;
+    return true;
+*/
+    // PROPOSED SOLUTION
+    value["class_name"] = "PinholeCameraTrajectory";
+    value["version_major"] = 1;
+    value["version_minor"] = 0;
+    Json::Value parameters_array;
+    for (const auto &parameter : parameters_) {
+        Json::Value parameter_value;
+        parameter.ConvertToJsonValue(parameter_value);
+        parameters_array.append(parameter_value);
+    }
+    value["parameters"] = parameters_array;
+
+    // DEBUG CODE
+    // std::cout << value << std::endl << std::endl;
+
     return true;
 }
 
@@ -71,18 +102,29 @@ bool PinholeCameraTrajectory::ConvertFromJsonValue(const Json::Value &value)
         PrintWarning("PinholeCameraTrajectory read JSON failed: unsupported json format.\n");
         return false;
     }
-    if (intrinsic_.ConvertFromJsonValue(value["intrinsic"]) == false) {
-        return false;
-    }
-    const Json::Value &trajectory_array = value["extrinsic"];
-    if (trajectory_array.size() == 0) {
+    // ORIGINAL CODE
+    // const Json::Value parameter_array = value["PinholeCameraParameters"];
+
+    // PROPOSED SOLUTION
+    const Json::Value parameter_array = value["parameters"];
+
+    // DEBUG CODE
+    // std::cout << value << std::endl << std::endl;
+    // std::cout << parameter_array << std::endl << std::endl;
+
+    if (parameter_array.size() == 0) {
         PrintWarning("PinholeCameraTrajectory read JSON failed: empty trajectory.\n");
         return false;
     }
-    extrinsic_.resize(trajectory_array.size());
-    for (int i = 0; i < (int)trajectory_array.size(); i++) {
-        const Json::Value &status_object = trajectory_array[i];
-        if (EigenMatrix4dFromJsonArray(extrinsic_[i], status_object) == false) {
+    parameters_.resize(parameter_array.size());
+    for (auto i = 0; i < parameter_array.size(); i++) {
+        const Json::Value &status_object = parameter_array[i];
+        if (parameters_[i].intrinsic_.ConvertFromJsonValue(
+                status_object["intrinsic"]) == false) {
+            return false;
+        }
+        if (EigenMatrix4dFromJsonArray(parameters_[i].extrinsic_,
+                status_object["extrinsic"]) == false) {
             return false;
         }
     }
