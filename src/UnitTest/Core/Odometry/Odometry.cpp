@@ -257,13 +257,7 @@ TEST(Odometry, DISABLED_ComputeCorrespondence)
     //                           *depth_t,
     //                           option);
 
-<<<<<<< HEAD
-    ExpectEQ(ref_output, *output);
-=======
-    // EXPECT_EQ(ref_output.size(), output->size());
-    // for (size_t i = 0; i < ref_output.size(); i++)
-    //     ExpectEQ(ref_output[i], (*output)[i]);
->>>>>>> namespace
+    // ExpectEQ(ref_output, *output);
 }
 
 // ----------------------------------------------------------------------------
@@ -304,20 +298,8 @@ TEST(Odometry, DISABLED_ConvertDepthImageToXYZImage)
 
     // shared_ptr<Image> output = ConvertDepthImageToXYZImage(*depth, intrinsic);
 
-<<<<<<< HEAD
-    float* const output_data = Cast<float>(&output->data_[0]);
-=======
-<<<<<<< HEAD
-    float* const output_data = reinterpret_cast<float*>(&output->data_[0]);
->>>>>>> expectEQ
-    ExpectEQ(&ref_output[0], output_data, output->data_.size() / sizeof(float));
-=======
-    // size_t output_size = output->data_.size() / sizeof(float);
-    // float* const output_data = reinterpret_cast<float*>(&output->data_[0]);
-    // EXPECT_EQ(ref_output.size(), output_size);
-    // for (size_t i = 0; i < ref_output.size(); i++)
-    //     EXPECT_NEAR(ref_output[i], output_data[i], THRESHOLD_1E_6);
->>>>>>> namespace
+    // float* const output_data = Cast<float>(&output->data_[0]);
+    // ExpectEQ(&ref_output[0], output_data, output->data_.size() / sizeof(float));
 }
 
 // ----------------------------------------------------------------------------
@@ -359,15 +341,7 @@ TEST(Odometry, DISABLED_CreateCameraMatrixPyramid)
 
     // vector<Matrix3d> output = CreateCameraMatrixPyramid(intrinsic, levels);
 
-<<<<<<< HEAD
-    ExpectEQ(ref_output, output);
-=======
-    // EXPECT_EQ(ref_output.size(), output.size());
-    // for (size_t i = 0; i < ref_output.size(); i++)
-    //     for (int r = 0; r < 3; r++)
-    //         for (int c = 0; c < 3; c++)
-    //             EXPECT_NEAR(ref_output[i][r * 3 + c], output[i](c, r), THRESHOLD_1E_6);
->>>>>>> namespace
+    // ExpectEQ(ref_output, output);
 }
 
 // ----------------------------------------------------------------------------
@@ -411,29 +385,13 @@ TEST(Odometry, DISABLED_CreateInformationMatrix)
     OdometryOption option;
     option.max_depth_diff_ = 0.25;
 
-<<<<<<< HEAD
-    Matrix6d output = CreateInformationMatrix(extrinsic,
-                                              intrinsic,
-                                              *depth_s,
-                                              *depth_t,
-                                              option);
-
-    ExpectEQ(ref_output, output);
-=======
     // Matrix6d output = CreateInformationMatrix(extrinsic,
     //                                           intrinsic,
     //                                           *depth_s,
     //                                           *depth_t,
     //                                           option);
 
-    // EXPECT_EQ(6, ref_output.size());
-    // for (int r = 0; r < 6; r++)
-    // {
-    //     EXPECT_EQ(6, ref_output[r].size());
-    //     for (int c = 0; c < 6; c++)
-    //         EXPECT_NEAR(ref_output[r][c], output(c, r), THRESHOLD_1E_6);
-    // }
->>>>>>> namespace
+    // ExpectEQ(ref_output, output);
 }
 
 // ----------------------------------------------------------------------------
@@ -534,18 +492,8 @@ TEST(Odometry, DISABLED_PackRGBDImage)
 
 //     shared_ptr<RGBDImage> rgbd_image = PackRGBDImage(color, *depth);
 
-<<<<<<< HEAD
-    ExpectEQ(rgbd_image->color_.data_, color.data_);
-    ExpectEQ(rgbd_image->depth_.data_, depth->data_);
-=======
-//     EXPECT_EQ(rgbd_image->color_.data_.size(), color.data_.size());
-//     for (size_t i = 0; i < rgbd_image->color_.data_.size(); i++)
-//         EXPECT_EQ(rgbd_image->color_.data_[i], color.data_[i]);
-
-//     EXPECT_EQ(rgbd_image->depth_.data_.size(), depth->data_.size());
-//     for (size_t i = 0; i < rgbd_image->depth_.data_.size(); i++)
-//         EXPECT_EQ(rgbd_image->depth_.data_[i], depth->data_[i]);
->>>>>>> namespace
+    // ExpectEQ(rgbd_image->color_.data_, color.data_);
+    // ExpectEQ(rgbd_image->depth_.data_, depth->data_);
 }
 
 // ----------------------------------------------------------------------------
@@ -573,22 +521,11 @@ TEST(Odometry, DISABLED_PreprocessDepth)
 
     // shared_ptr<Image> output = PreprocessDepth(*depth, option);
 
-<<<<<<< HEAD
-    float* const output_data = Cast<float>(&(*output).data_[0]);
-    size_t output_size = output->data_.size() / sizeof(float);
-=======
-    // float* const output_data = reinterpret_cast<float*>(&(*output).data_[0]);
+    // float* const output_data = Cast<float>(&(*output).data_[0]);
     // size_t output_size = output->data_.size() / sizeof(float);
->>>>>>> expectEQ
 
-<<<<<<< HEAD
-    EXPECT_EQ(ref_output.size(), output_size);
-    ExpectEQ(&ref_output[0], output_data, output_size);
-=======
     // EXPECT_EQ(ref_output.size(), output_size);
-    // for (size_t i = 0; i < ref_output.size(); i++)
-    //     EXPECT_NEAR(ref_output[i], output_data[i], THRESHOLD_1E_6);
->>>>>>> namespace
+    // ExpectEQ(&ref_output[0], output_data, output_size);
 }
 
 // ----------------------------------------------------------------------------
@@ -713,56 +650,6 @@ TEST(Odometry, DISABLED_InitializeRGBDOdometry)
     shared_ptr<Image> depth0 = DepthBuffer(width, height,  0.0, 255.0, 0);
     shared_ptr<Image> depth1 = DepthBuffer(width, height, 10.0, 255.0, 1);
 
-<<<<<<< HEAD
-    shared_ptr<RGBDImage> source = PackRGBDImage(color0, *depth0);
-    shared_ptr<RGBDImage> target = PackRGBDImage(color1, *depth1);
-
-    PinholeCameraIntrinsic intrinsic;
-    intrinsic.intrinsic_matrix_ = Matrix3d::Zero();
-    intrinsic.intrinsic_matrix_(0, 0) = 0.5;
-    intrinsic.intrinsic_matrix_(1, 1) = 0.65;
-    intrinsic.intrinsic_matrix_(0, 2) = 0.75;
-    intrinsic.intrinsic_matrix_(1, 2) = 0.35;
-    intrinsic.intrinsic_matrix_(2, 2) = 0.9;
-
-    Matrix4d extrinsic = Matrix4d::Zero();
-    extrinsic(0, 0) = 1.0;
-    extrinsic(1, 1) = 1.0;
-    extrinsic(2, 2) = 1.0;
-    extrinsic(0, 3) = 1.0;
-
-    OdometryOption option;
-    option.min_depth_ = 1.0;
-    option.max_depth_ = 250.0;
-    option.max_depth_diff_ = 5;
-
-    shared_ptr<RGBDImage> rgbd0 = NULL;
-    shared_ptr<RGBDImage> rgbd1 = NULL;
-
-    tie(rgbd0, rgbd1) = InitializeRGBDOdometry(*source,
-                                               *target,
-                                               intrinsic,
-                                               extrinsic,
-                                               option);
-
-    float* const rgbd0_color = Cast<float>(&(*rgbd0).color_.data_[0]);
-    float* const rgbd1_color = Cast<float>(&(*rgbd1).color_.data_[0]);
-    float* const rgbd0_depth = Cast<float>(&(*rgbd0).depth_.data_[0]);
-    float* const rgbd1_depth = Cast<float>(&(*rgbd1).depth_.data_[0]);
-    size_t rgbd_size = width * height;
-
-    EXPECT_EQ(ref_rgbd0_color.size(), rgbd_size);
-    ExpectEQ(&ref_rgbd0_color[0], rgbd0_color, rgbd_size);
-
-    EXPECT_EQ(ref_rgbd1_color.size(), rgbd_size);
-    ExpectEQ(&ref_rgbd1_color[0], rgbd1_color, rgbd_size);
-
-    EXPECT_EQ(ref_rgbd0_depth.size(), rgbd_size);
-    ExpectEQ(&ref_rgbd0_depth[0], rgbd0_depth, rgbd_size);
-
-    EXPECT_EQ(ref_rgbd1_depth.size(), rgbd_size);
-    ExpectEQ(&ref_rgbd1_depth[0], rgbd1_depth, rgbd_size);
-=======
     // shared_ptr<RGBDImage> source = PackRGBDImage(color0, *depth0);
     // shared_ptr<RGBDImage> target = PackRGBDImage(color1, *depth1);
 
@@ -794,28 +681,23 @@ TEST(Odometry, DISABLED_InitializeRGBDOdometry)
     //                                            extrinsic,
     //                                            option);
 
-    // float* const rgbd0_color = reinterpret_cast<float*>(&(*rgbd0).color_.data_[0]);
-    // float* const rgbd1_color = reinterpret_cast<float*>(&(*rgbd1).color_.data_[0]);
-    // float* const rgbd0_depth = reinterpret_cast<float*>(&(*rgbd0).depth_.data_[0]);
-    // float* const rgbd1_depth = reinterpret_cast<float*>(&(*rgbd1).depth_.data_[0]);
+    // float* const rgbd0_color = Cast<float>(&(*rgbd0).color_.data_[0]);
+    // float* const rgbd1_color = Cast<float>(&(*rgbd1).color_.data_[0]);
+    // float* const rgbd0_depth = Cast<float>(&(*rgbd0).depth_.data_[0]);
+    // float* const rgbd1_depth = Cast<float>(&(*rgbd1).depth_.data_[0]);
     // size_t rgbd_size = width * height;
 
     // EXPECT_EQ(ref_rgbd0_color.size(), rgbd_size);
-    // for (size_t i = 0; i < ref_rgbd0_color.size(); i++)
-    //     EXPECT_NEAR(ref_rgbd0_color[i], rgbd0_color[i], THRESHOLD_1E_6);
+    // ExpectEQ(&ref_rgbd0_color[0], rgbd0_color, rgbd_size);
 
     // EXPECT_EQ(ref_rgbd1_color.size(), rgbd_size);
-    // for (size_t i = 0; i < ref_rgbd1_color.size(); i++)
-    //     EXPECT_NEAR(ref_rgbd1_color[i], rgbd1_color[i], THRESHOLD_1E_6);
+    // ExpectEQ(&ref_rgbd1_color[0], rgbd1_color, rgbd_size);
 
     // EXPECT_EQ(ref_rgbd0_depth.size(), rgbd_size);
-    // for (size_t i = 0; i < ref_rgbd0_depth.size(); i++)
-    //     EXPECT_NEAR(ref_rgbd0_depth[i], rgbd0_depth[i], THRESHOLD_1E_6);
+    // ExpectEQ(&ref_rgbd0_depth[0], rgbd0_depth, rgbd_size);
 
     // EXPECT_EQ(ref_rgbd1_depth.size(), rgbd_size);
-    // for (size_t i = 0; i < ref_rgbd1_depth.size(); i++)
-    //     EXPECT_NEAR(ref_rgbd1_depth[i], rgbd1_depth[i], THRESHOLD_1E_6);
->>>>>>> namespace
+    // ExpectEQ(&ref_rgbd1_depth[0], rgbd1_depth, rgbd_size);
 }
 
 // ----------------------------------------------------------------------------
@@ -846,50 +728,9 @@ TEST(Odometry, DISABLED_DoSingleIteration)
     ShiftLeft(dxColor, 10);
     ShiftUp(dyColor, 5);
 
-<<<<<<< HEAD
-    RGBDImage source(*srcColor, *srcDepth);
-    RGBDImage target(*tgtColor, *tgtDepth);
-    shared_ptr<Image> source_xyz = GenerateImage(width, height, 3, 4, 0.0f, 1.0f, 0);
-    RGBDImage target_dx(*dxColor, *tgtDepth);
-    RGBDImage target_dy(*dyColor, *tgtDepth);
-
-    Matrix3d intrinsic = Matrix3d::Zero();
-    intrinsic(0, 0) = 0.5;
-    intrinsic(1, 1) = 0.65;
-    intrinsic(0, 2) = 0.75;
-    intrinsic(1, 2) = 0.35;
-    intrinsic(2, 2) = 0.9;
-
-    Matrix4d extrinsic = Matrix4d::Zero();
-    extrinsic(0, 0) = 1.0;
-    extrinsic(1, 1) = 1.0;
-    extrinsic(2, 2) = 1.0;
-    extrinsic(0, 3) = 1.0;
-
-    RGBDOdometryJacobianFromColorTerm jacobian_method;
-
-    OdometryOption option;
-    option.max_depth_diff_ = 0.978100725;
-
-    bool status = false;
-    Matrix4d output = Matrix4d::Zero();
-    tie(status, output) = DoSingleIteration(iter,
-                                            level,
-                                            source,
-                                            target,
-                                            *source_xyz,
-                                            target_dx,
-                                            target_dy,
-                                            intrinsic,
-                                            extrinsic,
-                                            jacobian_method,
-                                            option);
-
-    Print(output);
-=======
     // RGBDImage source(*srcColor, *srcDepth);
     // RGBDImage target(*tgtColor, *tgtDepth);
-    // shared_ptr<Image> source_xyz = GenerateImage(width, height, 3, 4, 0.0f, 1.0f, 0);;
+    // shared_ptr<Image> source_xyz = GenerateImage(width, height, 3, 4, 0.0f, 1.0f, 0);
     // RGBDImage target_dx(*dxColor, *tgtDepth);
     // RGBDImage target_dy(*dyColor, *tgtDepth);
 
@@ -926,7 +767,6 @@ TEST(Odometry, DISABLED_DoSingleIteration)
     //                                         option);
 
     // Print(output);
->>>>>>> expectEQ
 }
 
 // ----------------------------------------------------------------------------
