@@ -45,7 +45,7 @@ namespace unit_test
     const Eigen::Matrix<double, 6, 1> Zero6d = Eigen::Matrix<double, 6, 1>::Zero();
     const Eigen::Vector2i Zero2i = Eigen::Vector2i::Zero();
 
-    // Mechanism for reporting unit tests for which there is no implementation.
+    // Mechanism for reporting unit tests for which there is no implementation yet.
     void NotImplemented();
 
     // Equal test.
