@@ -64,7 +64,7 @@ void unit_test::ExpectEQ(const uint8_t* const v0,
 void unit_test::ExpectEQ(const vector<uint8_t>& v0, const vector<uint8_t>& v1)
 {
     EXPECT_EQ(v0.size(), v1.size());
-    ExpectEQ(&v0[0], &v1[0], v0.size());
+    ExpectEQ(v0.data(), v1.data(), v0.size());
 }
 
 // ----------------------------------------------------------------------------
@@ -84,7 +84,7 @@ void unit_test::ExpectEQ(const int* const v0,
 void unit_test::ExpectEQ(const vector<int>& v0, const vector<int>& v1)
 {
     EXPECT_EQ(v0.size(), v1.size());
-    ExpectEQ(&v0[0], &v1[0], v0.size());
+    ExpectEQ(v0.data(), v1.data(), v0.size());
 }
 
 // ----------------------------------------------------------------------------
@@ -104,7 +104,7 @@ void unit_test::ExpectEQ(const float* const v0,
 void unit_test::ExpectEQ(const vector<float>& v0, const vector<float>& v1)
 {
     EXPECT_EQ(v0.size(), v1.size());
-    ExpectEQ(&v0[0], &v1[0], v0.size());
+    ExpectEQ(v0.data(), v1.data(), v0.size());
 }
 
 // ----------------------------------------------------------------------------
@@ -124,5 +124,5 @@ void unit_test::ExpectEQ(const double* const v0,
 void unit_test::ExpectEQ(const vector<double>& v0, const vector<double>& v1)
 {
     EXPECT_EQ(v0.size(), v1.size());
-    ExpectEQ(&v0[0], &v1[0], v0.size());
+    ExpectEQ(v0.data(), v1.data(), v0.size());
 }
