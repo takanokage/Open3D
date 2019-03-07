@@ -7,27 +7,13 @@
 
 typedef unsigned int uint;
 
-// smallest power of two strictly greater than n
-template <uint N>
-struct pow2g { enum { value = (pow2g<(N >> 1)>::value) << 1 }; };
-template <>
-struct pow2g<0> { enum { value = 1 }; };
-
-// smallest power of two greater than or equal to n
-template <uint N> struct pow2ge {
-	enum {
-        value = (pow2g<(N >> 1)>::value == N) ? N : ((pow2g<(N >> 1)>::value) << 1)
-    };
-};
-template <> struct pow2ge<0> { enum { value = 1 }; };
-
 namespace open3d
 {
     // 2D tensor, row major
     template<typename T, uint ROWS, uint COLS>
     struct Matrix
     {
-        typedef struct alignas(pow2ge<ROWS * COLS * sizeof(T)>::value) _Type
+        typedef struct _Type
         {
             T s[ROWS][COLS];
 
@@ -77,7 +63,7 @@ namespace open3d
     template<typename T, uint COLS>
     struct Matrix<T, 1, COLS>
     {
-        typedef struct alignas(pow2ge<COLS * sizeof(T)>::value) _Type
+        typedef struct _Type
         {
             T s[COLS];
 
