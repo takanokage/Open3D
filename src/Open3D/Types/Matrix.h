@@ -123,9 +123,15 @@ namespace open3d
         } Type;
     };
 
-    // 2D tensor, row major, size 3
+    // 2D tensor, row major, size 3x3
     template<typename T>
     using Matrix3 = typename Matrix<T, 3, 3>::Type;
+    // 2D tensor, row major, size 4x4
+    template<typename T>
+    using Matrix4 = typename Matrix<T, 4, 4>::Type;
+    // 2D tensor, row major, size 6x6
+    template<typename T>
+    using Matrix6 = typename Matrix<T, 6, 6>::Type;
 
     // 1D tensor, row major, size 3
     template<typename T>
@@ -134,6 +140,14 @@ namespace open3d
     // 2D 3x3 tensor
     typedef Matrix3<double> Matrix3d;
     typedef Matrix3<float> Matrix3f;
+
+    // 2D 4x4 tensor
+    typedef Matrix4<double> Matrix4d;
+    typedef Matrix4<float> Matrix4f;
+
+    // 2D 6x6 tensor
+    typedef Matrix6<double> Matrix6d;
+    typedef Matrix6<float> Matrix6f;
 
     // 1D 1x3 tensor
     typedef Vector3<double> Vector3d;

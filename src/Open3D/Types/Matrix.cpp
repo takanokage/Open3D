@@ -548,6 +548,14 @@ open3d::Matrix<T, 1, COLS>::Type::operator /=(const T& t)
 template class open3d::Matrix<double, 3, 3>;
 // open3d::Matrix3f
 template class open3d::Matrix<float, 3, 3>;
+// open3d::Matrix4d
+template class open3d::Matrix<double, 4, 4>;
+// open3d::Matrix4f
+template class open3d::Matrix<float, 4, 4>;
+// open3d::Matrix6d
+template class open3d::Matrix<double, 6, 6>;
+// open3d::Matrix6f
+template class open3d::Matrix<float, 6, 6>;
 // open3d::Vector3d
 template class open3d::Matrix<double, 1, 3>;
 // open3d::Vector3f
