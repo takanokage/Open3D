@@ -15,44 +15,145 @@ struct Matrix {
         T s[ROWS][COLS];
 
         // subscript operator: readwrite
-        T* operator[](const uint& i);
+        T *operator[](const uint &i) {
+            // catch error in debug mode
+            assert(0 <= i && i < 3);
+
+            return (T *)&s[i];
+        }
         // subscript operator: readonly
-        const T* operator[](const uint& i) const;
+        const T *operator[](const uint &i) const {
+            // catch error in debug mode
+            assert(0 <= i && i < 3);
+
+            return (const T *const) & s[i];
+        }
 
         // casting operator: readwrite
-        explicit operator T* const();
+        explicit operator T *const() { return reinterpret_cast<T *>(s); }
         // casting operator: readonly
-        explicit operator const T* const();
+        explicit operator const T *const() {
+            return reinterpret_cast<const T *const>(s);
+        }
 
-        bool operator==(const _Type& m);
-        bool operator!=(const _Type& m);
-        bool operator<=(const _Type& m);
-        bool operator>=(const _Type& m);
+        bool operator==(const _Type &m) {
+            for (uint r = 0; r < ROWS; r++)
+                for (uint c = 0; c < COLS; c++)
+                    if ((*this)[r][c] != m[r][c]) return false;
+
+            return true;
+        }
+        bool operator!=(const _Type &m) { return !(*this == m); }
+        bool operator<=(const _Type &m) {
+            for (uint r = 0; r < ROWS; r++)
+                for (uint c = 0; c < COLS; c++)
+                    if ((*this)[r][c] > m[r][c]) return false;
+
+            return true;
+        }
+        bool operator>=(const _Type &m) {
+            for (uint r = 0; r < ROWS; r++)
+                if ((*this)[r] < m[r]) return false;
+
+            return true;
+        }
 
         // addition
-        _Type operator+(const _Type& v) const;
+        _Type operator+(const _Type &m) const {
+            Matrix<T, ROWS, COLS>::Type output;
+            for (uint r = 0; r < ROWS; r++)
+                for (uint c = 0; c < COLS; c++)
+                    output[r][c] = (*this)[r][c] + m[r][c];
+
+            return output;
+        }
         // subtraction
-        _Type operator-(const _Type& v) const;
+        _Type operator-(const _Type &m) const {
+            Matrix<T, ROWS, COLS>::Type output;
+            for (uint r = 0; r < ROWS; r++)
+                for (uint c = 0; c < COLS; c++)
+                    output[r][c] = (*this)[r][c] - m[r][c];
+
+            return output;
+        }
         // addition assignment
-        _Type& operator+=(const _Type& v);
+        _Type &operator+=(const _Type &m) {
+            for (uint r = 0; r < ROWS; r++)
+                for (uint c = 0; c < COLS; c++) (*this)[r][c] += m[r][c];
+
+            return *this;
+        }
         // subtraction assignment
-        _Type& operator-=(const _Type& v);
+        _Type &operator-=(const _Type &m) {
+            for (uint r = 0; r < ROWS; r++)
+                for (uint c = 0; c < COLS; c++) (*this)[r][c] -= m[r][c];
+
+            return *this;
+        }
         // addition
-        _Type operator+(const T& v) const;
+        _Type operator+(const T &t) const {
+            Matrix<T, ROWS, COLS>::Type output;
+            for (uint r = 0; r < ROWS; r++)
+                for (uint c = 0; c < COLS; c++)
+                    output[r][c] = (*this)[r][c] + t;
+
+            return output;
+        }
         // subtraction
-        _Type operator-(const T& v) const;
+        _Type operator-(const T &t) const {
+            Matrix<T, ROWS, COLS>::Type output;
+            for (uint r = 0; r < ROWS; r++)
+                for (uint c = 0; c < COLS; c++)
+                    output[r][c] = (*this)[r][c] - t;
+
+            return output;
+        }
         // multiply with scalar
-        _Type operator*(const T& v) const;
+        _Type operator*(const T &t) const {
+            Matrix<T, ROWS, COLS>::Type output;
+            for (uint r = 0; r < ROWS; r++)
+                for (uint c = 0; c < COLS; c++)
+                    output[r][c] = (*this)[r][c] * t;
+
+            return output;
+        }
         // divide by scalar
-        _Type operator/(const T& v) const;
+        _Type operator/(const T &t) const {
+            Matrix<T, ROWS, COLS>::Type output;
+            for (uint r = 0; r < ROWS; r++)
+                for (uint c = 0; c < COLS; c++)
+                    output[r][c] = (*this)[r][c] / t;
+
+            return output;
+        }
         // addition assignment
-        _Type& operator+=(const T& v);
+        _Type &operator+=(const T &t) {
+            for (uint r = 0; r < ROWS; r++)
+                for (uint c = 0; c < COLS; c++) (*this)[r][c] += t;
+
+            return *this;
+        }
         // subtraction assignment
-        _Type& operator-=(const T& v);
+        _Type &operator-=(const T &t) {
+            for (uint r = 0; r < ROWS; r++)
+                for (uint c = 0; c < COLS; c++) (*this)[r][c] -= t;
+
+            return *this;
+        }
         // multiplication assignment
-        _Type& operator*=(const T& v);
+        _Type &operator*=(const T &t) {
+            for (uint r = 0; r < ROWS; r++)
+                for (uint c = 0; c < COLS; c++) (*this)[r][c] *= t;
+
+            return *this;
+        }
         // division assignment
-        _Type& operator/=(const T& v);
+        _Type &operator/=(const T &t) {
+            for (uint r = 0; r < ROWS; r++)
+                for (uint c = 0; c < COLS; c++) (*this)[r][c] /= t;
+
+            return *this;
+        }
     } Type;
 };
 
@@ -63,44 +164,125 @@ struct Matrix<T, 1, COLS> {
         T s[COLS];
 
         // subscript operator: readwrite
-        T& operator[](const uint& i);
+        T &operator[](const uint &i) {
+            // catch error in debug mode
+            assert(0 <= i && i < 3);
+
+            return s[i];
+        }
         // subscript operator: readonly
-        const T& operator[](const uint& i) const;
+        const T &operator[](const uint &i) const {
+            // catch error in debug mode
+            assert(0 <= i && i < 3);
+
+            return s[i];
+        }
 
         // casting operator: readwrite
-        explicit operator T* const();
+        explicit operator T *const() { return reinterpret_cast<T *>(s); }
         // casting operator: readonly
-        explicit operator const T* const();
+        explicit operator const T *const() {
+            return reinterpret_cast<const T *const>(s);
+        }
 
-        bool operator==(const _Type& m);
-        bool operator!=(const _Type& m);
-        bool operator<=(const _Type& m);
-        bool operator>=(const _Type& m);
+        bool operator==(const _Type &v) {
+            for (uint c = 0; c < COLS; c++)
+                if ((*this)[c] != v[c]) return false;
+
+            return true;
+        }
+        bool operator!=(const _Type &v) { return !(*this == v); }
+        bool operator<=(const _Type &v) {
+            for (uint c = 0; c < COLS; c++)
+                if ((*this)[c] > v[c]) return false;
+
+            return true;
+        }
+        bool operator>=(const _Type &v) {
+            for (uint c = 0; c < COLS; c++)
+                if ((*this)[c] < v[c]) return false;
+
+            return true;
+        }
 
         // addition
-        _Type operator+(const _Type& v) const;
+        _Type operator+(const _Type &v) const {
+            Matrix<T, 1, COLS>::Type output;
+            for (uint c = 0; c < COLS; c++) output[c] = (*this)[c] + v[c];
+
+            return output;
+        }
         // subtraction
-        _Type operator-(const _Type& v) const;
+        _Type operator-(const _Type &v) const {
+            Matrix<T, 1, COLS>::Type output;
+            for (uint c = 0; c < COLS; c++) output[c] = (*this)[c] - v[c];
+
+            return output;
+        }
         // addition assignment
-        _Type& operator+=(const _Type& v);
+        _Type &operator+=(const _Type &v) {
+            for (uint c = 0; c < COLS; c++) (*this)[c] += v[c];
+
+            return *this;
+        }
         // subtraction assignment
-        _Type& operator-=(const _Type& v);
+        _Type &operator-=(const _Type &v) {
+            for (uint c = 0; c < COLS; c++) (*this)[c] -= v[c];
+
+            return *this;
+        }
         // addition
-        _Type operator+(const T& v) const;
+        _Type operator+(const T &t) const {
+            Matrix<T, 1, COLS>::Type output;
+            for (uint c = 0; c < COLS; c++) output[c] = (*this)[c] + t;
+
+            return output;
+        }
         // subtraction
-        _Type operator-(const T& v) const;
+        _Type operator-(const T &t) const {
+            Matrix<T, 1, COLS>::Type output;
+            for (uint c = 0; c < COLS; c++) output[c] = (*this)[c] - t;
+
+            return output;
+        }
         // multiply with scalar
-        _Type operator*(const T& v) const;
+        _Type operator*(const T &t) const {
+            Matrix<T, 1, COLS>::Type output;
+            for (uint c = 0; c < COLS; c++) output[c] = (*this)[c] * t;
+
+            return output;
+        }
         // divide by scalar
-        _Type operator/(const T& v) const;
+        _Type operator/(const T &t) const {
+            Matrix<T, 1, COLS>::Type output;
+            for (uint c = 0; c < COLS; c++) output[c] = (*this)[c] / t;
+
+            return output;
+        }
         // addition assignment
-        _Type& operator+=(const T& v);
+        _Type &operator+=(const T &t) {
+            for (uint c = 0; c < COLS; c++) (*this)[c] += t;
+
+            return *this;
+        }
         // subtraction assignment
-        _Type& operator-=(const T& v);
+        _Type &operator-=(const T &t) {
+            for (uint c = 0; c < COLS; c++) (*this)[c] -= t;
+
+            return *this;
+        }
         // multiplication assignment
-        _Type& operator*=(const T& v);
+        _Type &operator*=(const T &t) {
+            for (uint c = 0; c < COLS; c++) (*this)[c] *= t;
+
+            return *this;
+        }
         // division assignment
-        _Type& operator/=(const T& v);
+        _Type &operator/=(const T &t) {
+            for (uint c = 0; c < COLS; c++) (*this)[c] /= t;
+
+            return *this;
+        }
     } Type;
 };
 
