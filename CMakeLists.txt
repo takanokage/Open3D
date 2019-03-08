@@ -6,6 +6,7 @@ cmake_minimum_required(VERSION 3.0.0)
 
 if (NOT CMAKE_VERSION VERSION_LESS "3.1")
     cmake_policy(SET CMP0054 NEW)
+    cmake_policy(SET CMP0072 NEW)
 endif()
 
 # central location for specifying the Open3D version
