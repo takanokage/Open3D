@@ -184,7 +184,7 @@ if (WITH_CUDA)
     if (CUDA_FOUND)
         message(STATUS "Using installed CUDA ${CUDA_VERSION}")
     else ()
-        message(FATAL_ERROR "Unable to find CUDA installed in the system")
+        message(STATUS "CUDA not found - skipping.")
     endif ()
 endif ()
 
