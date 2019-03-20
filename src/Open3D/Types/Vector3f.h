@@ -1,52 +1,54 @@
+// ----------------------------------------------------------------------------
+// -                        Open3D: www.open3d.org                            -
+// ----------------------------------------------------------------------------
+// The MIT License (MIT)
+//
+// Copyright (c) 2018 www.open3d.org
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+// IN THE SOFTWARE.
+// ----------------------------------------------------------------------------
+
 #pragma once
 
-typedef unsigned int uint;
+#include "setup.h"
 
 namespace open3d {
 // 1D tensor, row major
 typedef struct _Vector3f {
+    static const uint ROWS = 1;
     static const uint COLS = 3;
+    static const uint SIZE = ROWS * COLS;
 
-    float s[COLS];
+    float s[ROWS][COLS];
 
-    // subscript operator: readwrite
-    float &operator[](const uint &i);
-    // subscript operator: readonly
-    const float &operator[](const uint &i) const;
+    OPEN3D_FUNC_DECL inline
+    float &operator[](const uint &i) {
+        assert(i < COLS);
 
-    // casting operator: readwrite
-    explicit operator float *const();
-    // casting operator: readonly
-    explicit operator const float *const();
+        return s[0][i];
+    }
 
-    bool operator==(const _Vector3f &m);
-    bool operator!=(const _Vector3f &m);
-    bool operator<=(const _Vector3f &m);
-    bool operator>=(const _Vector3f &m);
+    OPEN3D_FUNC_DECL inline
+    const float &operator[](const uint &i) const {
+        assert(i < COLS);
 
-    // addition
-    _Vector3f operator+(const _Vector3f &v) const;
-    // subtraction
-    _Vector3f operator-(const _Vector3f &v) const;
-    // addition assignment
-    _Vector3f &operator+=(const _Vector3f &v);
-    // subtraction assignment
-    _Vector3f &operator-=(const _Vector3f &v);
-    // addition
-    _Vector3f operator+(const float &t) const;
-    // subtraction
-    _Vector3f operator-(const float &t) const;
-    // multiply with scalar
-    _Vector3f operator*(const float &t) const;
-    // divide by scalar
-    _Vector3f operator/(const float &t) const;
-    // addition assignment
-    _Vector3f &operator+=(const float &t);
-    // subtraction assignment
-    _Vector3f &operator-=(const float &t);
-    // multiplication assignment
-    _Vector3f &operator*=(const float &t);
-    // division assignment
-    _Vector3f &operator/=(const float &t);
+        return s[0][i];
+    }
 } Vector3f;
 }  // namespace open3d

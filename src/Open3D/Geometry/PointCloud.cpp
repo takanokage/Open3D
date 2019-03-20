@@ -30,6 +30,14 @@
 #include <Open3D/Utility/Console.h>
 #include <Open3D/Geometry/KDTreeFlann.h>
 
+#include <iostream>
+#include <iomanip>
+using namespace std;
+
+#ifdef OPEN3D_USE_CUDA
+#include "Open3D/Utility/CUDA.cuh"
+#endif
+
 namespace open3d {
 namespace geometry {
 
@@ -155,11 +163,29 @@ std::vector<double> ComputePointCloudToPointCloudDistance(
 }
 
 std::tuple<Eigen::Vector3d, Eigen::Matrix3d> ComputePointCloudMeanAndCovariance(
-        const PointCloud &input) {
-    if (input.IsEmpty()) {
-        return std::make_tuple(Eigen::Vector3d::Zero(),
-                               Eigen::Matrix3d::Identity());
-    }
+        PointCloud &input) {
+    Eigen::Vector3d mean = Eigen::Vector3d::Zero();
+    Eigen::Matrix3d covariance = Eigen::Matrix3d::Identity();
+
+    if (input.IsEmpty()) return std::make_tuple(mean, covariance);
+
+#ifdef OPEN3D_USE_CUDA
+    if (0 <= input.cuda_device_id)
+        return ComputePointCloudMeanAndCovarianceCUDA(input);
+    else
+        return ComputePointCloudMeanAndCovarianceCPU(input);
+#else
+    return ComputePointCloudMeanAndCovarianceCPU(input);
+#endif
+}
+
+std::tuple<Eigen::Vector3d, Eigen::Matrix3d>
+ComputePointCloudMeanAndCovarianceCPU(const PointCloud &input) {
+    Eigen::Vector3d mean = Eigen::Vector3d::Zero();
+    Eigen::Matrix3d covariance = Eigen::Matrix3d::Identity();
+
+    if (input.IsEmpty()) return std::make_tuple(mean, covariance);
+
     Eigen::Matrix<double, 9, 1> cumulants;
     cumulants.setZero();
     for (const auto &point : input.points_) {
@@ -173,12 +199,13 @@ std::tuple<Eigen::Vector3d, Eigen::Matrix3d> ComputePointCloudMeanAndCovariance(
         cumulants(7) += point(1) * point(2);
         cumulants(8) += point(2) * point(2);
     }
+
     cumulants /= (double)input.points_.size();
-    Eigen::Vector3d mean;
-    Eigen::Matrix3d covariance;
+
     mean(0) = cumulants(0);
     mean(1) = cumulants(1);
     mean(2) = cumulants(2);
+
     covariance(0, 0) = cumulants(3) - cumulants(0) * cumulants(0);
     covariance(1, 1) = cumulants(6) - cumulants(1) * cumulants(1);
     covariance(2, 2) = cumulants(8) - cumulants(2) * cumulants(2);
@@ -188,11 +215,11 @@ std::tuple<Eigen::Vector3d, Eigen::Matrix3d> ComputePointCloudMeanAndCovariance(
     covariance(2, 0) = covariance(0, 2);
     covariance(1, 2) = cumulants(7) - cumulants(1) * cumulants(2);
     covariance(2, 1) = covariance(1, 2);
+
     return std::make_tuple(mean, covariance);
 }
 
-std::vector<double> ComputePointCloudMahalanobisDistance(
-        const PointCloud &input) {
+std::vector<double> ComputePointCloudMahalanobisDistance(PointCloud &input) {
     std::vector<double> mahalanobis(input.points_.size());
     Eigen::Vector3d mean;
     Eigen::Matrix3d covariance;
@@ -229,6 +256,73 @@ std::vector<double> ComputePointCloudNearestNeighborDistance(
     }
     return nn_dis;
 }
+
+#ifdef OPEN3D_USE_CUDA
+
+std::tuple<Eigen::Vector3d, Eigen::Matrix3d>
+ComputePointCloudMeanAndCovarianceCUDA(PointCloud &input) {
+    input.UpdateDevicePoints();
+    auto output = meanAndCovarianceCUDA(input.cuda_device_id, input.d_points_,
+                                        input.points_.size());
+
+    Vec3d meanCUDA = get<0>(output);
+    Mat3d covarianceCUDA = get<1>(output);
+
+    Eigen::Vector3d mean;
+    Eigen::Matrix3d covariance;
+
+    memcpy(&mean, &meanCUDA, Vec3d::Size * sizeof(double));
+    memcpy(&covariance, &covarianceCUDA, Mat3d::Size * sizeof(double));
+
+    return std::make_tuple(mean, covariance);
+}
+
+// update the memory assigned to d_points_
+bool PointCloud::UpdateDevicePoints() {
+    size_t size = points_.size() * open3d::Vec3d::Size;
+    return UpdateDeviceMemory(&d_points_, (const double *const)points_.data(),
+                              size, cuda_device_id);
+}
+
+// update the memory assigned to d_normals_
+bool PointCloud::UpdateDeviceNormals() {
+    size_t size = normals_.size() * open3d::Vec3d::Size;
+    return UpdateDeviceMemory(&d_normals_, (const double *const)normals_.data(),
+                              size, cuda_device_id);
+}
+
+// update the memory assigned to d_colors_
+bool PointCloud::UpdateDeviceColors() {
+    size_t size = colors_.size() * open3d::Vec3d::Size;
+    return UpdateDeviceMemory(&d_colors_, (const double *const)colors_.data(),
+                              size, cuda_device_id);
+}
+
+// perform cleanup
+bool PointCloud::ReleaseDeviceMemory(double **d_data) {
+    if (*d_data == NULL) return true;
+
+    if (cudaSuccess != cudaFree(*d_data)) return false;
+
+    *d_data = NULL;
+}
+
+// release the memory asigned to d_points_
+bool PointCloud::ReleaseDevicePoints() {
+    return ReleaseDeviceMemory(&d_points_);
+}
+
+// release the memory asigned to d_normals_
+bool PointCloud::ReleaseDeviceNormals() {
+    return ReleaseDeviceMemory(&d_normals_);
+}
+
+// release the memory asigned to d_colors_
+bool PointCloud::ReleaseDeviceColors() {
+    return ReleaseDeviceMemory(&d_colors_);
+}
+
+#endif  // OPEN3D_USE_CUDA
 
 }  // namespace geometry
 }  // namespace open3d

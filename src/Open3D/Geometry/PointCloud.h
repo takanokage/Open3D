@@ -28,10 +28,13 @@
 
 #include <tuple>
 #include <vector>
+#include <tuple>
 #include <memory>
 #include <Eigen/Core>
 #include <Open3D/Geometry/Geometry3D.h>
 #include <Open3D/Geometry/KDTreeSearchParam.h>
+// #include "Open3D/Types/Matrix3d.h"
+#include "Open3D/Types/Mat.h"
 
 namespace open3d {
 
@@ -88,6 +91,34 @@ public:
     std::vector<Eigen::Vector3d> points_;
     std::vector<Eigen::Vector3d> normals_;
     std::vector<Eigen::Vector3d> colors_;
+
+#ifdef OPEN3D_USE_CUDA
+
+public:  // cuda device pointers
+    double *d_points_{};
+    double *d_normals_{};
+    double *d_colors_{};
+    // set to -1 to execute on the CPU
+    // a non zero value must point to a valid device
+    int cuda_device_id = 0;
+
+public:
+    // update the memory assigned to d_points_
+    bool UpdateDevicePoints();
+    // update the memory assigned to d_normals_
+    bool UpdateDeviceNormals();
+    // update the memory assigned to d_colors_
+    bool UpdateDeviceColors();
+    // perform cleanup
+    bool ReleaseDeviceMemory(double **d_data);
+    // release the memory asigned to d_points_
+    bool ReleaseDevicePoints();
+    // release the memory asigned to d_normals_
+    bool ReleaseDeviceNormals();
+    // release the memory asigned to d_colors_
+    bool ReleaseDeviceColors();
+
+#endif // OPEN3D_USE_CUDA
 };
 
 /// Factory function to create a pointcloud from a depth image and a camera
@@ -198,18 +229,40 @@ std::vector<double> ComputePointCloudToPointCloudDistance(
 /// Function to compute the mean and covariance matrix
 /// of an \param input point cloud
 std::tuple<Eigen::Vector3d, Eigen::Matrix3d> ComputePointCloudMeanAndCovariance(
-        const PointCloud &input);
+        PointCloud &input);
+
+/// Function to compute the mean and covariance matrix
+/// of an \param input point cloud
+std::tuple<Eigen::Vector3d, Eigen::Matrix3d>
+ComputePointCloudMeanAndCovarianceCPU(const PointCloud &input);
 
 /// Function to compute the Mahalanobis distance for points
 /// in an \param input point cloud
 /// https://en.wikipedia.org/wiki/Mahalanobis_distance
 std::vector<double> ComputePointCloudMahalanobisDistance(
-        const PointCloud &input);
+        PointCloud &input);
 
 /// Function to compute the distance from a point to its nearest neighbor in the
 /// \param input point cloud
 std::vector<double> ComputePointCloudNearestNeighborDistance(
         const PointCloud &input);
 
+#ifdef OPEN3D_USE_CUDA
+
+/// Function to compute the mean and covariance matrix
+/// of an \param input point cloud
+std::tuple<Eigen::Vector3d, Eigen::Matrix3d>
+ComputePointCloudMeanAndCovarianceCUDA(PointCloud &input);
+
+#endif // OPEN3D_USE_CUDA
+
 }  // namespace geometry
 }  // namespace open3d
+
+#ifdef OPEN3D_USE_CUDA
+
+// compute mean and covariance on the GPU using CUDA
+std::tuple<open3d::Vec3d, open3d::Mat3d> meanAndCovarianceCUDA(
+        const int& devID, double *const d_points, const int &nrPoints);
+
+#endif // OPEN3D_USE_CUDA

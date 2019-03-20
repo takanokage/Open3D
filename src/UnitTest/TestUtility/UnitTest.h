@@ -26,6 +26,12 @@
 
 #pragma once
 
+// TEST_DATA_DIR defined in CMakeLists.txt
+// Put it here to avoid editor warnings
+#ifndef TEST_DATA_DIR
+#define TEST_DATA_DIR
+#endif
+
 #include <gtest/gtest.h>
 #include <Eigen/Core>
 #include <vector>
@@ -36,7 +42,7 @@
 
 namespace unit_test {
 // thresholds for comparing floating point values
-const double THRESHOLD_1E_6 = 1e-6;
+const double THRESHOLD = 1e-6;
 
 // Eigen Zero()
 const Eigen::Vector2d Zero2d = Eigen::Vector2d::Zero();
@@ -53,7 +59,7 @@ void ExpectEQ(const Eigen::Matrix<T, M, N, A>& v0,
               const Eigen::Matrix<T, M, N, A>& v1) {
     EXPECT_EQ(v0.size(), v1.size());
     for (int i = 0; i < v0.size(); i++)
-        EXPECT_NEAR(v0.coeff(i), v1.coeff(i), THRESHOLD_1E_6);
+        EXPECT_NEAR(v0.coeff(i), v1.coeff(i), THRESHOLD);
 }
 template <class T, int M, int N, int A>
 void ExpectEQ(const std::vector<Eigen::Matrix<T, M, N, A>>& v0,
