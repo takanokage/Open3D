@@ -33,7 +33,6 @@
 #include <Eigen/Core>
 #include <Open3D/Geometry/Geometry3D.h>
 #include <Open3D/Geometry/KDTreeSearchParam.h>
-// #include "Open3D/Types/Matrix3d.h"
 #include "Open3D/Types/Mat.h"
 
 namespace open3d {
@@ -55,8 +54,8 @@ public:
 public:
     void Clear() override;
     bool IsEmpty() const override;
-    Eigen::Vector3d GetMinBound() const override;
-    Eigen::Vector3d GetMaxBound() const override;
+    Vec3d GetMinBound() const override;
+    Vec3d GetMaxBound() const override;
     void Transform(const Eigen::Matrix4d &transformation) override;
 
 public:
@@ -80,7 +79,7 @@ public:
         }
     }
 
-    void PaintUniformColor(const Eigen::Vector3d &color) {
+    void PaintUniformColor(const Vec3d &color) {
         colors_.resize(points_.size());
         for (size_t i = 0; i < points_.size(); i++) {
             colors_[i] = color;
@@ -88,9 +87,9 @@ public:
     }
 
 public:
-    std::vector<Eigen::Vector3d> points_;
-    std::vector<Eigen::Vector3d> normals_;
-    std::vector<Eigen::Vector3d> colors_;
+    std::vector<Vec3d> points_;
+    std::vector<Vec3d> normals_;
+    std::vector<Vec3d> colors_;
 
 #ifdef OPEN3D_USE_CUDA
 
@@ -118,7 +117,7 @@ public:
     // release the memory asigned to d_colors_
     bool ReleaseDeviceColors();
 
-#endif // OPEN3D_USE_CUDA
+#endif  // OPEN3D_USE_CUDA
 };
 
 /// Factory function to create a pointcloud from a depth image and a camera
@@ -163,8 +162,8 @@ std::shared_ptr<PointCloud> VoxelDownSample(const PointCloud &input,
 std::tuple<std::shared_ptr<PointCloud>, Eigen::MatrixXi>
 VoxelDownSampleAndTrace(const PointCloud &input,
                         double voxel_size,
-                        const Eigen::Vector3d &min_bound,
-                        const Eigen::Vector3d &max_bound,
+                        const Vec3d &min_bound,
+                        const Vec3d &max_bound,
                         bool approximate_class = false);
 
 /// Function to downsample \param input pointcloud into output pointcloud
@@ -176,8 +175,8 @@ std::shared_ptr<PointCloud> UniformDownSample(const PointCloud &input,
 /// All points with coordinates less than \param min_bound or larger than
 /// \param max_bound are clipped.
 std::shared_ptr<PointCloud> CropPointCloud(const PointCloud &input,
-                                           const Eigen::Vector3d &min_bound,
-                                           const Eigen::Vector3d &max_bound);
+                                           const Vec3d &min_bound,
+                                           const Vec3d &max_bound);
 
 /// Function to remove points that have less than \param nb_points in a sphere
 /// of radius \param search_radius
@@ -207,16 +206,13 @@ bool EstimateNormals(
 /// Normals are oriented with respect to \param orientation_reference
 bool OrientNormalsToAlignWithDirection(
         PointCloud &cloud,
-        const Eigen::Vector3d &orientation_reference = Eigen::Vector3d(0.0,
-                                                                       0.0,
-                                                                       1.0));
+        const Vec3d &orientation_reference = Vec3d{0.0, 0.0, 1.0});
 
 /// Function to orient the normals of a point cloud
 /// \param cloud is the input point cloud. It also stores the output normals.
 /// Normals are oriented with towards \param camera_location
 bool OrientNormalsTowardsCameraLocation(
-        PointCloud &cloud,
-        const Eigen::Vector3d &camera_location = Eigen::Vector3d::Zero());
+        PointCloud &cloud, const Vec3d &camera_location = Vec3d{});
 
 /// Function to compute the point to point distances between point clouds
 /// \param source is the first point cloud.
@@ -228,19 +224,17 @@ std::vector<double> ComputePointCloudToPointCloudDistance(
 
 /// Function to compute the mean and covariance matrix
 /// of an \param input point cloud
-std::tuple<Eigen::Vector3d, Eigen::Matrix3d> ComputePointCloudMeanAndCovariance(
-        PointCloud &input);
+std::tuple<Vec3d, Mat3d> ComputePointCloudMeanAndCovariance(PointCloud &input);
 
 /// Function to compute the mean and covariance matrix
 /// of an \param input point cloud
-std::tuple<Eigen::Vector3d, Eigen::Matrix3d>
-ComputePointCloudMeanAndCovarianceCPU(const PointCloud &input);
+std::tuple<Vec3d, Mat3d> ComputePointCloudMeanAndCovarianceCPU(
+        const PointCloud &input);
 
 /// Function to compute the Mahalanobis distance for points
 /// in an \param input point cloud
 /// https://en.wikipedia.org/wiki/Mahalanobis_distance
-std::vector<double> ComputePointCloudMahalanobisDistance(
-        PointCloud &input);
+std::vector<double> ComputePointCloudMahalanobisDistance(PointCloud &input);
 
 /// Function to compute the distance from a point to its nearest neighbor in the
 /// \param input point cloud
@@ -251,10 +245,10 @@ std::vector<double> ComputePointCloudNearestNeighborDistance(
 
 /// Function to compute the mean and covariance matrix
 /// of an \param input point cloud
-std::tuple<Eigen::Vector3d, Eigen::Matrix3d>
-ComputePointCloudMeanAndCovarianceCUDA(PointCloud &input);
+std::tuple<Vec3d, Mat3d> ComputePointCloudMeanAndCovarianceCUDA(
+        PointCloud &input);
 
-#endif // OPEN3D_USE_CUDA
+#endif  // OPEN3D_USE_CUDA
 
 }  // namespace geometry
 }  // namespace open3d
@@ -263,6 +257,6 @@ ComputePointCloudMeanAndCovarianceCUDA(PointCloud &input);
 
 // compute mean and covariance on the GPU using CUDA
 std::tuple<open3d::Vec3d, open3d::Mat3d> meanAndCovarianceCUDA(
-        const int& devID, double *const d_points, const int &nrPoints);
+        const int &devID, double *const d_points, const int &nrPoints);
 
-#endif // OPEN3D_USE_CUDA
+#endif  // OPEN3D_USE_CUDA

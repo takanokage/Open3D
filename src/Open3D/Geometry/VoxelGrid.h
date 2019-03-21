@@ -45,8 +45,8 @@ public:
 public:
     void Clear() override;
     bool IsEmpty() const override;
-    Eigen::Vector3d GetMinBound() const override;
-    Eigen::Vector3d GetMaxBound() const override;
+    Vec3d GetMinBound() const override;
+    Vec3d GetMaxBound() const override;
     void Transform(const Eigen::Matrix4d &transformation) override;
 
 public:
@@ -62,9 +62,9 @@ public:
 
 public:
     double voxel_size_;
-    Eigen::Vector3d origin_;
+    Vec3d origin_;
     std::vector<Eigen::Vector3i> voxels_;
-    std::vector<Eigen::Vector3d> colors_;
+    std::vector<Vec3d> colors_;
 };
 
 std::shared_ptr<VoxelGrid> CreateSurfaceVoxelGridFromPointCloud(

@@ -56,6 +56,7 @@ struct Vec {
             return s[i];
         }
         OPEN3D_FUNC_DECL inline bool operator==(const _Type &v) {
+            #pragma unroll
             for (uint c = 0; c < COLS; c++)
                 if (s[c] != v[c]) return false;
 
@@ -65,20 +66,37 @@ struct Vec {
             return !(*this == v);
         }
         OPEN3D_FUNC_DECL inline bool operator<=(const _Type &v) {
+            #pragma unroll
             for (uint c = 0; c < COLS; c++)
                 if (s[c] > v[c]) return false;
 
             return true;
         }
         OPEN3D_FUNC_DECL inline bool operator>=(const _Type &v) {
+            #pragma unroll
             for (uint c = 0; c < COLS; c++)
                 if (s[c] < v[c]) return false;
+
+            return true;
+        }
+        OPEN3D_FUNC_DECL inline bool operator<(const _Type &v) {
+            #pragma unroll
+            for (uint c = 0; c < COLS; c++)
+                if (s[c] < v[c]) return false;
+
+            return true;
+        }
+        OPEN3D_FUNC_DECL inline bool operator>(const _Type &v) {
+            #pragma unroll
+            for (uint c = 0; c < COLS; c++)
+                if (s[c] > v[c]) return false;
 
             return true;
         }
         // addition
         OPEN3D_FUNC_DECL inline _Type operator+(const _Type &v) const {
             _Type output;
+            #pragma unroll
             for (uint c = 0; c < COLS; c++) output[c] = s[c] + v[c];
 
             return output;
@@ -86,18 +104,21 @@ struct Vec {
         // subtraction
         OPEN3D_FUNC_DECL inline _Type operator-(const _Type &v) const {
             _Type output;
+            #pragma unroll
             for (uint c = 0; c < COLS; c++) output[c] = s[c] - v[c];
 
             return output;
         }
         // addition assignment
         OPEN3D_FUNC_DECL inline _Type &operator+=(const _Type &v) {
+            #pragma unroll
             for (uint c = 0; c < COLS; c++) s[c] += v[c];
 
             return *this;
         }
         // subtraction assignment
         OPEN3D_FUNC_DECL inline _Type &operator-=(const _Type &v) {
+            #pragma unroll
             for (uint c = 0; c < COLS; c++) s[c] -= v[c];
 
             return *this;
@@ -105,6 +126,7 @@ struct Vec {
         // addition
         OPEN3D_FUNC_DECL inline _Type operator+(const T &t) const {
             _Type output;
+            #pragma unroll
             for (uint c = 0; c < COLS; c++) output[c] = s[c] + t;
 
             return output;
@@ -112,6 +134,7 @@ struct Vec {
         // subtraction
         OPEN3D_FUNC_DECL inline _Type operator-(const T &t) const {
             _Type output;
+            #pragma unroll
             for (uint c = 0; c < COLS; c++) output[c] = s[c] - t;
 
             return output;
@@ -119,6 +142,7 @@ struct Vec {
         // multiply with scalar
         OPEN3D_FUNC_DECL inline _Type operator*(const T &t) const {
             _Type output;
+            #pragma unroll
             for (uint c = 0; c < COLS; c++) output[c] = s[c] * t;
 
             return output;
@@ -126,34 +150,63 @@ struct Vec {
         // divide by scalar
         OPEN3D_FUNC_DECL inline _Type operator/(const T &t) const {
             _Type output;
+            #pragma unroll
             for (uint c = 0; c < COLS; c++) output[c] = s[c] / t;
 
             return output;
         }
         // addition assignment
         OPEN3D_FUNC_DECL inline _Type &operator+=(const T &t) {
+            #pragma unroll
             for (uint c = 0; c < COLS; c++) s[c] += t;
 
             return *this;
         }
         // subtraction assignment
         OPEN3D_FUNC_DECL inline _Type &operator-=(const T &t) {
+            #pragma unroll
             for (uint c = 0; c < COLS; c++) s[c] -= t;
 
             return *this;
         }
         // multiplication assignment
         OPEN3D_FUNC_DECL inline _Type &operator*=(const T &t) {
+            #pragma unroll
             for (uint c = 0; c < COLS; c++) s[c] *= t;
 
             return *this;
         }
         // division assignment
         OPEN3D_FUNC_DECL inline _Type &operator/=(const T &t) {
+            #pragma unroll
             for (uint c = 0; c < COLS; c++) s[c] /= t;
 
             return *this;
         }
+        OPEN3D_FUNC_DECL inline T squaredNorm() const {
+            T output = (T)0;
+            #pragma unroll
+            for (uint c = 0; c < COLS; c++) output += s[c] * s[c];
+
+            return output;
+        }
+        OPEN3D_FUNC_DECL inline void normalize() {
+            T norm = sqrt(squaredNorm());
+            #pragma unroll
+            for (uint c = 0; c < COLS; c++) s[c] /= norm;
+        }
+        OPEN3D_FUNC_DECL inline _Type cross(const _Type& v) const {
+            static_assert(1 == Rows, "must be a 1x3 vector");
+            static_assert(3 == COLS, "must be a 1x3 vector");
+
+            _Type output{};
+            output[0] = s[1] * v.s[2] - s[2] * v.s[1];
+            output[1] = s[2] * v.s[0] - s[0] * v.s[2];
+            output[2] = s[0] * v.s[1] - s[1] * v.s[0];
+
+            return output;
+        }
+
     } Type;
 };
 
@@ -196,23 +249,47 @@ struct Mat {
             return !(*this == m);
         }
         OPEN3D_FUNC_DECL inline bool operator<=(const _Type &m) {
+            #pragma unroll
             for (uint r = 0; r < ROWS; r++)
+                #pragma unroll
                 for (uint c = 0; c < COLS; c++)
                     if (s[r][c] > m.s[r][c]) return false;
 
             return true;
         }
         OPEN3D_FUNC_DECL inline bool operator>=(const _Type &m) {
+            #pragma unroll
             for (uint r = 0; r < ROWS; r++)
+                #pragma unroll
                 for (uint c = 0; c < COLS; c++)
                     if (s[r][c] < m.s[r][c]) return false;
+
+            return true;
+        }
+        OPEN3D_FUNC_DECL inline bool operator<(const _Type &m) {
+            #pragma unroll
+            for (uint r = 0; r < ROWS; r++)
+                #pragma unroll
+                for (uint c = 0; c < COLS; c++)
+                    if (s[r][c] < m.s[r][c]) return false;
+
+            return true;
+        }
+        OPEN3D_FUNC_DECL inline bool operator>(const _Type &m) {
+            #pragma unroll
+            for (uint r = 0; r < ROWS; r++)
+                #pragma unroll
+                for (uint c = 0; c < COLS; c++)
+                    if (s[r][c] > m.s[r][c]) return false;
 
             return true;
         }
         // addition
         OPEN3D_FUNC_DECL inline _Type operator+(const _Type &m) const {
             _Type output;
+            #pragma unroll
             for (uint r = 0; r < ROWS; r++)
+                #pragma unroll
                 for (uint c = 0; c < COLS; c++)
                     output[r][c] = s[r][c] + m.s[r][c];
 
@@ -221,7 +298,9 @@ struct Mat {
         // subtraction
         OPEN3D_FUNC_DECL inline _Type operator-(const _Type &m) const {
             _Type output;
+            #pragma unroll
             for (uint r = 0; r < ROWS; r++)
+                #pragma unroll
                 for (uint c = 0; c < COLS; c++)
                     output[r][c] = s[r][c] - m.s[r][c];
 
@@ -229,14 +308,18 @@ struct Mat {
         }
         // addition assignment
         OPEN3D_FUNC_DECL inline _Type &operator+=(const _Type &m) {
+            #pragma unroll
             for (uint r = 0; r < ROWS; r++)
+                #pragma unroll
                 for (uint c = 0; c < COLS; c++) s[r][c] += m.s[r][c];
 
             return *this;
         }
         // subtraction assignment
         OPEN3D_FUNC_DECL inline _Type &operator-=(const _Type &m) {
+            #pragma unroll
             for (uint r = 0; r < ROWS; r++)
+                #pragma unroll
                 for (uint c = 0; c < COLS; c++) s[r][c] -= m.s[r][c];
 
             return *this;
@@ -244,7 +327,9 @@ struct Mat {
         // addition
         OPEN3D_FUNC_DECL inline _Type operator+(const T &t) const {
             _Type output;
+            #pragma unroll
             for (uint r = 0; r < ROWS; r++)
+                #pragma unroll
                 for (uint c = 0; c < COLS; c++) output[r][c] = s[r][c] + t;
 
             return output;
@@ -252,7 +337,9 @@ struct Mat {
         // subtraction
         OPEN3D_FUNC_DECL inline _Type operator-(const T &t) const {
             _Type output;
+            #pragma unroll
             for (uint r = 0; r < ROWS; r++)
+                #pragma unroll
                 for (uint c = 0; c < COLS; c++) output[r][c] = s[r][c] - t;
 
             return output;
@@ -260,7 +347,9 @@ struct Mat {
         // multiply with scalar
         OPEN3D_FUNC_DECL inline _Type operator*(const T &t) const {
             _Type output;
+            #pragma unroll
             for (uint r = 0; r < ROWS; r++)
+                #pragma unroll
                 for (uint c = 0; c < COLS; c++) output[r][c] = s[r][c] * t;
 
             return output;
@@ -268,35 +357,45 @@ struct Mat {
         // divide by scalar
         OPEN3D_FUNC_DECL inline _Type operator/(const T &t) const {
             _Type output;
+            #pragma unroll
             for (uint r = 0; r < ROWS; r++)
+                #pragma unroll
                 for (uint c = 0; c < COLS; c++) output[r][c] = s[r][c] / t;
 
             return output;
         }
         // addition assignment
         OPEN3D_FUNC_DECL inline _Type &operator+=(const T &t) {
+            #pragma unroll
             for (uint r = 0; r < ROWS; r++)
+                #pragma unroll
                 for (uint c = 0; c < COLS; c++) s[r][c] += t;
 
             return *this;
         }
         // subtraction assignment
         OPEN3D_FUNC_DECL inline _Type &operator-=(const T &t) {
+            #pragma unroll
             for (uint r = 0; r < ROWS; r++)
+                #pragma unroll
                 for (uint c = 0; c < COLS; c++) s[r][c] -= t;
 
             return *this;
         }
         // multiplication assignment
         OPEN3D_FUNC_DECL inline _Type &operator*=(const T &t) {
+            #pragma unroll
             for (uint r = 0; r < ROWS; r++)
+                #pragma unroll
                 for (uint c = 0; c < COLS; c++) s[r][c] *= t;
 
             return *this;
         }
         // division assignment
         OPEN3D_FUNC_DECL inline _Type &operator/=(const T &t) {
+            #pragma unroll
             for (uint r = 0; r < ROWS; r++)
+                #pragma unroll
                 for (uint c = 0; c < COLS; c++) s[r][c] /= t;
 
             return *this;
@@ -304,10 +403,27 @@ struct Mat {
     } Type;
 };
 
+// 1D tensor, row major
+template <typename T, uint COLS>
+using VecType = typename Vec<T, COLS>::Type;
+// 1D tensor, row major, size 2
+template <typename T>
+using Vec2 = typename Vec<T, 2>::Type;
+// 1D tensor, row major, size 3
+template <typename T>
+using Vec3 = typename Vec<T, 3>::Type;
+
+// 1D 1x2 tensor
+typedef Vec2<int> Vec2i;
+
+// 1D 1x3 tensor
+typedef Vec3<double> Vec3d;
+typedef Vec3<float> Vec3f;
+typedef Vec3<int> Vec3i;
+
 // 2D tensor, row major
 template <typename T, uint ROWS, uint COLS>
 using MatType = typename Mat<T, ROWS, COLS>::Type;
-
 // 2D tensor, row major, size 3x3
 template <typename T>
 using Mat3 = typename Mat<T, 3, 3>::Type;
@@ -317,14 +433,6 @@ using Mat4 = typename Mat<T, 4, 4>::Type;
 // 2D tensor, row major, size 6x6
 template <typename T>
 using Mat6 = typename Mat<T, 6, 6>::Type;
-
-// 1D tensor, row major, size 3
-template <typename T, uint COLS>
-using VecType = typename Vec<T, COLS>::Type;
-
-// 1D tensor, row major, size 3
-template <typename T>
-using Vec3 = typename Vec<T, 3>::Type;
 
 // 2D 3x3 tensor
 typedef Mat3<double> Mat3d;
@@ -337,9 +445,4 @@ typedef Mat4<float> Mat4f;
 // 2D 6x6 tensor
 typedef Mat6<double> Mat6d;
 typedef Mat6<float> Mat6f;
-
-// 1D 1x3 tensor
-typedef Vec3<double> Vec3d;
-typedef Vec3<float> Vec3f;
-typedef Vec3<int> Vec3i;
 }  // namespace open3d

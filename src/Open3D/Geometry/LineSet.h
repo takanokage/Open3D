@@ -44,8 +44,8 @@ public:
 public:
     void Clear() override;
     bool IsEmpty() const override;
-    Eigen::Vector3d GetMinBound() const override;
-    Eigen::Vector3d GetMaxBound() const override;
+    Vec3d GetMinBound() const override;
+    Vec3d GetMaxBound() const override;
     void Transform(const Eigen::Matrix4d &transformation) override;
 
 public:
@@ -61,15 +61,15 @@ public:
         return HasLines() && colors_.size() == lines_.size();
     }
 
-    std::pair<Eigen::Vector3d, Eigen::Vector3d> GetLineCoordinate(
+    std::pair<Vec3d, Vec3d> GetLineCoordinate(
             size_t i) const {
         return std::make_pair(points_[lines_[i][0]], points_[lines_[i][1]]);
     }
 
 public:
-    std::vector<Eigen::Vector3d> points_;
-    std::vector<Eigen::Vector2i> lines_;
-    std::vector<Eigen::Vector3d> colors_;
+    std::vector<Vec3d> points_;
+    std::vector<Vec2i> lines_;
+    std::vector<Vec3d> colors_;
 };
 
 /// Factory function to create a lineset from two pointclouds and a

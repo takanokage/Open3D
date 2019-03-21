@@ -31,59 +31,59 @@ namespace geometry {
 
 void VoxelGrid::Clear() {
     voxel_size_ = 0.0;
-    origin_ = Eigen::Vector3d::Zero();
+    origin_ = Vec3d{};
     voxels_.clear();
     colors_.clear();
 }
 
 bool VoxelGrid::IsEmpty() const { return !HasVoxels(); }
 
-Eigen::Vector3d VoxelGrid::GetMinBound() const {
+Vec3d VoxelGrid::GetMinBound() const {
     if (!HasVoxels()) {
-        return Eigen::Vector3d(0.0, 0.0, 0.0);
+        return Vec3d{};
     }
     auto itr_x = std::min_element(
             voxels_.begin(), voxels_.end(),
             [](const Eigen::Vector3i &a, const Eigen::Vector3i &b) {
-                return a(0) < b(0);
+                return a[0] < b[0];
             });
     auto itr_y = std::min_element(
             voxels_.begin(), voxels_.end(),
             [](const Eigen::Vector3i &a, const Eigen::Vector3i &b) {
-                return a(1) < b(1);
+                return a[1] < b[1];
             });
     auto itr_z = std::min_element(
             voxels_.begin(), voxels_.end(),
             [](const Eigen::Vector3i &a, const Eigen::Vector3i &b) {
-                return a(2) < b(2);
+                return a[2] < b[2];
             });
-    return Eigen::Vector3d((*itr_x)(0) * voxel_size_ + origin_(0),
-                           (*itr_y)(1) * voxel_size_ + origin_(1),
-                           (*itr_z)(2) * voxel_size_ + origin_(2));
+    return Vec3d{(*itr_x)[0] * voxel_size_ + origin_[0],
+                           (*itr_y)[1] * voxel_size_ + origin_[1],
+                           (*itr_z)[2] * voxel_size_ + origin_[2]};
 }
 
-Eigen::Vector3d VoxelGrid::GetMaxBound() const {
+Vec3d VoxelGrid::GetMaxBound() const {
     if (!HasVoxels()) {
-        return Eigen::Vector3d(0.0, 0.0, 0.0);
+        return Vec3d{};
     }
     auto itr_x = std::max_element(
             voxels_.begin(), voxels_.end(),
             [](const Eigen::Vector3i &a, const Eigen::Vector3i &b) {
-                return a(0) < b(0);
+                return a[0] < b[0];
             });
     auto itr_y = std::max_element(
             voxels_.begin(), voxels_.end(),
             [](const Eigen::Vector3i &a, const Eigen::Vector3i &b) {
-                return a(1) < b(1);
+                return a[1] < b[1];
             });
     auto itr_z = std::max_element(
             voxels_.begin(), voxels_.end(),
             [](const Eigen::Vector3i &a, const Eigen::Vector3i &b) {
-                return a(2) < b(2);
+                return a[2] < b[2];
             });
-    return Eigen::Vector3d((*itr_x)(0) * voxel_size_ + origin_(0),
-                           (*itr_y)(1) * voxel_size_ + origin_(1),
-                           (*itr_z)(2) * voxel_size_ + origin_(2));
+    return Vec3d{(*itr_x)[0] * voxel_size_ + origin_[0],
+                           (*itr_y)[1] * voxel_size_ + origin_[1],
+                           (*itr_z)[2] * voxel_size_ + origin_[2]};
 }
 
 void VoxelGrid::Transform(const Eigen::Matrix4d &transformation) {

@@ -34,26 +34,26 @@ std::shared_ptr<TriangleMesh> CreateMeshBox(double width /* = 1.0*/,
                                             double depth /* = 1.0*/) {
     auto mesh_ptr = std::make_shared<TriangleMesh>();
     mesh_ptr->vertices_.resize(8);
-    mesh_ptr->vertices_[0] = Eigen::Vector3d(0.0, 0.0, 0.0);
-    mesh_ptr->vertices_[1] = Eigen::Vector3d(width, 0.0, 0.0);
-    mesh_ptr->vertices_[2] = Eigen::Vector3d(0.0, 0.0, depth);
-    mesh_ptr->vertices_[3] = Eigen::Vector3d(width, 0.0, depth);
-    mesh_ptr->vertices_[4] = Eigen::Vector3d(0.0, height, 0.0);
-    mesh_ptr->vertices_[5] = Eigen::Vector3d(width, height, 0.0);
-    mesh_ptr->vertices_[6] = Eigen::Vector3d(0.0, height, depth);
-    mesh_ptr->vertices_[7] = Eigen::Vector3d(width, height, depth);
-    mesh_ptr->triangles_.push_back(Eigen::Vector3i(4, 7, 5));
-    mesh_ptr->triangles_.push_back(Eigen::Vector3i(4, 6, 7));
-    mesh_ptr->triangles_.push_back(Eigen::Vector3i(0, 2, 4));
-    mesh_ptr->triangles_.push_back(Eigen::Vector3i(2, 6, 4));
-    mesh_ptr->triangles_.push_back(Eigen::Vector3i(0, 1, 2));
-    mesh_ptr->triangles_.push_back(Eigen::Vector3i(1, 3, 2));
-    mesh_ptr->triangles_.push_back(Eigen::Vector3i(1, 5, 7));
-    mesh_ptr->triangles_.push_back(Eigen::Vector3i(1, 7, 3));
-    mesh_ptr->triangles_.push_back(Eigen::Vector3i(2, 3, 7));
-    mesh_ptr->triangles_.push_back(Eigen::Vector3i(2, 7, 6));
-    mesh_ptr->triangles_.push_back(Eigen::Vector3i(0, 4, 1));
-    mesh_ptr->triangles_.push_back(Eigen::Vector3i(1, 4, 5));
+    mesh_ptr->vertices_[0] = Vec3d{0.0, 0.0, 0.0};
+    mesh_ptr->vertices_[1] = Vec3d{width, 0.0, 0.0};
+    mesh_ptr->vertices_[2] = Vec3d{0.0, 0.0, depth};
+    mesh_ptr->vertices_[3] = Vec3d{width, 0.0, depth};
+    mesh_ptr->vertices_[4] = Vec3d{0.0, height, 0.0};
+    mesh_ptr->vertices_[5] = Vec3d{width, height, 0.0};
+    mesh_ptr->vertices_[6] = Vec3d{0.0, height, depth};
+    mesh_ptr->vertices_[7] = Vec3d{width, height, depth};
+    mesh_ptr->triangles_.push_back(Vec3i{4, 7, 5});
+    mesh_ptr->triangles_.push_back(Vec3i{4, 6, 7});
+    mesh_ptr->triangles_.push_back(Vec3i{0, 2, 4});
+    mesh_ptr->triangles_.push_back(Vec3i{2, 6, 4});
+    mesh_ptr->triangles_.push_back(Vec3i{0, 1, 2});
+    mesh_ptr->triangles_.push_back(Vec3i{1, 3, 2});
+    mesh_ptr->triangles_.push_back(Vec3i{1, 5, 7});
+    mesh_ptr->triangles_.push_back(Vec3i{1, 7, 3});
+    mesh_ptr->triangles_.push_back(Vec3i{2, 3, 7});
+    mesh_ptr->triangles_.push_back(Vec3i{2, 7, 6});
+    mesh_ptr->triangles_.push_back(Vec3i{0, 4, 1});
+    mesh_ptr->triangles_.push_back(Vec3i{1, 4, 5});
     return mesh_ptr;
 }
 
@@ -64,8 +64,8 @@ std::shared_ptr<TriangleMesh> CreateMeshSphere(double radius /* = 1.0*/,
         return mesh_ptr;
     }
     mesh_ptr->vertices_.resize(2 * resolution * (resolution - 1) + 2);
-    mesh_ptr->vertices_[0] = Eigen::Vector3d(0.0, 0.0, radius);
-    mesh_ptr->vertices_[1] = Eigen::Vector3d(0.0, 0.0, -radius);
+    mesh_ptr->vertices_[0] = Vec3d{0.0, 0.0, radius};
+    mesh_ptr->vertices_[1] = Vec3d{0.0, 0.0, -radius};
     double step = M_PI / (double)resolution;
     for (int i = 1; i < resolution; i++) {
         double alpha = step * i;
@@ -73,17 +73,17 @@ std::shared_ptr<TriangleMesh> CreateMeshSphere(double radius /* = 1.0*/,
         for (int j = 0; j < 2 * resolution; j++) {
             double theta = step * j;
             mesh_ptr->vertices_[base + j] =
-                    Eigen::Vector3d(sin(alpha) * cos(theta),
-                                    sin(alpha) * sin(theta), cos(alpha)) *
+                    Vec3d{sin(alpha) * cos(theta),
+                                    sin(alpha) * sin(theta), cos(alpha)} *
                     radius;
         }
     }
     for (int j = 0; j < 2 * resolution; j++) {
         int j1 = (j + 1) % (2 * resolution);
         int base = 2;
-        mesh_ptr->triangles_.push_back(Eigen::Vector3i(0, base + j, base + j1));
+        mesh_ptr->triangles_.push_back(Vec3i{0, base + j, base + j1});
         base = 2 + 2 * resolution * (resolution - 2);
-        mesh_ptr->triangles_.push_back(Eigen::Vector3i(1, base + j1, base + j));
+        mesh_ptr->triangles_.push_back(Vec3i{1, base + j1, base + j});
     }
     for (int i = 1; i < resolution - 1; i++) {
         int base1 = 2 + 2 * resolution * (i - 1);
@@ -91,9 +91,9 @@ std::shared_ptr<TriangleMesh> CreateMeshSphere(double radius /* = 1.0*/,
         for (int j = 0; j < 2 * resolution; j++) {
             int j1 = (j + 1) % (2 * resolution);
             mesh_ptr->triangles_.push_back(
-                    Eigen::Vector3i(base2 + j, base1 + j1, base1 + j));
+                    Vec3i{base2 + j, base1 + j1, base1 + j});
             mesh_ptr->triangles_.push_back(
-                    Eigen::Vector3i(base2 + j, base2 + j1, base1 + j1));
+                    Vec3i{base2 + j, base2 + j1, base1 + j1});
         }
     }
     return mesh_ptr;
@@ -108,24 +108,24 @@ std::shared_ptr<TriangleMesh> CreateMeshCylinder(double radius /* = 1.0*/,
         return mesh_ptr;
     }
     mesh_ptr->vertices_.resize(resolution * (split + 1) + 2);
-    mesh_ptr->vertices_[0] = Eigen::Vector3d(0.0, 0.0, height * 0.5);
-    mesh_ptr->vertices_[1] = Eigen::Vector3d(0.0, 0.0, -height * 0.5);
+    mesh_ptr->vertices_[0] = Vec3d{0.0, 0.0, height * 0.5};
+    mesh_ptr->vertices_[1] = Vec3d{0.0, 0.0, -height * 0.5};
     double step = M_PI * 2.0 / (double)resolution;
     double h_step = height / (double)split;
     for (int i = 0; i <= split; i++) {
         for (int j = 0; j < resolution; j++) {
             double theta = step * j;
             mesh_ptr->vertices_[2 + resolution * i + j] =
-                    Eigen::Vector3d(cos(theta) * radius, sin(theta) * radius,
-                                    height * 0.5 - h_step * i);
+                    Vec3d{cos(theta) * radius, sin(theta) * radius,
+                                    height * 0.5 - h_step * i};
         }
     }
     for (int j = 0; j < resolution; j++) {
         int j1 = (j + 1) % resolution;
         int base = 2;
-        mesh_ptr->triangles_.push_back(Eigen::Vector3i(0, base + j, base + j1));
+        mesh_ptr->triangles_.push_back(Vec3i{0, base + j, base + j1});
         base = 2 + resolution * split;
-        mesh_ptr->triangles_.push_back(Eigen::Vector3i(1, base + j1, base + j));
+        mesh_ptr->triangles_.push_back(Vec3i{1, base + j1, base + j});
     }
     for (int i = 0; i < split; i++) {
         int base1 = 2 + resolution * i;
@@ -133,9 +133,9 @@ std::shared_ptr<TriangleMesh> CreateMeshCylinder(double radius /* = 1.0*/,
         for (int j = 0; j < resolution; j++) {
             int j1 = (j + 1) % resolution;
             mesh_ptr->triangles_.push_back(
-                    Eigen::Vector3i(base2 + j, base1 + j1, base1 + j));
+                    Vec3i{base2 + j, base1 + j1, base1 + j});
             mesh_ptr->triangles_.push_back(
-                    Eigen::Vector3i(base2 + j, base2 + j1, base1 + j1));
+                    Vec3i{base2 + j, base2 + j1, base1 + j1});
         }
     }
     return mesh_ptr;
@@ -150,8 +150,8 @@ std::shared_ptr<TriangleMesh> CreateMeshCone(double radius /* = 1.0*/,
         return mesh_ptr;
     }
     mesh_ptr->vertices_.resize(resolution * split + 2);
-    mesh_ptr->vertices_[0] = Eigen::Vector3d(0.0, 0.0, 0.0);
-    mesh_ptr->vertices_[1] = Eigen::Vector3d(0.0, 0.0, height);
+    mesh_ptr->vertices_[0] = Vec3d{0.0, 0.0, 0.0};
+    mesh_ptr->vertices_[1] = Vec3d{0.0, 0.0, height};
     double step = M_PI * 2.0 / (double)resolution;
     double h_step = height / (double)split;
     double r_step = radius / (double)split;
@@ -161,15 +161,15 @@ std::shared_ptr<TriangleMesh> CreateMeshCone(double radius /* = 1.0*/,
         for (int j = 0; j < resolution; j++) {
             double theta = step * j;
             mesh_ptr->vertices_[base + j] =
-                    Eigen::Vector3d(cos(theta) * r, sin(theta) * r, h_step * i);
+                    Vec3d{cos(theta) * r, sin(theta) * r, h_step * i};
         }
     }
     for (int j = 0; j < resolution; j++) {
         int j1 = (j + 1) % resolution;
         int base = 2;
-        mesh_ptr->triangles_.push_back(Eigen::Vector3i(0, base + j1, base + j));
+        mesh_ptr->triangles_.push_back(Vec3i{0, base + j1, base + j});
         base = 2 + resolution * (split - 1);
-        mesh_ptr->triangles_.push_back(Eigen::Vector3i(1, base + j, base + j1));
+        mesh_ptr->triangles_.push_back(Vec3i{1, base + j, base + j1});
     }
     for (int i = 0; i < split - 1; i++) {
         int base1 = 2 + resolution * i;
@@ -177,9 +177,9 @@ std::shared_ptr<TriangleMesh> CreateMeshCone(double radius /* = 1.0*/,
         for (int j = 0; j < resolution; j++) {
             int j1 = (j + 1) % resolution;
             mesh_ptr->triangles_.push_back(
-                    Eigen::Vector3i(base2 + j1, base1 + j, base1 + j1));
+                    Vec3i{base2 + j1, base1 + j, base1 + j1});
             mesh_ptr->triangles_.push_back(
-                    Eigen::Vector3i(base2 + j1, base2 + j, base1 + j));
+                    Vec3i{base2 + j1, base2 + j, base1 + j});
         }
     }
     return mesh_ptr;
@@ -208,10 +208,10 @@ std::shared_ptr<TriangleMesh> CreateMeshArrow(double cylinder_radius /* = 1.0*/,
 
 std::shared_ptr<TriangleMesh> CreateMeshCoordinateFrame(
         double size /* = 1.0*/,
-        const Eigen::Vector3d &origin /* = Eigen::Vector3d(0.0, 0.0, 0.0)*/) {
+        const Vec3d &origin /* = Vec3d{}*/) {
     auto mesh_frame = CreateMeshSphere(0.06 * size);
     mesh_frame->ComputeVertexNormals();
-    mesh_frame->PaintUniformColor(Eigen::Vector3d(0.5, 0.5, 0.5));
+    mesh_frame->PaintUniformColor(Vec3d{0.5, 0.5, 0.5});
 
     std::shared_ptr<TriangleMesh> mesh_arrow;
     Eigen::Matrix4d transformation;
@@ -219,7 +219,7 @@ std::shared_ptr<TriangleMesh> CreateMeshCoordinateFrame(
     mesh_arrow =
             CreateMeshArrow(0.035 * size, 0.06 * size, 0.8 * size, 0.2 * size);
     mesh_arrow->ComputeVertexNormals();
-    mesh_arrow->PaintUniformColor(Eigen::Vector3d(1.0, 0.0, 0.0));
+    mesh_arrow->PaintUniformColor(Vec3d{1.0, 0.0, 0.0});
     transformation << 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1;
     mesh_arrow->Transform(transformation);
     *mesh_frame += *mesh_arrow;
@@ -227,7 +227,7 @@ std::shared_ptr<TriangleMesh> CreateMeshCoordinateFrame(
     mesh_arrow =
             CreateMeshArrow(0.035 * size, 0.06 * size, 0.8 * size, 0.2 * size);
     mesh_arrow->ComputeVertexNormals();
-    mesh_arrow->PaintUniformColor(Eigen::Vector3d(0.0, 1.0, 0.0));
+    mesh_arrow->PaintUniformColor(Vec3d{0.0, 1.0, 0.0});
     transformation << 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1;
     mesh_arrow->Transform(transformation);
     *mesh_frame += *mesh_arrow;
@@ -235,13 +235,13 @@ std::shared_ptr<TriangleMesh> CreateMeshCoordinateFrame(
     mesh_arrow =
             CreateMeshArrow(0.035 * size, 0.06 * size, 0.8 * size, 0.2 * size);
     mesh_arrow->ComputeVertexNormals();
-    mesh_arrow->PaintUniformColor(Eigen::Vector3d(0.0, 0.0, 1.0));
+    mesh_arrow->PaintUniformColor(Vec3d{0.0, 0.0, 1.0});
     transformation << 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1;
     mesh_arrow->Transform(transformation);
     *mesh_frame += *mesh_arrow;
 
     transformation = Eigen::Matrix4d::Identity();
-    transformation.block<3, 1>(0, 3) = origin;
+    transformation.block<3, 1>(0, 3) = Eigen::Vector3d(origin[0], origin[1], origin[2]);
     mesh_frame->Transform(transformation);
 
     return mesh_frame;

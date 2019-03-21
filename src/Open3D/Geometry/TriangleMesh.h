@@ -32,6 +32,7 @@
 #include <Eigen/Core>
 
 #include <Open3D/Geometry/Geometry3D.h>
+#include "Open3D/Types/Mat.h"
 
 namespace open3d {
 namespace geometry {
@@ -44,8 +45,8 @@ public:
 public:
     void Clear() override;
     bool IsEmpty() const override;
-    Eigen::Vector3d GetMinBound() const override;
-    Eigen::Vector3d GetMaxBound() const override;
+    Vec3d GetMinBound() const override;
+    Vec3d GetMaxBound() const override;
     void Transform(const Eigen::Matrix4d &transformation) override;
 
 public:
@@ -101,19 +102,19 @@ public:
     void NormalizeNormals() {
         for (size_t i = 0; i < vertex_normals_.size(); i++) {
             vertex_normals_[i].normalize();
-            if (std::isnan(vertex_normals_[i](0))) {
-                vertex_normals_[i] = Eigen::Vector3d(0.0, 0.0, 1.0);
+            if (std::isnan(vertex_normals_[i][0])) {
+                vertex_normals_[i] = Vec3d{0.0, 0.0, 1.0};
             }
         }
         for (size_t i = 0; i < triangle_normals_.size(); i++) {
             triangle_normals_[i].normalize();
-            if (std::isnan(triangle_normals_[i](0))) {
-                triangle_normals_[i] = Eigen::Vector3d(0.0, 0.0, 1.0);
+            if (std::isnan(triangle_normals_[i][0])) {
+                triangle_normals_[i] = Vec3d{0.0, 0.0, 1.0};
             }
         }
     }
 
-    void PaintUniformColor(const Eigen::Vector3d &color) {
+    void PaintUniformColor(const Vec3d &color) {
         vertex_colors_.resize(vertices_.size());
         for (size_t i = 0; i < vertices_.size(); i++) {
             vertex_colors_[i] = color;
@@ -121,11 +122,11 @@ public:
     }
 
 public:
-    std::vector<Eigen::Vector3d> vertices_;
-    std::vector<Eigen::Vector3d> vertex_normals_;
-    std::vector<Eigen::Vector3d> vertex_colors_;
-    std::vector<Eigen::Vector3i> triangles_;
-    std::vector<Eigen::Vector3d> triangle_normals_;
+    std::vector<Vec3d> vertices_;
+    std::vector<Vec3d> vertex_normals_;
+    std::vector<Vec3d> vertex_colors_;
+    std::vector<Vec3i> triangles_;
+    std::vector<Vec3d> triangle_normals_;
     std::vector<std::unordered_set<int>> adjacency_list_;
 };
 
@@ -140,8 +141,8 @@ std::shared_ptr<TriangleMesh> SelectDownSample(
 /// \param max_bound are clipped.
 std::shared_ptr<TriangleMesh> CropTriangleMesh(
         const TriangleMesh &input,
-        const Eigen::Vector3d &min_bound,
-        const Eigen::Vector3d &max_bound);
+        const Vec3d &min_bound,
+        const Vec3d &max_bound);
 
 /// Factory function to create a box mesh (TriangleMeshFactory.cpp)
 /// The left bottom corner on the front will be placed at (0, 0, 0).
@@ -201,7 +202,7 @@ std::shared_ptr<TriangleMesh> CreateMeshArrow(double cylinder_radius = 1.0,
 /// respectively. \param size is the length of the axes.
 std::shared_ptr<TriangleMesh> CreateMeshCoordinateFrame(
         double size = 1.0,
-        const Eigen::Vector3d &origin = Eigen::Vector3d(0.0, 0.0, 0.0));
+        const Vec3d &origin = Vec3d{0.0, 0.0, 0.0});
 
 }  // namespace geometry
 }  // namespace open3d

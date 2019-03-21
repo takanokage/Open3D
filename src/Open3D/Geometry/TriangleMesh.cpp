@@ -47,70 +47,60 @@ void TriangleMesh::Clear() {
 
 bool TriangleMesh::IsEmpty() const { return !HasVertices(); }
 
-Eigen::Vector3d TriangleMesh::GetMinBound() const {
+Vec3d TriangleMesh::GetMinBound() const {
     if (!HasVertices()) {
-        return Eigen::Vector3d(0.0, 0.0, 0.0);
+        return Vec3d{};
     }
     auto itr_x = std::min_element(
             vertices_.begin(), vertices_.end(),
-            [](const Eigen::Vector3d &a, const Eigen::Vector3d &b) {
-                return a(0) < b(0);
-            });
+            [](const Vec3d &a, const Vec3d &b) { return a[0] < b[0]; });
     auto itr_y = std::min_element(
             vertices_.begin(), vertices_.end(),
-            [](const Eigen::Vector3d &a, const Eigen::Vector3d &b) {
-                return a(1) < b(1);
-            });
+            [](const Vec3d &a, const Vec3d &b) { return a[1] < b[1]; });
     auto itr_z = std::min_element(
             vertices_.begin(), vertices_.end(),
-            [](const Eigen::Vector3d &a, const Eigen::Vector3d &b) {
-                return a(2) < b(2);
-            });
-    return Eigen::Vector3d((*itr_x)(0), (*itr_y)(1), (*itr_z)(2));
+            [](const Vec3d &a, const Vec3d &b) { return a[2] < b[2]; });
+    return Vec3d{(*itr_x)[0], (*itr_y)[1], (*itr_z)[2]};
 }
 
-Eigen::Vector3d TriangleMesh::GetMaxBound() const {
+Vec3d TriangleMesh::GetMaxBound() const {
     if (!HasVertices()) {
-        return Eigen::Vector3d(0.0, 0.0, 0.0);
+        return Vec3d{};
     }
     auto itr_x = std::max_element(
             vertices_.begin(), vertices_.end(),
-            [](const Eigen::Vector3d &a, const Eigen::Vector3d &b) {
-                return a(0) < b(0);
-            });
+            [](const Vec3d &a, const Vec3d &b) { return a[0] < b[0]; });
     auto itr_y = std::max_element(
             vertices_.begin(), vertices_.end(),
-            [](const Eigen::Vector3d &a, const Eigen::Vector3d &b) {
-                return a(1) < b(1);
-            });
+            [](const Vec3d &a, const Vec3d &b) { return a[1] < b[1]; });
     auto itr_z = std::max_element(
             vertices_.begin(), vertices_.end(),
-            [](const Eigen::Vector3d &a, const Eigen::Vector3d &b) {
-                return a(2) < b(2);
-            });
-    return Eigen::Vector3d((*itr_x)(0), (*itr_y)(1), (*itr_z)(2));
+            [](const Vec3d &a, const Vec3d &b) { return a[2] < b[2]; });
+    return Vec3d{(*itr_x)[0], (*itr_y)[1], (*itr_z)[2]};
 }
 
 void TriangleMesh::Transform(const Eigen::Matrix4d &transformation) {
     for (auto &vertex : vertices_) {
         Eigen::Vector4d new_point =
                 transformation *
-                Eigen::Vector4d(vertex(0), vertex(1), vertex(2), 1.0);
-        vertex = new_point.block<3, 1>(0, 0);
+                Eigen::Vector4d(vertex[0], vertex[1], vertex[2], 1.0);
+        vertex = Vec3d{vertex[0], vertex[1], vertex[2]};
     }
     for (auto &vertex_normal : vertex_normals_) {
         Eigen::Vector4d new_normal =
-                transformation * Eigen::Vector4d(vertex_normal(0),
-                                                 vertex_normal(1),
-                                                 vertex_normal(2), 0.0);
-        vertex_normal = new_normal.block<3, 1>(0, 0);
+                transformation * Eigen::Vector4d(vertex_normal[0],
+                                                 vertex_normal[1],
+                                                 vertex_normal[2], 0.0);
+        vertex_normal =
+                Vec3d{vertex_normal[0], vertex_normal[1], vertex_normal[2]};
     }
     for (auto &triangle_normal : triangle_normals_) {
         Eigen::Vector4d new_normal =
-                transformation * Eigen::Vector4d(triangle_normal(0),
-                                                 triangle_normal(1),
-                                                 triangle_normal(2), 0.0);
-        triangle_normal = new_normal.block<3, 1>(0, 0);
+                transformation * Eigen::Vector4d(triangle_normal[0],
+                                                 triangle_normal[1],
+                                                 triangle_normal[2], 0.0);
+        triangle_normal = Vec3d{triangle_normal[0], triangle_normal[1],
+                                triangle_normal[2]};
     }
 }
 
@@ -149,8 +139,7 @@ TriangleMesh &TriangleMesh::operator+=(const TriangleMesh &mesh) {
         triangle_normals_.clear();
     }
     triangles_.resize(triangles_.size() + mesh.triangles_.size());
-    Eigen::Vector3i index_shift((int)old_vert_num, (int)old_vert_num,
-                                (int)old_vert_num);
+    Vec3i index_shift{(int)old_vert_num, (int)old_vert_num, (int)old_vert_num};
     for (size_t i = 0; i < add_tri_num; i++) {
         triangles_[old_tri_num + i] = mesh.triangles_[i] + index_shift;
     }
@@ -168,8 +157,8 @@ void TriangleMesh::ComputeTriangleNormals(bool normalized /* = true*/) {
     triangle_normals_.resize(triangles_.size());
     for (size_t i = 0; i < triangles_.size(); i++) {
         auto &triangle = triangles_[i];
-        Eigen::Vector3d v01 = vertices_[triangle(1)] - vertices_[triangle(0)];
-        Eigen::Vector3d v02 = vertices_[triangle(2)] - vertices_[triangle(0)];
+        Vec3d v01 = vertices_[triangle[1]] - vertices_[triangle[0]];
+        Vec3d v02 = vertices_[triangle[2]] - vertices_[triangle[0]];
         triangle_normals_[i] = v01.cross(v02);
     }
     if (normalized) {
@@ -181,12 +170,12 @@ void TriangleMesh::ComputeVertexNormals(bool normalized /* = true*/) {
     if (HasTriangleNormals() == false) {
         ComputeTriangleNormals(false);
     }
-    vertex_normals_.resize(vertices_.size(), Eigen::Vector3d::Zero());
+    vertex_normals_.resize(vertices_.size(), Vec3d{});
     for (size_t i = 0; i < triangles_.size(); i++) {
         auto &triangle = triangles_[i];
-        vertex_normals_[triangle(0)] += triangle_normals_[i];
-        vertex_normals_[triangle(1)] += triangle_normals_[i];
-        vertex_normals_[triangle(2)] += triangle_normals_[i];
+        vertex_normals_[triangle[0]] += triangle_normals_[i];
+        vertex_normals_[triangle[1]] += triangle_normals_[i];
+        vertex_normals_[triangle[2]] += triangle_normals_[i];
     }
     if (normalized) {
         NormalizeNormals();
@@ -197,12 +186,12 @@ void TriangleMesh::ComputeAdjacencyList() {
     adjacency_list_.clear();
     adjacency_list_.resize(vertices_.size());
     for (const auto &triangle : triangles_) {
-        adjacency_list_[triangle(0)].insert(triangle(1));
-        adjacency_list_[triangle(0)].insert(triangle(2));
-        adjacency_list_[triangle(1)].insert(triangle(0));
-        adjacency_list_[triangle(1)].insert(triangle(2));
-        adjacency_list_[triangle(2)].insert(triangle(0));
-        adjacency_list_[triangle(2)].insert(triangle(1));
+        adjacency_list_[triangle[0]].insert(triangle[1]);
+        adjacency_list_[triangle[0]].insert(triangle[2]);
+        adjacency_list_[triangle[1]].insert(triangle[0]);
+        adjacency_list_[triangle[1]].insert(triangle[2]);
+        adjacency_list_[triangle[2]].insert(triangle[0]);
+        adjacency_list_[triangle[2]].insert(triangle[1]);
     }
 }
 
@@ -224,8 +213,8 @@ void TriangleMesh::RemoveDuplicatedVertices() {
     size_t old_vertex_num = vertices_.size();
     size_t k = 0;                                  // new index
     for (size_t i = 0; i < old_vertex_num; i++) {  // old index
-        Coordinate3 coord = std::make_tuple(vertices_[i](0), vertices_[i](1),
-                                            vertices_[i](2));
+        Coordinate3 coord = std::make_tuple(vertices_[i][0], vertices_[i][1],
+                                            vertices_[i][2]);
         if (point_to_old_index.find(coord) == point_to_old_index.end()) {
             point_to_old_index[coord] = i;
             vertices_[k] = vertices_[i];
@@ -242,9 +231,9 @@ void TriangleMesh::RemoveDuplicatedVertices() {
     if (has_vert_color) vertex_colors_.resize(k);
     if (k < old_vertex_num) {
         for (auto &triangle : triangles_) {
-            triangle(0) = index_old_to_new[triangle(0)];
-            triangle(1) = index_old_to_new[triangle(1)];
-            triangle(2) = index_old_to_new[triangle(2)];
+            triangle[0] = index_old_to_new[triangle[0]];
+            triangle[1] = index_old_to_new[triangle[1]];
+            triangle[2] = index_old_to_new[triangle[2]];
         }
         if (HasAdjacencyList()) {
             ComputeAdjacencyList();
@@ -266,21 +255,21 @@ void TriangleMesh::RemoveDuplicatedTriangles() {
         Index3 index;
         // We first need to find the minimum index. Because triangle (0-1-2) and
         // triangle (2-0-1) are the same.
-        if (triangles_[i](0) <= triangles_[i](1)) {
-            if (triangles_[i](0) <= triangles_[i](2)) {
-                index = std::make_tuple(triangles_[i](0), triangles_[i](1),
-                                        triangles_[i](2));
+        if (triangles_[i][0] <= triangles_[i][1]) {
+            if (triangles_[i][0] <= triangles_[i][2]) {
+                index = std::make_tuple(triangles_[i][0], triangles_[i][1],
+                                        triangles_[i][2]);
             } else {
-                index = std::make_tuple(triangles_[i](2), triangles_[i](0),
-                                        triangles_[i](1));
+                index = std::make_tuple(triangles_[i][2], triangles_[i][0],
+                                        triangles_[i][1]);
             }
         } else {
-            if (triangles_[i](1) <= triangles_[i](2)) {
-                index = std::make_tuple(triangles_[i](1), triangles_[i](2),
-                                        triangles_[i](0));
+            if (triangles_[i][1] <= triangles_[i][2]) {
+                index = std::make_tuple(triangles_[i][1], triangles_[i][2],
+                                        triangles_[i][0]);
             } else {
-                index = std::make_tuple(triangles_[i](2), triangles_[i](0),
-                                        triangles_[i](1));
+                index = std::make_tuple(triangles_[i][2], triangles_[i][0],
+                                        triangles_[i][1]);
             }
         }
         if (triangle_to_old_index.find(index) == triangle_to_old_index.end()) {
@@ -305,9 +294,9 @@ void TriangleMesh::RemoveNonManifoldVertices() {
     // should not exist in a valid triangle mesh.
     std::vector<bool> vertex_has_reference(vertices_.size(), false);
     for (const auto &triangle : triangles_) {
-        vertex_has_reference[triangle(0)] = true;
-        vertex_has_reference[triangle(1)] = true;
-        vertex_has_reference[triangle(2)] = true;
+        vertex_has_reference[triangle[0]] = true;
+        vertex_has_reference[triangle[1]] = true;
+        vertex_has_reference[triangle[2]] = true;
     }
     std::vector<int> index_old_to_new(vertices_.size());
     bool has_vert_normal = HasVertexNormals();
@@ -330,9 +319,9 @@ void TriangleMesh::RemoveNonManifoldVertices() {
     if (has_vert_color) vertex_colors_.resize(k);
     if (k < old_vertex_num) {
         for (auto &triangle : triangles_) {
-            triangle(0) = index_old_to_new[triangle(0)];
-            triangle(1) = index_old_to_new[triangle(1)];
-            triangle(2) = index_old_to_new[triangle(2)];
+            triangle[0] = index_old_to_new[triangle[0]];
+            triangle[1] = index_old_to_new[triangle[1]];
+            triangle[2] = index_old_to_new[triangle[2]];
         }
         if (HasAdjacencyList()) {
             ComputeAdjacencyList();
@@ -352,8 +341,8 @@ void TriangleMesh::RemoveNonManifoldTriangles() {
     size_t k = 0;
     for (size_t i = 0; i < old_triangle_num; i++) {
         const auto &triangle = triangles_[i];
-        if (triangle(0) != triangle(1) && triangle(1) != triangle(2) &&
-            triangle(2) != triangle(0)) {
+        if (triangle[0] != triangle[1] && triangle[1] != triangle[2] &&
+            triangle[2] != triangle[0]) {
             triangles_[k] = triangles_[i];
             if (has_tri_normal) triangle_normals_[k] = triangle_normals_[i];
             k++;
