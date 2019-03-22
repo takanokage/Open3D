@@ -51,14 +51,14 @@ int CountValidDepthPixels(const Image &depth, int stride) {
 std::shared_ptr<PointCloud> CreatePointCloudFromFloatDepthImage(
         const Image &depth,
         const camera::PinholeCameraIntrinsic &intrinsic,
-        const Eigen::Matrix4d &extrinsic,
+        const Mat4d &extrinsic,
         int stride) {
     auto pointcloud = std::make_shared<PointCloud>();
-    Eigen::Matrix4d camera_pose = extrinsic.inverse();
+    Mat4d camera_pose = extrinsic.inverse();
     auto focal_length = intrinsic.GetFocalLength();
     auto principal_point = intrinsic.GetPrincipalPoint();
     int num_valid_pixels = CountValidDepthPixels(depth, stride);
-    pointcloud->points_.resize(num_valid_pixels);
+    pointcloud->points_.h_data.resize(num_valid_pixels);
     int cnt = 0;
     for (int i = 0; i < depth.height_; i += stride) {
         for (int j = 0; j < depth.width_; j += stride) {
@@ -68,9 +68,9 @@ std::shared_ptr<PointCloud> CreatePointCloudFromFloatDepthImage(
                 double x = (j - principal_point.first) * z / focal_length.first;
                 double y =
                         (i - principal_point.second) * z / focal_length.second;
-                Eigen::Vector4d point =
-                        camera_pose * Eigen::Vector4d(x, y, z, 1.0);
-                pointcloud->points_[cnt++] = Vec3d{x, y, z};
+                Vec4d point = camera_pose * Vec4d{x, y, z, 1.0};
+                pointcloud->points_.h_data[cnt++] =
+                        Vec3d{point[0], point[1], point[2]};
             }
         }
     }
@@ -81,15 +81,15 @@ template <typename TC, int NC>
 std::shared_ptr<PointCloud> CreatePointCloudFromRGBDImageT(
         const RGBDImage &image,
         const camera::PinholeCameraIntrinsic &intrinsic,
-        const Eigen::Matrix4d &extrinsic) {
+        const Mat4d &extrinsic) {
     auto pointcloud = std::make_shared<PointCloud>();
-    Eigen::Matrix4d camera_pose = extrinsic.inverse();
+    Mat4d camera_pose = extrinsic.inverse();
     auto focal_length = intrinsic.GetFocalLength();
     auto principal_point = intrinsic.GetPrincipalPoint();
     double scale = (sizeof(TC) == 1) ? 255.0 : 1.0;
     int num_valid_pixels = CountValidDepthPixels(image.depth_, 1);
-    pointcloud->points_.resize(num_valid_pixels);
-    pointcloud->colors_.resize(num_valid_pixels);
+    pointcloud->points_.h_data.resize(num_valid_pixels);
+    pointcloud->colors_.h_data.resize(num_valid_pixels);
     int cnt = 0;
     for (int i = 0; i < image.depth_.height_; i++) {
         float *p = (float *)(image.depth_.data_.data() +
@@ -102,10 +102,10 @@ std::shared_ptr<PointCloud> CreatePointCloudFromRGBDImageT(
                 double x = (j - principal_point.first) * z / focal_length.first;
                 double y =
                         (i - principal_point.second) * z / focal_length.second;
-                Eigen::Vector4d point =
-                        camera_pose * Eigen::Vector4d(x, y, z, 1.0);
-                pointcloud->points_[cnt] = point.block<3, 1>(0, 0);
-                pointcloud->colors_[cnt++] =
+                Vec4d point = camera_pose * Vec4d{x, y, z, 1.0};
+                pointcloud->points_.h_data[cnt] =
+                        Vec3d{point[0], point[1], point[2]};
+                pointcloud->colors_.h_data[cnt++] =
                         Vec3d{pc[0], pc[(NC - 1) / 2], pc[NC - 1]} / scale;
             }
         }
@@ -119,7 +119,7 @@ namespace geometry {
 std::shared_ptr<PointCloud> CreatePointCloudFromDepthImage(
         const Image &depth,
         const camera::PinholeCameraIntrinsic &intrinsic,
-        const Eigen::Matrix4d &extrinsic /* = Eigen::Matrix4d::Identity()*/,
+        const Mat4d &extrinsic /* = Mat4d::Identity()*/,
         double depth_scale /* = 1000.0*/,
         double depth_trunc /* = 1000.0*/,
         int stride /* = 1*/) {
@@ -142,7 +142,7 @@ std::shared_ptr<PointCloud> CreatePointCloudFromDepthImage(
 std::shared_ptr<PointCloud> CreatePointCloudFromRGBDImage(
         const RGBDImage &image,
         const camera::PinholeCameraIntrinsic &intrinsic,
-        const Eigen::Matrix4d &extrinsic /* = Eigen::Matrix4d::Identity()*/) {
+        const Mat4d &extrinsic /* = Mat4d::Identity()*/) {
     if (image.depth_.num_of_channels_ == 1 &&
         image.depth_.bytes_per_channel_ == 4) {
         if (image.color_.bytes_per_channel_ == 1 &&

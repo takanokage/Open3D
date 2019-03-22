@@ -62,7 +62,7 @@ public:
 
     public:
         std::shared_ptr<UniformTSDFVolume> volume_;
-        Eigen::Vector3i index_;
+        Vec3i index_;
     };
 
 public:
@@ -77,7 +77,7 @@ public:
     void Reset() override;
     void Integrate(const geometry::RGBDImage &image,
                    const camera::PinholeCameraIntrinsic &intrinsic,
-                   const Eigen::Matrix4d &extrinsic) override;
+                   const Mat4d &extrinsic) override;
     std::shared_ptr<geometry::PointCloud> ExtractPointCloud() override;
     std::shared_ptr<geometry::TriangleMesh> ExtractTriangleMesh() override;
     std::shared_ptr<geometry::PointCloud> ExtractVoxelPointCloud();
@@ -90,24 +90,21 @@ public:
     /// Assume the index of the volume unit is (x, y, z), then the unit spans
     /// from (x, y, z) * volume_unit_length_
     /// to (x + 1, y + 1, z + 1) * volume_unit_length_
-    std::unordered_map<Eigen::Vector3i,
-                       VolumeUnit,
-                       utility::hash_eigen::hash<Eigen::Vector3i>>
+    std::unordered_map<Vec3i, VolumeUnit, utility::hash_eigen::hash<Vec3i>>
             volume_units_;
 
 private:
-    Eigen::Vector3i LocateVolumeUnit(const Eigen::Vector3d &point) {
-        return Eigen::Vector3i((int)std::floor(point(0) / volume_unit_length_),
-                               (int)std::floor(point(1) / volume_unit_length_),
-                               (int)std::floor(point(2) / volume_unit_length_));
+    Vec3i LocateVolumeUnit(const Vec3d &point) {
+        return Vec3i{(int)std::floor(point[0] / volume_unit_length_),
+                     (int)std::floor(point[1] / volume_unit_length_),
+                     (int)std::floor(point[2] / volume_unit_length_)};
     }
 
-    std::shared_ptr<UniformTSDFVolume> OpenVolumeUnit(
-            const Eigen::Vector3i &index);
+    std::shared_ptr<UniformTSDFVolume> OpenVolumeUnit(const Vec3i &index);
 
-    Eigen::Vector3d GetNormalAt(const Eigen::Vector3d &p);
+    Vec3d GetNormalAt(const Vec3d &p);
 
-    double GetTSDFAt(const Eigen::Vector3d &p);
+    double GetTSDFAt(const Vec3d &p);
 };
 
 }  // namespace integration

@@ -43,42 +43,38 @@ using namespace geometry;
 class AccumulatedPoint {
 public:
     AccumulatedPoint()
-        : num_of_points_(0),
+        : num_of_points_[0],
           point_(0.0, 0.0, 0.0),
           normal_(0.0, 0.0, 0.0),
           color_(0.0, 0.0, 0.0) {}
 
 public:
     void AddPoint(const PointCloud &cloud, int index) {
-        point_ += cloud.points_[index];
+        point_ += cloud.points_.h_data[index];
         if (cloud.HasNormals()) {
-            if (!std::isnan(cloud.normals_[index](0)) &&
-                !std::isnan(cloud.normals_[index](1)) &&
-                !std::isnan(cloud.normals_[index](2))) {
-                normal_ += cloud.normals_[index];
+            if (!std::isnan(cloud.normals_.h_data[index][0]) &&
+                !std::isnan(cloud.normals_.h_data[index][1]) &&
+                !std::isnan(cloud.normals_.h_data[index][2])) {
+                normal_ += cloud.normals_.h_data[index];
             }
         }
         if (cloud.HasColors()) {
-            color_ += cloud.colors_[index];
+            color_ += cloud.colors_.h_data[index];
         }
         num_of_points_++;
     }
 
-    Eigen::Vector3d GetAveragePoint() const {
-        return point_ / double(num_of_points_);
-    }
+    Vec3d GetAveragePoint() const { return point_ / double(num_of_points_); }
 
-    Eigen::Vector3d GetAverageNormal() const { return normal_.normalized(); }
+    Vec3d GetAverageNormal() const { return normal_.normalized(); }
 
-    Eigen::Vector3d GetAverageColor() const {
-        return color_ / double(num_of_points_);
-    }
+    Vec3d GetAverageColor() const { return color_ / double(num_of_points_); }
 
 public:
     int num_of_points_;
-    Eigen::Vector3d point_;
-    Eigen::Vector3d normal_;
-    Eigen::Vector3d color_;
+    Vec3d point_;
+    Vec3d normal_;
+    Vec3d color_;
 };
 
 class point_cubic_id {
@@ -93,23 +89,23 @@ public:
                   size_t index,
                   int cubic_index,
                   bool approximate_class) {
-        point_ += cloud.points_[index];
+        point_ += cloud.points_.h_data[index];
         if (cloud.HasNormals()) {
-            if (!std::isnan(cloud.normals_[index](0)) &&
-                !std::isnan(cloud.normals_[index](1)) &&
-                !std::isnan(cloud.normals_[index](2))) {
-                normal_ += cloud.normals_[index];
+            if (!std::isnan(cloud.normals_.h_data[index][0]) &&
+                !std::isnan(cloud.normals_.h_data[index][1]) &&
+                !std::isnan(cloud.normals_.h_data[index][2])) {
+                normal_ += cloud.normals_.h_data[index];
             }
         }
         if (cloud.HasColors()) {
             if (approximate_class) {
-                auto got = classes.find(cloud.colors_[index][0]);
+                auto got = classes.find(cloud.colors_.h_data[index][0]);
                 if (got == classes.end())
-                    classes[cloud.colors_[index][0]] = 1;
+                    classes[cloud.colors_.h_data[index][0]] = 1;
                 else
-                    classes[cloud.colors_[index][0]] += 1;
+                    classes[cloud.colors_.h_data[index][0]] += 1;
             } else {
-                color_ += cloud.colors_[index];
+                color_ += cloud.colors_.h_data[index];
             }
         }
         point_cubic_id new_id;
@@ -119,7 +115,7 @@ public:
         num_of_points_++;
     }
 
-    Eigen::Vector3d GetMaxClass() {
+    Vec3d GetMaxClass() {
         int max_class = -1;
         int max_count = -1;
         for (auto it = classes.begin(); it != classes.end(); it++) {
@@ -128,7 +124,7 @@ public:
                 max_class = it->first;
             }
         }
-        return Eigen::Vector3d(max_class, max_class, max_class);
+        return Vec3d{max_class, max_class, max_class};
     }
 
     std::vector<point_cubic_id> GetOriginalID() { return original_id; }
@@ -156,9 +152,11 @@ std::shared_ptr<PointCloud> SelectDownSample(const PointCloud &input,
 
     for (size_t i = 0; i < input.points_.size(); i++) {
         if (mask[i]) {
-            output->points_.push_back(input.points_[i]);
-            if (has_normals) output->normals_.push_back(input.normals_[i]);
-            if (has_colors) output->colors_.push_back(input.colors_[i]);
+            output->points_.h_data.push_back(input.points_.h_data[i]);
+            if (has_normals)
+                output->normals_.h_data.push_back(input.normals_.h_data[i]);
+            if (has_colors)
+                output->colors_.h_data.push_back(input.colors_.h_data[i]);
         }
     }
     utility::PrintDebug(
@@ -213,7 +211,7 @@ std::shared_ptr<TriangleMesh> SelectDownSample(
     triangle_id = 0;
     for (auto vertex_ids : triangle_to_vertex) {
         if ((int)vertex_ids.size() == 3) {
-            Eigen::Vector3i new_face;
+            Vec3i new_face;
             for (int i = 0; i < 3; i++)
                 new_face(i) = new_vertex_id[input.triangles_[triangle_id][i]];
             output->triangles_.push_back(new_face);
@@ -249,36 +247,36 @@ std::shared_ptr<PointCloud> VoxelDownSample(const PointCloud &input,
         utility::PrintDebug("[VoxelDownSample] voxel_size <= 0.\n");
         return output;
     }
-    Eigen::Vector3d voxel_size3 =
-            Eigen::Vector3d(voxel_size, voxel_size, voxel_size);
-    Eigen::Vector3d voxel_min_bound = input.GetMinBound() - voxel_size3 * 0.5;
-    Eigen::Vector3d voxel_max_bound = input.GetMaxBound() + voxel_size3 * 0.5;
+    Vec3d voxel_size3 = Vec3d{voxel_size, voxel_size, voxel_size};
+    Vec3d voxel_min_bound = input.GetMinBound() - voxel_size3 * 0.5;
+    Vec3d voxel_max_bound = input.GetMaxBound() + voxel_size3 * 0.5;
     if (voxel_size * std::numeric_limits<int>::max() <
         (voxel_max_bound - voxel_min_bound).maxCoeff()) {
         utility::PrintDebug("[VoxelDownSample] voxel_size is too small.\n");
         return output;
     }
-    std::unordered_map<Eigen::Vector3i, AccumulatedPoint,
-                       utility::hash_eigen::hash<Eigen::Vector3i>>
+    std::unordered_map<Vec3i, AccumulatedPoint,
+                       utility::hash_eigen::hash<Vec3i>>
             voxelindex_to_accpoint;
 
-    Eigen::Vector3d ref_coord;
-    Eigen::Vector3i voxel_index;
+    Vec3d ref_coord;
+    Vec3i voxel_index;
     for (int i = 0; i < (int)input.points_.size(); i++) {
-        ref_coord = (input.points_[i] - voxel_min_bound) / voxel_size;
-        voxel_index << int(floor(ref_coord(0))), int(floor(ref_coord(1))),
-                int(floor(ref_coord(2)));
+        ref_coord = (input.points_.h_data[i] - voxel_min_bound) / voxel_size;
+        voxel_index << int(floor(ref_coord[0])), int(floor(ref_coord[1])),
+                int(floor(ref_coord[2]));
         voxelindex_to_accpoint[voxel_index].AddPoint(input, i);
     }
     bool has_normals = input.HasNormals();
     bool has_colors = input.HasColors();
     for (auto accpoint : voxelindex_to_accpoint) {
-        output->points_.push_back(accpoint.second.GetAveragePoint());
+        output->points_.h_data.push_back(accpoint.second.GetAveragePoint());
         if (has_normals) {
-            output->normals_.push_back(accpoint.second.GetAverageNormal());
+            output->normals_.h_data.push_back(
+                    accpoint.second.GetAverageNormal());
         }
         if (has_colors) {
-            output->colors_.push_back(accpoint.second.GetAverageColor());
+            output->colors_.h_data.push_back(accpoint.second.GetAverageColor());
         }
     }
     utility::PrintDebug(
@@ -290,8 +288,8 @@ std::shared_ptr<PointCloud> VoxelDownSample(const PointCloud &input,
 std::tuple<std::shared_ptr<PointCloud>, Eigen::MatrixXi>
 VoxelDownSampleAndTrace(const PointCloud &input,
                         double voxel_size,
-                        const Eigen::Vector3d &min_bound,
-                        const Eigen::Vector3d &max_bound,
+                        const Vec3d &min_bound,
+                        const Vec3d &max_bound,
                         bool approximate_class) {
     auto output = std::make_shared<PointCloud>();
     Eigen::MatrixXi cubic_id;
@@ -308,15 +306,16 @@ VoxelDownSampleAndTrace(const PointCloud &input,
         utility::PrintDebug("[VoxelDownSample] voxel_size is too small.\n");
         return std::make_tuple(output, cubic_id);
     }
-    std::unordered_map<Eigen::Vector3i, AccumulatedPointForTrace,
-                       utility::hash_eigen::hash<Eigen::Vector3i>>
+    std::unordered_map<Vec3i, AccumulatedPointForTrace,
+                       utility::hash_eigen::hash<Vec3i>>
             voxelindex_to_accpoint;
     int cid_temp[3] = {1, 2, 4};
     for (size_t i = 0; i < input.points_.size(); i++) {
-        auto ref_coord = (input.points_[i] - voxel_min_bound) / voxel_size;
-        auto voxel_index = Eigen::Vector3i(int(floor(ref_coord(0))),
-                                           int(floor(ref_coord(1))),
-                                           int(floor(ref_coord(2))));
+        auto ref_coord =
+                (input.points_.h_data[i] - voxel_min_bound) / voxel_size;
+        auto voxel_index =
+                Vec3i{int(floor(ref_coord[0])), int(floor(ref_coord[1])),
+                      int(floor(ref_coord[2]))};
         int cid = 0;
         for (int c = 0; c < 3; c++) {
             if ((ref_coord(c) - voxel_index(c)) >= 0.5) {
@@ -332,15 +331,17 @@ VoxelDownSampleAndTrace(const PointCloud &input,
     cubic_id.resize(voxelindex_to_accpoint.size(), 8);
     cubic_id.setConstant(-1);
     for (auto accpoint : voxelindex_to_accpoint) {
-        output->points_.push_back(accpoint.second.GetAveragePoint());
+        output->points_.h_data.push_back(accpoint.second.GetAveragePoint());
         if (has_normals) {
-            output->normals_.push_back(accpoint.second.GetAverageNormal());
+            output->normals_.h_data.push_back(
+                    accpoint.second.GetAverageNormal());
         }
         if (has_colors) {
             if (approximate_class) {
-                output->colors_.push_back(accpoint.second.GetMaxClass());
+                output->colors_.h_data.push_back(accpoint.second.GetMaxClass());
             } else {
-                output->colors_.push_back(accpoint.second.GetAverageColor());
+                output->colors_.h_data.push_back(
+                        accpoint.second.GetAverageColor());
             }
         }
         auto original_id = accpoint.second.GetOriginalID();
@@ -371,20 +372,20 @@ std::shared_ptr<PointCloud> UniformDownSample(const PointCloud &input,
 }
 
 std::shared_ptr<PointCloud> CropPointCloud(const PointCloud &input,
-                                           const Eigen::Vector3d &min_bound,
-                                           const Eigen::Vector3d &max_bound) {
-    if (min_bound(0) > max_bound(0) || min_bound(1) > max_bound(1) ||
-        min_bound(2) > max_bound(2)) {
+                                           const Vec3d &min_bound,
+                                           const Vec3d &max_bound) {
+    if (min_bound[0] > max_bound[0] || min_bound[1] > max_bound[1] ||
+        min_bound[2] > max_bound[2]) {
         utility::PrintDebug(
                 "[CropPointCloud] Illegal boundary clipped all points.\n");
         return std::make_shared<PointCloud>();
     }
     std::vector<size_t> indices;
     for (size_t i = 0; i < input.points_.size(); i++) {
-        const auto &point = input.points_[i];
-        if (point(0) >= min_bound(0) && point(0) <= max_bound(0) &&
-            point(1) >= min_bound(1) && point(1) <= max_bound(1) &&
-            point(2) >= min_bound(2) && point(2) <= max_bound(2)) {
+        const auto &point = input.points_.h_data[i];
+        if (point[0] >= min_bound[0] && point[0] <= max_bound[0] &&
+            point[1] >= min_bound[1] && point[1] <= max_bound[1] &&
+            point[2] >= min_bound[2] && point[2] <= max_bound[2]) {
             indices.push_back(i);
         }
     }
@@ -411,8 +412,8 @@ RemoveRadiusOutliers(const PointCloud &input,
     for (auto i = 0; i < input.points_.size(); i++) {
         std::vector<int> tmp_indices;
         std::vector<double> dist;
-        int nb_neighbors = kdtree.SearchRadius(input.points_[i], search_radius,
-                                               tmp_indices, dist);
+        int nb_neighbors = kdtree.SearchRadius(
+                input.points_.h_data[i], search_radius, tmp_indices, dist);
         mask[i] = (nb_neighbors > nb_points);
     }
     std::vector<size_t> indices;
@@ -452,7 +453,8 @@ RemoveStatisticalOutliers(const PointCloud &input,
     for (auto i = 0; i < input.points_.size(); i++) {
         std::vector<int> tmp_indices;
         std::vector<double> dist;
-        kdtree.SearchKNN(input.points_[i], nb_neighbors, tmp_indices, dist);
+        kdtree.SearchKNN(input.points_.h_data[i], nb_neighbors, tmp_indices,
+                         dist);
         double mean = -1;
         if (dist.size() > 0) {
             valid_distances++;
@@ -485,12 +487,11 @@ RemoveStatisticalOutliers(const PointCloud &input,
     return std::make_tuple(SelectDownSample(input, indices), indices);
 }
 
-std::shared_ptr<TriangleMesh> CropTriangleMesh(
-        const TriangleMesh &input,
-        const Eigen::Vector3d &min_bound,
-        const Eigen::Vector3d &max_bound) {
-    if (min_bound(0) > max_bound(0) || min_bound(1) > max_bound(1) ||
-        min_bound(2) > max_bound(2)) {
+std::shared_ptr<TriangleMesh> CropTriangleMesh(const TriangleMesh &input,
+                                               const Vec3d &min_bound,
+                                               const Vec3d &max_bound) {
+    if (min_bound[0] > max_bound[0] || min_bound[1] > max_bound[1] ||
+        min_bound[2] > max_bound[2]) {
         utility::PrintDebug(
                 "[CropTriangleMesh] Illegal boundary clipped all points.\n");
         return std::make_shared<TriangleMesh>();
@@ -498,9 +499,9 @@ std::shared_ptr<TriangleMesh> CropTriangleMesh(
     std::vector<size_t> indices;
     for (size_t i = 0; i < input.vertices_.size(); i++) {
         const auto &point = input.vertices_[i];
-        if (point(0) >= min_bound(0) && point(0) <= max_bound(0) &&
-            point(1) >= min_bound(1) && point(1) <= max_bound(1) &&
-            point(2) >= min_bound(2) && point(2) <= max_bound(2)) {
+        if (point[0] >= min_bound[0] && point[0] <= max_bound[0] &&
+            point[1] >= min_bound[1] && point[1] <= max_bound[1] &&
+            point[2] >= min_bound[2] && point[2] <= max_bound[2]) {
             indices.push_back(i);
         }
     }

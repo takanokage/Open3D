@@ -41,12 +41,10 @@ int main(int argc, char *argv[]) {
         return 1;
     }
     const int NUM_OF_COLOR_PALETTE = 5;
-    Eigen::Vector3d color_palette[NUM_OF_COLOR_PALETTE] = {
-            Eigen::Vector3d(255, 180, 0) / 255.0,
-            Eigen::Vector3d(0, 166, 237) / 255.0,
-            Eigen::Vector3d(246, 81, 29) / 255.0,
-            Eigen::Vector3d(127, 184, 0) / 255.0,
-            Eigen::Vector3d(13, 44, 84) / 255.0,
+    Vec3d color_palette[NUM_OF_COLOR_PALETTE] = {
+            Vec3d{255, 180, 0} / 255.0, Vec3d{0, 166, 237} / 255.0,
+            Vec3d{246, 81, 29} / 255.0, Vec3d{127, 184, 0} / 255.0,
+            Vec3d{13, 44, 84} / 255.0,
     };
 
     camera::PinholeCameraTrajectory trajectory;
@@ -58,14 +56,14 @@ int main(int argc, char *argv[]) {
         if (utility::filesystem::FileExists(buff)) {
             auto pcd = io::CreatePointCloudFromFile(buff);
             pcd->Transform(trajectory.parameters_[i].extrinsic_);
-            pcd->colors_.clear();
+            pcd->colors_.h_data.clear();
             if ((int)i < NUM_OF_COLOR_PALETTE) {
-                pcd->colors_.resize(pcd->points_.size(), color_palette[i]);
+                pcd->colors_.h_data.resize(pcd->points_.size(),
+                                           color_palette[i]);
             } else {
-                pcd->colors_.resize(pcd->points_.size(),
-                                    (Eigen::Vector3d::Random() +
-                                     Eigen::Vector3d::Constant(1.0)) *
-                                            0.5);
+                pcd->colors_.h_data.resize(
+                        pcd->points_.size(),
+                        (Vec3d::Random() + Vec3d::Constant(1.0)) * 0.5);
             }
             pcds.push_back(pcd);
         }

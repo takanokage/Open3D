@@ -79,26 +79,23 @@ Vec3d TriangleMesh::GetMaxBound() const {
     return Vec3d{(*itr_x)[0], (*itr_y)[1], (*itr_z)[2]};
 }
 
-void TriangleMesh::Transform(const Eigen::Matrix4d &transformation) {
+void TriangleMesh::Transform(const Mat4d &transformation) {
     for (auto &vertex : vertices_) {
-        Eigen::Vector4d new_point =
-                transformation *
-                Eigen::Vector4d(vertex[0], vertex[1], vertex[2], 1.0);
+        Vec4d new_point =
+                transformation * Vec4d{vertex[0], vertex[1], vertex[2], 1.0};
         vertex = Vec3d{vertex[0], vertex[1], vertex[2]};
     }
     for (auto &vertex_normal : vertex_normals_) {
-        Eigen::Vector4d new_normal =
-                transformation * Eigen::Vector4d(vertex_normal[0],
-                                                 vertex_normal[1],
-                                                 vertex_normal[2], 0.0);
+        Vec4d new_normal =
+                transformation * Vec4d{vertex_normal[0], vertex_normal[1],
+                                       vertex_normal[2], 0.0};
         vertex_normal =
                 Vec3d{vertex_normal[0], vertex_normal[1], vertex_normal[2]};
     }
     for (auto &triangle_normal : triangle_normals_) {
-        Eigen::Vector4d new_normal =
-                transformation * Eigen::Vector4d(triangle_normal[0],
-                                                 triangle_normal[1],
-                                                 triangle_normal[2], 0.0);
+        Vec4d new_normal =
+                transformation * Vec4d{triangle_normal[0], triangle_normal[1],
+                                       triangle_normal[2], 0.0};
         triangle_normal = Vec3d{triangle_normal[0], triangle_normal[1],
                                 triangle_normal[2]};
     }
@@ -139,7 +136,7 @@ TriangleMesh &TriangleMesh::operator+=(const TriangleMesh &mesh) {
         triangle_normals_.clear();
     }
     triangles_.resize(triangles_.size() + mesh.triangles_.size());
-    Vec3i index_shift{(int)old_vert_num, (int)old_vert_num, (int)old_vert_num};
+    Vec3i index_shift((int)old_vert_num, (int)old_vert_num, (int)old_vert_num);
     for (size_t i = 0; i < add_tri_num; i++) {
         triangles_[old_tri_num + i] = mesh.triangles_[i] + index_shift;
     }
@@ -170,7 +167,7 @@ void TriangleMesh::ComputeVertexNormals(bool normalized /* = true*/) {
     if (HasTriangleNormals() == false) {
         ComputeTriangleNormals(false);
     }
-    vertex_normals_.resize(vertices_.size(), Vec3d{});
+    vertex_normals_.resize(vertices_.size(), Vec3d::Zero());
     for (size_t i = 0; i < triangles_.size(); i++) {
         auto &triangle = triangles_[i];
         vertex_normals_[triangle[0]] += triangle_normals_[i];

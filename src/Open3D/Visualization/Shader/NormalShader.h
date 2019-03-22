@@ -60,8 +60,8 @@ protected:
     virtual bool PrepareBinding(const geometry::Geometry &geometry,
                                 const RenderOption &option,
                                 const ViewControl &view,
-                                std::vector<Eigen::Vector3f> &points,
-                                std::vector<Eigen::Vector3f> &normals) = 0;
+                                std::vector<Vec3f> &points,
+                                std::vector<Vec3f> &normals) = 0;
 
 protected:
     GLuint vertex_position_;
@@ -84,8 +84,8 @@ protected:
     bool PrepareBinding(const geometry::Geometry &geometry,
                         const RenderOption &option,
                         const ViewControl &view,
-                        std::vector<Eigen::Vector3f> &points,
-                        std::vector<Eigen::Vector3f> &normals) final;
+                        std::vector<Vec3f> &points,
+                        std::vector<Vec3f> &normals) final;
 };
 
 class NormalShaderForTriangleMesh : public NormalShader {
@@ -100,8 +100,8 @@ protected:
     bool PrepareBinding(const geometry::Geometry &geometry,
                         const RenderOption &option,
                         const ViewControl &view,
-                        std::vector<Eigen::Vector3f> &points,
-                        std::vector<Eigen::Vector3f> &normals) final;
+                        std::vector<Vec3f> &points,
+                        std::vector<Vec3f> &normals) final;
 };
 
 }  // namespace glsl

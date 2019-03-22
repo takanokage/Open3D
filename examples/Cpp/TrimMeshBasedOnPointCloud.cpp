@@ -84,8 +84,8 @@ int main(int argc, char *argv[]) {
 #pragma omp parallel for schedule(static)
 #endif
     for (int i = 0; i < (int)mesh->vertices_.size(); i++) {
-        std::vector<int> indices(1);
-        std::vector<double> dists(1);
+        std::vector<int> indices[1];
+        std::vector<double> dists[1];
         int k = kdtree.SearchKNN(mesh->vertices_[i], 1, indices, dists);
         if (k == 0 || dists[0] > distance * distance) {
             remove_vertex_mask[i] = true;
@@ -123,10 +123,10 @@ int main(int argc, char *argv[]) {
     if (k < old_vertex_num) {
         for (size_t i = 0; i < old_triangle_num; i++) {
             auto &triangle = mesh->triangles_[i];
-            triangle(0) = index_old_to_new[triangle(0)];
-            triangle(1) = index_old_to_new[triangle(1)];
-            triangle(2) = index_old_to_new[triangle(2)];
-            if (triangle(0) != -1 && triangle(1) != -1 && triangle(2) != -1) {
+            triangle[0] = index_old_to_new[triangle[0]];
+            triangle[1] = index_old_to_new[triangle[1]];
+            triangle[2] = index_old_to_new[triangle[2]];
+            if (triangle[0] != -1 && triangle[1] != -1 && triangle[2] != -1) {
                 mesh->triangles_[kt] = mesh->triangles_[i];
                 if (has_tri_normal)
                     mesh->triangle_normals_[kt] = mesh->triangle_normals_[i];

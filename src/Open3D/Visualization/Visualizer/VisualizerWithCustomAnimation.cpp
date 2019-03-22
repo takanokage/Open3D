@@ -216,7 +216,7 @@ void VisualizerWithCustomAnimation::KeyPressCallback(
                 view_control.GoToLast();
                 break;
             case GLFW_KEY_EQUAL:
-                view_control.ChangeTrajectoryInterval(1);
+                view_control.ChangeTrajectoryInterval[1];
                 utility::PrintDebug(
                         "[Visualizer] Trajectory interval set to %d.\n",
                         view_control.GetTrajectoryInterval());

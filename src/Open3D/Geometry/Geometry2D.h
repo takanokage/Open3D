@@ -42,8 +42,8 @@ protected:
 public:
     void Clear() override = 0;
     bool IsEmpty() const override = 0;
-    virtual Eigen::Vector2d GetMinBound() const = 0;
-    virtual Eigen::Vector2d GetMaxBound() const = 0;
+    virtual Vec2d GetMinBound() const = 0;
+    virtual Vec2d GetMaxBound() const = 0;
 };
 
 }  // namespace geometry

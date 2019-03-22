@@ -54,9 +54,9 @@ void pybind_pointcloud(py::module &m) {
             .def("normalize_normals", &geometry::PointCloud::NormalizeNormals)
             .def("paint_uniform_color",
                  &geometry::PointCloud::PaintUniformColor)
-            .def_readwrite("points", &geometry::PointCloud::points_)
-            .def_readwrite("normals", &geometry::PointCloud::normals_)
-            .def_readwrite("colors", &geometry::PointCloud::colors_);
+            .def_readwrite("points", &geometry::PointCloud::points_.h_data)
+            .def_readwrite("normals", &geometry::PointCloud::normals_.h_data)
+            .def_readwrite("colors", &geometry::PointCloud::colors_.h_data);
 }
 
 void pybind_pointcloud_methods(py::module &m) {
@@ -69,7 +69,7 @@ void pybind_pointcloud_methods(py::module &m) {
           "    z = d / depth_scale\n"
           "    x = (u - cx) * z / fx\n"
           "    y = (v - cy) * z / fy",
-          "depth"_a, "intrinsic"_a, "extrinsic"_a = Eigen::Matrix4d::Identity(),
+          "depth"_a, "intrinsic"_a, "extrinsic"_a = Mat4d::Identity(),
           "depth_scale"_a = 1000.0, "depth_trunc"_a = 1000.0, "stride"_a = 1);
     m.def("create_point_cloud_from_rgbd_image",
           &geometry::CreatePointCloudFromRGBDImage,
@@ -80,8 +80,7 @@ void pybind_pointcloud_methods(py::module &m) {
           "    z = d / depth_scale\n"
           "    x = (u - cx) * z / fx\n"
           "    y = (v - cy) * z / fy",
-          "image"_a, "intrinsic"_a,
-          "extrinsic"_a = Eigen::Matrix4d::Identity());
+          "image"_a, "intrinsic"_a, "extrinsic"_a = Mat4d::Identity());
     m.def("select_down_sample",
           (std::shared_ptr<geometry::PointCloud>(*)(
                   const geometry::PointCloud &, const std::vector<size_t> &,
@@ -121,11 +120,11 @@ void pybind_pointcloud_methods(py::module &m) {
     m.def("orient_normals_to_align_with_direction",
           &geometry::OrientNormalsToAlignWithDirection,
           "Function to orient the normals of a point cloud", "cloud"_a,
-          "orientation_reference"_a = Eigen::Vector3d(0.0, 0.0, 1.0));
+          "orientation_reference"_a = Vec3d{0.0, 0.0, 1.0});
     m.def("orient_normals_towards_camera_location",
           &geometry::OrientNormalsTowardsCameraLocation,
           "Function to orient the normals of a point cloud", "cloud"_a,
-          "camera_location"_a = Eigen::Vector3d(0.0, 0.0, 0.0));
+          "camera_location"_a = Vec3d{});
     m.def("compute_point_cloud_to_point_cloud_distance",
           &geometry::ComputePointCloudToPointCloudDistance,
           "Function to compute the point to point distances between point "

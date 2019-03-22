@@ -30,6 +30,7 @@
 #include <memory>
 #include <Eigen/Core>
 #include <Open3D/Geometry/Geometry3D.h>
+#include "Open3D/Types/Blob.h"
 
 namespace open3d {
 namespace geometry {
@@ -46,7 +47,7 @@ public:
     bool IsEmpty() const override;
     Vec3d GetMinBound() const override;
     Vec3d GetMaxBound() const override;
-    void Transform(const Eigen::Matrix4d &transformation) override;
+    void Transform(const Mat4d &transformation) override;
 
 public:
     LineSet &operator+=(const LineSet &lineset);
@@ -61,15 +62,15 @@ public:
         return HasLines() && colors_.size() == lines_.size();
     }
 
-    std::pair<Vec3d, Vec3d> GetLineCoordinate(
-            size_t i) const {
-        return std::make_pair(points_[lines_[i][0]], points_[lines_[i][1]]);
+    std::pair<Vec3d, Vec3d> GetLineCoordinate(size_t i) const {
+        return std::make_pair(points_.h_data[lines_.h_data[i][0]],
+                              points_.h_data[lines_.h_data[i][1]]);
     }
 
 public:
-    std::vector<Vec3d> points_;
-    std::vector<Vec2i> lines_;
-    std::vector<Vec3d> colors_;
+    Blob<Vec3d, double>::Type points_;
+    Blob<Vec2i, int>::Type lines_;
+    Blob<Vec3d, double>::Type colors_;
 };
 
 /// Factory function to create a lineset from two pointclouds and a

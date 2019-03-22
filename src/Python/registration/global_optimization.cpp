@@ -57,8 +57,7 @@ void pybind_global_optimization(py::module &m) {
     py::detail::bind_copy_functions<registration::PoseGraphNode>(
             pose_graph_node);
     pose_graph_node.def_readwrite("pose", &registration::PoseGraphNode::pose_)
-            .def(py::init([](Eigen::Matrix4d pose =
-                                     Eigen::Matrix4d::Identity()) {
+            .def(py::init([](Mat4d pose = Mat4d::Identity()) {
                      return new registration::PoseGraphNode(pose);
                  }),
                  "pose"_a)
@@ -91,17 +90,16 @@ void pybind_global_optimization(py::module &m) {
             .def_readwrite("confidence",
                            &registration::PoseGraphEdge::confidence_)
             .def(py::init([](int source_node_id, int target_node_id,
-                             Eigen::Matrix4d transformation,
-                             Eigen::Matrix6d information, bool uncertain,
-                             double confidence) {
+                             Mat4d transformation, Mat6d information,
+                             bool uncertain, double confidence) {
                      return new registration::PoseGraphEdge(
                              source_node_id, target_node_id, transformation,
                              information, uncertain, confidence);
                  }),
                  "source_node_id"_a = -1, "target_node_id"_a = -1,
-                 "transformation"_a = Eigen::Matrix4d::Identity(),
-                 "information"_a = Eigen::Matrix6d::Identity(),
-                 "uncertain"_a = false, "confidence"_a = 1.0)
+                 "transformation"_a = Mat4d::Identity(),
+                 "information"_a = Mat6d::Identity(), "uncertain"_a = false,
+                 "confidence"_a = 1.0)
             .def("__repr__", [](const registration::PoseGraphEdge &rr) {
                 return std::string("registration::PoseGraphEdge from nodes ") +
                        std::to_string(rr.source_node_id_) +

@@ -34,7 +34,7 @@ namespace open3d {
 namespace camera {
 
 PinholeCameraIntrinsic::PinholeCameraIntrinsic()
-    : width_(-1), height_(-1), intrinsic_matrix_(Eigen::Matrix3d::Zero()) {}
+    : width_(-1), height_(-1), intrinsic_matrix_{} {}
 
 PinholeCameraIntrinsic::PinholeCameraIntrinsic(
         int width, int height, double fx, double fy, double cx, double cy) {
@@ -58,8 +58,8 @@ PinholeCameraIntrinsic::~PinholeCameraIntrinsic() {}
 bool PinholeCameraIntrinsic::ConvertToJsonValue(Json::Value &value) const {
     value["width"] = width_;
     value["height"] = height_;
-    if (EigenMatrix3dToJsonArray(intrinsic_matrix_,
-                                 value["intrinsic_matrix"]) == false) {
+    if (Matrix3dToJsonArray(intrinsic_matrix_, value["intrinsic_matrix"]) ==
+        false) {
         return false;
     }
     return true;
@@ -74,8 +74,8 @@ bool PinholeCameraIntrinsic::ConvertFromJsonValue(const Json::Value &value) {
     }
     width_ = value.get("width", -1).asInt();
     height_ = value.get("height", -1).asInt();
-    if (EigenMatrix3dFromJsonArray(intrinsic_matrix_,
-                                   value["intrinsic_matrix"]) == false) {
+    if (Matrix3dFromJsonArray(intrinsic_matrix_, value["intrinsic_matrix"]) ==
+        false) {
         utility::PrintWarning(
                 "PinholeCameraParameters read JSON failed: wrong format.\n");
         return false;

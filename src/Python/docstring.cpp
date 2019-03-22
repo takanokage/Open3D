@@ -235,7 +235,7 @@ std::vector<std::string> FunctionDoc::GetArgumentTokens(
     std::string::const_iterator start_iter(str.cbegin());
     std::vector<size_t> argument_start_positions;
     while (std::regex_search(start_iter, str.cend(), res, pattern)) {
-        size_t pos = res.position(0) + (start_iter - str.cbegin());
+        size_t pos = res.position[0] + (start_iter - str.cbegin());
         start_iter = res.suffix().first;
         // Now the pos include ", ", which needs to be removed
         argument_start_positions.push_back(pos + 2);

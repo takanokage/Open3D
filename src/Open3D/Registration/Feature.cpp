@@ -36,37 +36,37 @@ namespace open3d {
 namespace {
 using namespace registration;
 
-Eigen::Vector4d ComputePairFeatures(const Eigen::Vector3d &p1,
-                                    const Eigen::Vector3d &n1,
-                                    const Eigen::Vector3d &p2,
-                                    const Eigen::Vector3d &n2) {
-    Eigen::Vector4d result;
-    Eigen::Vector3d dp2p1 = p2 - p1;
-    result(3) = dp2p1.norm();
-    if (result(3) == 0.0) {
-        return Eigen::Vector4d::Zero();
+Vec4d ComputePairFeatures(const Vec3d &p1,
+                          const Vec3d &n1,
+                          const Vec3d &p2,
+                          const Vec3d &n2) {
+    Vec4d result;
+    Vec3d dp2p1 = p2 - p1;
+    result[3] = dp2p1.norm();
+    if (result[3] == 0.0) {
+        return Vec4d::Zero();
     }
     auto n1_copy = n1;
     auto n2_copy = n2;
-    double angle1 = n1_copy.dot(dp2p1) / result(3);
-    double angle2 = n2_copy.dot(dp2p1) / result(3);
+    double angle1 = n1_copy.dot(dp2p1) / result[3];
+    double angle2 = n2_copy.dot(dp2p1) / result[3];
     if (acos(fabs(angle1)) > acos(fabs(angle2))) {
         n1_copy = n2;
         n2_copy = n1;
         dp2p1 *= -1.0;
-        result(2) = -angle2;
+        result[2] = -angle2;
     } else {
-        result(2) = angle1;
+        result[2] = angle1;
     }
     auto v = dp2p1.cross(n1_copy);
     double v_norm = v.norm();
     if (v_norm == 0.0) {
-        return Eigen::Vector4d::Zero();
+        return Vec4d::Zero();
     }
     v /= v_norm;
     auto w = n1_copy.cross(v);
-    result(1) = v.dot(n2_copy);
-    result(0) = atan2(w.dot(n2_copy), n1_copy.dot(n2_copy));
+    result[1] = v.dot(n2_copy);
+    result[0] = atan2(w.dot(n2_copy), n1_copy.dot(n2_copy));
     return result;
 }
 
@@ -80,8 +80,8 @@ std::shared_ptr<Feature> ComputeSPFHFeature(
 #pragma omp parallel for schedule(static)
 #endif
     for (int i = 0; i < (int)input.points_.size(); i++) {
-        const auto &point = input.points_[i];
-        const auto &normal = input.normals_[i];
+        const auto &point = input.points_.h_data[i];
+        const auto &normal = input.normals_.h_data[i];
         std::vector<int> indices;
         std::vector<double> distance2;
         if (kdtree.Search(point, search_param, indices, distance2) > 1) {
@@ -89,18 +89,18 @@ std::shared_ptr<Feature> ComputeSPFHFeature(
             double hist_incr = 100.0 / (double)(indices.size() - 1);
             for (size_t k = 1; k < indices.size(); k++) {
                 // skip the point itself, compute histogram
-                auto pf = ComputePairFeatures(point, normal,
-                                              input.points_[indices[k]],
-                                              input.normals_[indices[k]]);
-                int h_index = (int)(floor(11 * (pf(0) + M_PI) / (2.0 * M_PI)));
+                auto pf = ComputePairFeatures(
+                        point, normal, input.points_.h_data[indices[k]],
+                        input.normals_.h_data[indices[k]]);
+                int h_index = (int)(floor(11 * (pf[0] + M_PI) / (2.0 * M_PI)));
                 if (h_index < 0) h_index = 0;
                 if (h_index >= 11) h_index = 10;
                 feature->data_(h_index, i) += hist_incr;
-                h_index = (int)(floor(11 * (pf(1) + 1.0) * 0.5));
+                h_index = (int)(floor(11 * (pf[1] + 1.0) * 0.5));
                 if (h_index < 0) h_index = 0;
                 if (h_index >= 11) h_index = 10;
                 feature->data_(h_index + 11, i) += hist_incr;
-                h_index = (int)(floor(11 * (pf(2) + 1.0) * 0.5));
+                h_index = (int)(floor(11 * (pf[2] + 1.0) * 0.5));
                 if (h_index < 0) h_index = 0;
                 if (h_index >= 11) h_index = 10;
                 feature->data_(h_index + 22, i) += hist_incr;
@@ -131,7 +131,7 @@ std::shared_ptr<Feature> ComputeFPFHFeature(
 #pragma omp parallel for schedule(static)
 #endif
     for (int i = 0; i < (int)input.points_.size(); i++) {
-        const auto &point = input.points_[i];
+        const auto &point = input.points_.h_data[i];
         std::vector<int> indices;
         std::vector<double> distance2;
         if (kdtree.Search(point, search_param, indices, distance2) > 1) {

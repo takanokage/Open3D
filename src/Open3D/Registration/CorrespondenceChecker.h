@@ -33,6 +33,8 @@
 
 #include <Open3D/Registration/TransformationEstimation.h>
 
+#include "Open3D/Types/Mat.h"
+
 namespace open3d {
 
 namespace geometry {
@@ -56,7 +58,7 @@ public:
     virtual bool Check(const geometry::PointCloud &source,
                        const geometry::PointCloud &target,
                        const CorrespondenceSet &corres,
-                       const Eigen::Matrix4d &transformation) const = 0;
+                       const Mat4d &transformation) const = 0;
 
 public:
     /// Some checkers do not require point clouds to be aligned, e.g., the edge
@@ -78,7 +80,7 @@ public:
     bool Check(const geometry::PointCloud &source,
                const geometry::PointCloud &target,
                const CorrespondenceSet &corres,
-               const Eigen::Matrix4d &transformation) const override;
+               const Mat4d &transformation) const override;
 
 public:
     double similarity_threshold_;
@@ -96,7 +98,7 @@ public:
     bool Check(const geometry::PointCloud &source,
                const geometry::PointCloud &target,
                const CorrespondenceSet &corres,
-               const Eigen::Matrix4d &transformation) const override;
+               const Mat4d &transformation) const override;
 
 public:
     double distance_threshold_;
@@ -114,7 +116,7 @@ public:
     bool Check(const geometry::PointCloud &source,
                const geometry::PointCloud &target,
                const CorrespondenceSet &corres,
-               const Eigen::Matrix4d &transformation) const override;
+               const Mat4d &transformation) const override;
 
 public:
     double normal_angle_threshold_;

@@ -50,11 +50,9 @@ void Image::Clear() {
 
 bool Image::IsEmpty() const { return !HasData(); }
 
-Eigen::Vector2d Image::GetMinBound() const { return Eigen::Vector2d(0.0, 0.0); }
+Vec2d Image::GetMinBound() const { return Vec2d{0.0, 0.0}; }
 
-Eigen::Vector2d Image::GetMaxBound() const {
-    return Eigen::Vector2d(width_, height_);
-}
+Vec2d Image::GetMaxBound() const { return Vec2d{width_, height_}; }
 
 bool Image::TestImageBoundary(double u,
                               double v,

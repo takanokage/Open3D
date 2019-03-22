@@ -37,19 +37,18 @@ template <class RGBDOdometryJacobianBase = odometry::RGBDOdometryJacobian>
 class PyRGBDOdometryJacobian : public RGBDOdometryJacobianBase {
 public:
     using RGBDOdometryJacobianBase::RGBDOdometryJacobianBase;
-    void ComputeJacobianAndResidual(
-            int row,
-            std::vector<Eigen::Vector6d, utility::Vector6d_allocator> &J_r,
-            std::vector<double> &r,
-            const geometry::RGBDImage &source,
-            const geometry::RGBDImage &target,
-            const geometry::Image &source_xyz,
-            const geometry::RGBDImage &target_dx,
-            const geometry::RGBDImage &target_dy,
-            const Eigen::Matrix3d &intrinsic,
-            const Eigen::Matrix4d &extrinsic,
-            const odometry::CorrespondenceSetPixelWise &corresps)
-            const override {
+    void ComputeJacobianAndResidual(int row,
+                                    std::vector<Vec6d> &J_r,
+                                    std::vector<double> &r,
+                                    const geometry::RGBDImage &source,
+                                    const geometry::RGBDImage &target,
+                                    const geometry::Image &source_xyz,
+                                    const geometry::RGBDImage &target_dx,
+                                    const geometry::RGBDImage &target_dy,
+                                    const Mat3d &intrinsic,
+                                    const Mat4d &extrinsic,
+                                    const odometry::CorrespondenceSetPixelWise
+                                            &corresps) const override {
         PYBIND11_OVERLOAD_PURE(void, RGBDOdometryJacobianBase, row, J_r, r,
                                source, target, source_xyz, target_dx, target_dy,
                                extrinsic, corresps, intrinsic);
@@ -146,7 +145,7 @@ void pybind_odometry_methods(py::module &m) {
           "Function to estimate 6D rigid motion from two RGBD image pairs",
           "rgbd_source"_a, "rgbd_target"_a,
           "pinhole_camera_intrinsic"_a = camera::PinholeCameraIntrinsic(),
-          "odo_init"_a = Eigen::Matrix4d::Identity(),
+          "odo_init"_a = Mat4d::Identity(),
           "jacobian"_a = odometry::RGBDOdometryJacobianFromHybridTerm(),
           "option"_a = odometry::OdometryOption());
 }

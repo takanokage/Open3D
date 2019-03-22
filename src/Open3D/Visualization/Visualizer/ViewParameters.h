@@ -30,33 +30,31 @@
 #include <Eigen/StdVector>
 #include <Open3D/Utility/IJsonConvertible.h>
 
+#include "Open3D/Types/Mat.h"
+
 namespace open3d {
 namespace visualization {
 
 class ViewParameters : public utility::IJsonConvertible {
-public:
-    typedef Eigen::Matrix<double, 17, 4, Eigen::RowMajor> Matrix17x4d;
-    typedef Eigen::Matrix<double, 17, 1> Vector17d;
-    typedef Eigen::aligned_allocator<Matrix17x4d> Matrix17x4d_allocator;
 
 public:
     ViewParameters() {}
     ~ViewParameters() override {}
 
 public:
-    Vector17d ConvertToVector17d();
-    void ConvertFromVector17d(const Vector17d &v);
+    Vec17d ConvertToVector17d();
+    void ConvertFromVector17d(const Vec17d &v);
     bool ConvertToJsonValue(Json::Value &value) const override;
     bool ConvertFromJsonValue(const Json::Value &value) override;
 
 public:
     double field_of_view_;
     double zoom_;
-    Eigen::Vector3d lookat_;
-    Eigen::Vector3d up_;
-    Eigen::Vector3d front_;
-    Eigen::Vector3d boundingbox_min_;
-    Eigen::Vector3d boundingbox_max_;
+    Vec3d lookat_;
+    Vec3d up_;
+    Vec3d front_;
+    Vec3d boundingbox_min_;
+    Vec3d boundingbox_max_;
 };
 
 }  // namespace visualization

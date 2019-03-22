@@ -72,18 +72,18 @@ void OptimizeImageCoorNonrigid(
                               warping_fields[c].anchor_h_ * 2;
             double rr_reg = 0.0;
 
-            Eigen::Matrix4d pose;
+            Mat4d pose;
             pose = camera.parameters_[c].extrinsic_;
 
             auto intrinsic = camera.parameters_[c].intrinsic_.intrinsic_matrix_;
             auto extrinsic = camera.parameters_[c].extrinsic_;
             ColorMapOptimizationJacobian jac;
-            Eigen::Matrix4d intr = Eigen::Matrix4d::Zero();
+            Mat4d intr = Mat4d::Zero();
             intr.block<3, 3>(0, 0) = intrinsic;
-            intr(3, 3) = 1.0;
+            intr[3][3] = 1.0;
 
-            auto f_lambda = [&](int i, Eigen::Vector14d& J_r, double& r,
-                                Eigen::Vector14i& pattern) {
+            auto f_lambda = [&](int i, Vec14d& J_r, double& r,
+                                Vec14i& pattern) {
                 jac.ComputeJacobianAndResidualNonRigid(
                         i, J_r, r, pattern, mesh, proxy_intensity,
                         images_gray[c], images_dx[c], images_dy[c],
@@ -95,8 +95,8 @@ void OptimizeImageCoorNonrigid(
             Eigen::VectorXd JTr;
             double r2;
             std::tie(JTJ, JTr, r2) =
-                    ComputeJTJandJTrNonRigid<Eigen::Vector14d, Eigen::Vector14i,
-                                             Eigen::MatrixXd, Eigen::VectorXd>(
+                    ComputeJTJandJTrNonRigid<Vec14d, Vec14i, Eigen::MatrixXd,
+                                             Eigen::VectorXd>(
                             f_lambda, visiblity_image_to_vertex[c].size(),
                             nonrigidval, false);
 
@@ -116,7 +116,7 @@ void OptimizeImageCoorNonrigid(
                     JTJ, -JTr, /*prefer_sparse=*/false,
                     /*check_symmetric=*/false,
                     /*check_det=*/false, /*check_psd=*/false);
-            Eigen::Vector6d result_pose;
+            Vec6d result_pose;
             result_pose << result.block(0, 0, 6, 1);
             auto delta = utility::TransformVector6dToMatrix4d(result_pose);
             pose = delta * pose;
@@ -165,33 +165,31 @@ void OptimizeImageCoorRigid(
 #pragma omp parallel for schedule(static)
 #endif
         for (int c = 0; c < n_camera; c++) {
-            Eigen::Matrix4d pose;
+            Mat4d pose;
             pose = camera.parameters_[c].extrinsic_;
 
             auto intrinsic = camera.parameters_[c].intrinsic_.intrinsic_matrix_;
             auto extrinsic = camera.parameters_[c].extrinsic_;
             ColorMapOptimizationJacobian jac;
-            Eigen::Matrix4d intr = Eigen::Matrix4d::Zero();
+            Mat4d intr = Mat4d::Zero();
             intr.block<3, 3>(0, 0) = intrinsic;
-            intr(3, 3) = 1.0;
+            intr[3][3] = 1.0;
 
-            auto f_lambda = [&](int i, Eigen::Vector6d& J_r, double& r) {
+            auto f_lambda = [&](int i, Vec6d& J_r, double& r) {
                 jac.ComputeJacobianAndResidualRigid(
                         i, J_r, r, mesh, proxy_intensity, images_gray[c],
                         images_dx[c], images_dy[c], intr, extrinsic,
                         visiblity_image_to_vertex[c],
                         option.image_boundary_margin_);
             };
-            Eigen::Matrix6d JTJ;
-            Eigen::Vector6d JTr;
+            Mat6d JTJ;
+            Vec6d JTr;
             double r2;
-            std::tie(JTJ, JTr, r2) =
-                    utility::ComputeJTJandJTr<Eigen::Matrix6d, Eigen::Vector6d>(
-                            f_lambda, visiblity_image_to_vertex[c].size(),
-                            false);
+            std::tie(JTJ, JTr, r2) = utility::ComputeJTJandJTr<Mat6d, Vec6d>(
+                    f_lambda, visiblity_image_to_vertex[c].size(), false);
 
             bool is_success;
-            Eigen::Matrix4d delta;
+            Mat4d delta;
             std::tie(is_success, delta) =
                     utility::SolveJacobianSystemAndObtainExtrinsicMatrix(JTJ,
                                                                          JTr);

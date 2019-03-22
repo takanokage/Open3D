@@ -63,8 +63,8 @@ public:
 public:
     void Clear() override;
     bool IsEmpty() const override;
-    Eigen::Vector2d GetMinBound() const override;
-    Eigen::Vector2d GetMaxBound() const override;
+    Vec2d GetMinBound() const override;
+    Vec2d GetMaxBound() const override;
     bool TestImageBoundary(double u, double v, double inner_margin = 0.0) const;
 
 public:

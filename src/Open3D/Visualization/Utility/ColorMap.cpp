@@ -60,32 +60,32 @@ public:
 }  // unnamed namespace
 
 namespace visualization {
-Eigen::Vector3d ColorMapGray::GetColor(double value) const {
-    return Eigen::Vector3d(value, value, value);
+Vec3d ColorMapGray::GetColor(double value) const {
+    return Vec3d{value, value, value};
 }
 
-Eigen::Vector3d ColorMapJet::GetColor(double value) const {
-    return Eigen::Vector3d(JetBase(value * 2.0 - 1.5),   // red
-                           JetBase(value * 2.0 - 1.0),   // green
-                           JetBase(value * 2.0 - 0.5));  // blue
+Vec3d ColorMapJet::GetColor(double value) const {
+    return Vec3d{JetBase(value * 2.0 - 1.5),   // red
+                 JetBase(value * 2.0 - 1.0),   // green
+                 JetBase(value * 2.0 - 0.5)};  // blue
 }
 
-Eigen::Vector3d ColorMapSummer::GetColor(double value) const {
-    return Eigen::Vector3d(Interpolate(value, 0.0, 0.0, 1.0, 1.0),
-                           Interpolate(value, 0.5, 0.0, 1.0, 1.0), 0.4);
+Vec3d ColorMapSummer::GetColor(double value) const {
+    return Vec3d{Interpolate(value, 0.0, 0.0, 1.0, 1.0),
+                 Interpolate(value, 0.5, 0.0, 1.0, 1.0), 0.4};
 }
 
-Eigen::Vector3d ColorMapWinter::GetColor(double value) const {
-    return Eigen::Vector3d(0.0, Interpolate(value, 0.0, 0.0, 1.0, 1.0),
-                           Interpolate(value, 1.0, 0.0, 0.5, 1.0));
+Vec3d ColorMapWinter::GetColor(double value) const {
+    return Vec3d{0.0, Interpolate(value, 0.0, 0.0, 1.0, 1.0),
+                 Interpolate(value, 1.0, 0.0, 0.5, 1.0)};
 }
 
-Eigen::Vector3d ColorMapHot::GetColor(double value) const {
-    Eigen::Vector3d edges[4] = {
-            Eigen::Vector3d(1.0, 1.0, 1.0),
-            Eigen::Vector3d(1.0, 1.0, 0.0),
-            Eigen::Vector3d(1.0, 0.0, 0.0),
-            Eigen::Vector3d(0.0, 0.0, 0.0),
+Vec3d ColorMapHot::GetColor(double value) const {
+    Vec3d edges[4] = {
+            Vec3d{1.0, 1.0, 1.0},
+            Vec3d{1.0, 1.0, 0.0},
+            Vec3d{1.0, 0.0, 0.0},
+            Vec3d{},
     };
     if (value < 0.0) {
         return edges[0];

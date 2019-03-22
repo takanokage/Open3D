@@ -44,13 +44,13 @@ void unit_test::Rand(Vector3d &v,
     Raw raw(seed);
 
     Vector3d factor;
-    factor(0, 0) = vmax(0, 0) - vmin(0, 0);
-    factor(1, 0) = vmax(1, 0) - vmin(1, 0);
-    factor(2, 0) = vmax(2, 0) - vmin(2, 0);
+    factor[0][0] = vmax[0][0] - vmin[0][0];
+    factor[1][0] = vmax[1][0] - vmin[1][0];
+    factor[2][0] = vmax[2][0] - vmin[2][0];
 
-    v(0, 0) = vmin(0, 0) + raw.Next<double>() * factor(0, 0);
-    v(1, 0) = vmin(1, 0) + raw.Next<double>() * factor(1, 0);
-    v(2, 0) = vmin(2, 0) + raw.Next<double>() * factor(2, 0);
+    v[0][0] = vmin[0][0] + raw.Next<double>() * factor[0][0];
+    v[1][0] = vmin[1][0] + raw.Next<double>() * factor[1][0];
+    v[2][0] = vmin[2][0] + raw.Next<double>() * factor[2][0];
 }
 
 // ----------------------------------------------------------------------------
@@ -66,9 +66,9 @@ void unit_test::Rand(Vector3d &v,
     double factor;
     factor = vmax - vmin;
 
-    v(0, 0) = vmin + raw.Next<double>() * factor;
-    v(1, 0) = vmin + raw.Next<double>() * factor;
-    v(2, 0) = vmin + raw.Next<double>() * factor;
+    v[0][0] = vmin + raw.Next<double>() * factor;
+    v[1][0] = vmin + raw.Next<double>() * factor;
+    v[2][0] = vmin + raw.Next<double>() * factor;
 }
 
 // ----------------------------------------------------------------------------
@@ -82,12 +82,12 @@ void unit_test::Rand(vector<Vector2i> &v,
     Raw raw(seed);
 
     Vector2d factor;
-    factor(0, 0) = (double)(vmax(0, 0) - vmin(0, 0)) / Raw::VMAX;
-    factor(1, 0) = (double)(vmax(1, 0) - vmin(1, 0)) / Raw::VMAX;
+    factor[0][0] = (double)(vmax[0][0] - vmin[0][0]) / Raw::VMAX;
+    factor[1][0] = (double)(vmax[1][0] - vmin[1][0]) / Raw::VMAX;
 
     for (size_t i = 0; i < v.size(); i++) {
-        v[i](0, 0) = vmin(0, 0) + (int)(raw.Next<int>() * factor(0, 0));
-        v[i](1, 0) = vmin(1, 0) + (int)(raw.Next<int>() * factor(1, 0));
+        v[i][0][0] = vmin[0][0] + (int)(raw.Next<int>() * factor[0][0]);
+        v[i][1][0] = vmin[1][0] + (int)(raw.Next<int>() * factor[1][0]);
     }
 }
 
@@ -102,14 +102,14 @@ void unit_test::Rand(vector<Vector3i> &v,
     Raw raw(seed);
 
     Vector3d factor;
-    factor(0, 0) = (double)(vmax(0, 0) - vmin(0, 0)) / Raw::VMAX;
-    factor(1, 0) = (double)(vmax(1, 0) - vmin(1, 0)) / Raw::VMAX;
-    factor(2, 0) = (double)(vmax(2, 0) - vmin(2, 0)) / Raw::VMAX;
+    factor[0][0] = (double)(vmax[0][0] - vmin[0][0]) / Raw::VMAX;
+    factor[1][0] = (double)(vmax[1][0] - vmin[1][0]) / Raw::VMAX;
+    factor[2][0] = (double)(vmax[2][0] - vmin[2][0]) / Raw::VMAX;
 
     for (size_t i = 0; i < v.size(); i++) {
-        v[i](0, 0) = vmin(0, 0) + (int)(raw.Next<int>() * factor(0, 0));
-        v[i](1, 0) = vmin(1, 0) + (int)(raw.Next<int>() * factor(1, 0));
-        v[i](2, 0) = vmin(2, 0) + (int)(raw.Next<int>() * factor(2, 0));
+        v[i][0][0] = vmin[0][0] + (int)(raw.Next<int>() * factor[0][0]);
+        v[i][1][0] = vmin[1][0] + (int)(raw.Next<int>() * factor[1][0]);
+        v[i][2][0] = vmin[2][0] + (int)(raw.Next<int>() * factor[2][0]);
     }
 }
 
@@ -117,19 +117,19 @@ void unit_test::Rand(vector<Vector3i> &v,
 // Initialize an Vector2d vector.
 // Output range: [vmin:vmax].
 // ----------------------------------------------------------------------------
-void unit_test::Rand(vector<Vector2d, open3d::utility::Vector2d_allocator> &v,
+void unit_test::Rand(vector<Vector2d> &v,
                      const Vector2d &vmin,
                      const Vector2d &vmax,
                      const int &seed) {
     Raw raw(seed);
 
     Vector2d factor;
-    factor(0, 0) = vmax(0, 0) - vmin(0, 0);
-    factor(1, 0) = vmax(1, 0) - vmin(1, 0);
+    factor[0][0] = vmax[0][0] - vmin[0][0];
+    factor[1][0] = vmax[1][0] - vmin[1][0];
 
     for (size_t i = 0; i < v.size(); i++) {
-        v[i](0, 0) = vmin(0, 0) + raw.Next<double>() * factor(0, 0);
-        v[i](1, 0) = vmin(1, 0) + raw.Next<double>() * factor(1, 0);
+        v[i][0][0] = vmin[0][0] + raw.Next<double>() * factor[0][0];
+        v[i][1][0] = vmin[1][0] + raw.Next<double>() * factor[1][0];
     }
 }
 
@@ -144,14 +144,14 @@ void unit_test::Rand(vector<Vector3d> &v,
     Raw raw(seed);
 
     Vector3d factor;
-    factor(0, 0) = vmax(0, 0) - vmin(0, 0);
-    factor(1, 0) = vmax(1, 0) - vmin(1, 0);
-    factor(2, 0) = vmax(2, 0) - vmin(2, 0);
+    factor[0][0] = vmax[0][0] - vmin[0][0];
+    factor[1][0] = vmax[1][0] - vmin[1][0];
+    factor[2][0] = vmax[2][0] - vmin[2][0];
 
     for (size_t i = 0; i < v.size(); i++) {
-        v[i](0, 0) = vmin(0, 0) + raw.Next<double>() * factor(0, 0);
-        v[i](1, 0) = vmin(1, 0) + raw.Next<double>() * factor(1, 0);
-        v[i](2, 0) = vmin(2, 0) + raw.Next<double>() * factor(2, 0);
+        v[i][0][0] = vmin[0][0] + raw.Next<double>() * factor[0][0];
+        v[i][1][0] = vmin[1][0] + raw.Next<double>() * factor[1][0];
+        v[i][2][0] = vmin[2][0] + raw.Next<double>() * factor[2][0];
     }
 }
 
@@ -159,7 +159,7 @@ void unit_test::Rand(vector<Vector3d> &v,
 // Initialize an Vector4i vector.
 // Output range: [vmin:vmax].
 // ----------------------------------------------------------------------------
-void unit_test::Rand(vector<Vector4i, open3d::utility::Vector4i_allocator> &v,
+void unit_test::Rand(vector<Vector4i> &v,
                      const int &vmin,
                      const int &vmax,
                      const int &seed) {
@@ -168,10 +168,10 @@ void unit_test::Rand(vector<Vector4i, open3d::utility::Vector4i_allocator> &v,
     double factor = (double)(vmax - vmin) / Raw::VMAX;
 
     for (size_t i = 0; i < v.size(); i++) {
-        v[i](0, 0) = vmin + (int)(raw.Next<int>() * factor);
-        v[i](1, 0) = vmin + (int)(raw.Next<int>() * factor);
-        v[i](2, 0) = vmin + (int)(raw.Next<int>() * factor);
-        v[i](3, 0) = vmin + (int)(raw.Next<int>() * factor);
+        v[i][0][0] = vmin + (int)(raw.Next<int>() * factor);
+        v[i][1][0] = vmin + (int)(raw.Next<int>() * factor);
+        v[i][2][0] = vmin + (int)(raw.Next<int>() * factor);
+        v[i][3][0] = vmin + (int)(raw.Next<int>() * factor);
     }
 }
 

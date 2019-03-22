@@ -47,8 +47,7 @@ const double ViewControl::ZOOM_STEP = 0.02;
 const double ViewControl::ROTATION_RADIAN_PER_PIXEL = 0.003;
 
 void ViewControl::SetViewMatrices(
-        const Eigen::Matrix4d
-                &model_matrix /* = Eigen::Matrix4d::Identity()*/) {
+        const Mat4d &model_matrix /* = Mat4d::Identity()*/) {
     if (window_height_ <= 0 || window_width_ <= 0) {
         utility::PrintWarning(
                 "[ViewControl] SetViewPoint() failed because window height and "
@@ -129,23 +128,23 @@ bool ViewControl::ConvertToPinholeCameraParameters(
     intrinsic.intrinsic_matrix_.setIdentity();
     double fov_rad = field_of_view_ / 180.0 * M_PI;
     double tan_half_fov = std::tan(fov_rad / 2.0);
-    intrinsic.intrinsic_matrix_(0, 0) = intrinsic.intrinsic_matrix_(1, 1) =
+    intrinsic.intrinsic_matrix_[0][0] = intrinsic.intrinsic_matrix_[1][1] =
             (double)window_height_ / tan_half_fov / 2.0;
-    intrinsic.intrinsic_matrix_(0, 2) = (double)window_width_ / 2.0 - 0.5;
-    intrinsic.intrinsic_matrix_(1, 2) = (double)window_height_ / 2.0 - 0.5;
+    intrinsic.intrinsic_matrix_[0][2] = (double)window_width_ / 2.0 - 0.5;
+    intrinsic.intrinsic_matrix_[1][2] = (double)window_height_ / 2.0 - 0.5;
     parameters.intrinsic_ = intrinsic;
-    Eigen::Matrix4d extrinsic;
+    Mat4d extrinsic;
     extrinsic.setZero();
-    Eigen::Vector3d front_dir = front_.normalized();
-    Eigen::Vector3d up_dir = up_.normalized();
-    Eigen::Vector3d right_dir = right_.normalized();
+    Vec3d front_dir = front_.normalized();
+    Vec3d up_dir = up_.normalized();
+    Vec3d right_dir = right_.normalized();
     extrinsic.block<1, 3>(0, 0) = right_dir.transpose();
     extrinsic.block<1, 3>(1, 0) = -up_dir.transpose();
     extrinsic.block<1, 3>(2, 0) = -front_dir.transpose();
-    extrinsic(0, 3) = -right_dir.dot(eye_);
-    extrinsic(1, 3) = up_dir.dot(eye_);
-    extrinsic(2, 3) = front_dir.dot(eye_);
-    extrinsic(3, 3) = 1.0;
+    extrinsic[0][3] = -right_dir.dot(eye_);
+    extrinsic[1][3] = up_dir.dot(eye_);
+    extrinsic[2][3] = front_dir.dot(eye_);
+    extrinsic[3][3] = 1.0;
     parameters.extrinsic_ = extrinsic;
     return true;
 }
@@ -157,9 +156,9 @@ bool ViewControl::ConvertFromPinholeCameraParameters(
     if (window_height_ <= 0 || window_width_ <= 0 ||
         window_height_ != intrinsic.height_ ||
         window_width_ != intrinsic.width_ ||
-        intrinsic.intrinsic_matrix_(0, 2) !=
+        intrinsic.intrinsic_matrix_[0][2] !=
                 (double)window_width_ / 2.0 - 0.5 ||
-        intrinsic.intrinsic_matrix_(1, 2) !=
+        intrinsic.intrinsic_matrix_[1][2] !=
                 (double)window_height_ / 2.0 - 0.5) {
         utility::PrintWarning(
                 "[ViewControl] ConvertFromPinholeCameraParameters() failed "
@@ -167,7 +166,7 @@ bool ViewControl::ConvertFromPinholeCameraParameters(
         return false;
     }
     double tan_half_fov =
-            (double)window_height_ / (intrinsic.intrinsic_matrix_(1, 1) * 2.0);
+            (double)window_height_ / (intrinsic.intrinsic_matrix_[1][1] * 2.0);
     double fov_rad = std::atan(tan_half_fov) * 2.0;
     double old_fov = field_of_view_;
     field_of_view_ =
@@ -208,8 +207,8 @@ void ViewControl::Reset() {
     field_of_view_ = FIELD_OF_VIEW_DEFAULT;
     zoom_ = ZOOM_DEFAULT;
     lookat_ = bounding_box_.GetCenter();
-    up_ = Eigen::Vector3d(0.0, 1.0, 0.0);
-    front_ = Eigen::Vector3d(0.0, 0.0, 1.0);
+    up_ = Vec3d{0.0, 1.0, 0.0};
+    front_ = Vec3d{0.0, 0.0, 1.0};
     SetProjectionParameters();
 }
 
@@ -267,8 +266,8 @@ void ViewControl::Translate(double x,
                             double y,
                             double xo /* = 0.0*/,
                             double yo /* = 0.0*/) {
-    Eigen::Vector3d shift = right_ * (-x) / window_height_ * view_ratio_ * 2.0 +
-                            up_ * y / window_height_ * view_ratio_ * 2.0;
+    Vec3d shift = right_ * (-x) / window_height_ * view_ratio_ * 2.0 +
+                  up_ * y / window_height_ * view_ratio_ * 2.0;
     eye_ += shift;
     lookat_ += shift;
     SetProjectionParameters();

@@ -30,6 +30,7 @@
 #include <memory>
 #include <Eigen/Core>
 #include <Open3D/Geometry/Geometry3D.h>
+#include "Open3D/Types/Blob.h"
 
 namespace open3d {
 namespace geometry {
@@ -47,7 +48,7 @@ public:
     bool IsEmpty() const override;
     Vec3d GetMinBound() const override;
     Vec3d GetMaxBound() const override;
-    void Transform(const Eigen::Matrix4d &transformation) override;
+    void Transform(const Mat4d &transformation) override;
 
 public:
     VoxelGrid &operator+=(const VoxelGrid &voxelgrid);
@@ -63,8 +64,8 @@ public:
 public:
     double voxel_size_;
     Vec3d origin_;
-    std::vector<Eigen::Vector3i> voxels_;
-    std::vector<Vec3d> colors_;
+    Blob<Vec3i, int>::Type voxels_;
+    Blob<Vec3d, double>::Type colors_;
 };
 
 std::shared_ptr<VoxelGrid> CreateSurfaceVoxelGridFromPointCloud(

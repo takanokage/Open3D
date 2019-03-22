@@ -32,51 +32,45 @@
 #include <vector>
 
 namespace unit_test {
-// Initialize an Eigen::Vector3d.
+// Initialize an Vec3d.
 // Output range: [vmin:vmax].
-void Rand(Eigen::Vector3d& v,
-          const Eigen::Vector3d& vmin,
-          const Eigen::Vector3d& vmax,
+void Rand(Vec3d& v, const Vec3d& vmin, const Vec3d& vmax, const int& seed);
+
+// Initialize an Vec3d.
+// Output range: [vmin:vmax].
+void Rand(Vec3d& v, const double& vmin, const double& vmax, const int& seed);
+
+// Initialize an Vec2i vector.
+// Output range: [vmin:vmax].
+void Rand(std::vector<Vec2i>& v,
+          const Vec2i& vmin,
+          const Vec2i& vmax,
           const int& seed);
 
-// Initialize an Eigen::Vector3d.
+// Initialize an Vec2d vector.
 // Output range: [vmin:vmax].
-void Rand(Eigen::Vector3d& v,
-          const double& vmin,
-          const double& vmax,
+void Rand(std::vector<Vec2d>& v,
+          const Vec2d& vmin,
+          const Vec2d& vmax,
           const int& seed);
 
-// Initialize an Eigen::Vector2i vector.
+// Initialize an Vec3i vector.
 // Output range: [vmin:vmax].
-void Rand(std::vector<Eigen::Vector2i>& v,
-          const Eigen::Vector2i& vmin,
-          const Eigen::Vector2i& vmax,
+void Rand(std::vector<Vec3i>& v,
+          const Vec3i& vmin,
+          const Vec3i& vmax,
           const int& seed);
 
-// Initialize an Eigen::Vector2d vector.
+// Initialize an Vec3d vector.
 // Output range: [vmin:vmax].
-void Rand(std::vector<Eigen::Vector2d, open3d::utility::Vector2d_allocator>& v,
-          const Eigen::Vector2d& vmin,
-          const Eigen::Vector2d& vmax,
+void Rand(std::vector<Vec3d>& v,
+          const Vec3d& vmin,
+          const Vec3d& vmax,
           const int& seed);
 
-// Initialize an Eigen::Vector3i vector.
+// Initialize an Vec4i vector.
 // Output range: [vmin:vmax].
-void Rand(std::vector<Eigen::Vector3i>& v,
-          const Eigen::Vector3i& vmin,
-          const Eigen::Vector3i& vmax,
-          const int& seed);
-
-// Initialize an Eigen::Vector3d vector.
-// Output range: [vmin:vmax].
-void Rand(std::vector<Eigen::Vector3d>& v,
-          const Eigen::Vector3d& vmin,
-          const Eigen::Vector3d& vmax,
-          const int& seed);
-
-// Initialize an Eigen::Vector4i vector.
-// Output range: [vmin:vmax].
-void Rand(std::vector<Eigen::Vector4i, open3d::utility::Vector4i_allocator>& v,
+void Rand(std::vector<Vec4i>& v,
           const int& vmin,
           const int& vmax,
           const int& seed);

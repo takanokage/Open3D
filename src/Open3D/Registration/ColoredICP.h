@@ -46,7 +46,7 @@ RegistrationResult RegistrationColoredICP(
         const geometry::PointCloud &source,
         const geometry::PointCloud &target,
         double max_distance,
-        const Eigen::Matrix4d &init = Eigen::Matrix4d::Identity(),
+        const Mat4d &init = Mat4d::Identity(),
         const ICPConvergenceCriteria &criteria = ICPConvergenceCriteria(),
         double lambda_geometric = 0.968);
 

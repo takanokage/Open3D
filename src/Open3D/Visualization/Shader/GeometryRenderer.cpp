@@ -260,12 +260,10 @@ bool SelectionPolygonRenderer::UpdateGeometry() {
 bool PointCloudPickerRenderer::Render(const RenderOption &option,
                                       const ViewControl &view) {
     const int NUM_OF_COLOR_PALETTE = 5;
-    Eigen::Vector3d color_palette[NUM_OF_COLOR_PALETTE] = {
-            Eigen::Vector3d(255, 180, 0) / 255.0,
-            Eigen::Vector3d(0, 166, 237) / 255.0,
-            Eigen::Vector3d(246, 81, 29) / 255.0,
-            Eigen::Vector3d(127, 184, 0) / 255.0,
-            Eigen::Vector3d(13, 44, 84) / 255.0,
+    Vec3d color_palette[NUM_OF_COLOR_PALETTE] = {
+            Vec3d{255, 180, 0} / 255.0, Vec3d{0, 166, 237} / 255.0,
+            Vec3d{246, 81, 29} / 255.0, Vec3d{127, 184, 0} / 255.0,
+            Vec3d{13, 44, 84} / 255.0,
     };
     if (is_visible_ == false || geometry_ptr_->IsEmpty()) return true;
     const auto &picker = (const PointCloudPicker &)(*geometry_ptr_);
@@ -283,8 +281,8 @@ bool PointCloudPickerRenderer::Render(const RenderOption &option,
             sphere->vertex_colors_.resize(
                     sphere->vertices_.size(),
                     color_palette[i % NUM_OF_COLOR_PALETTE]);
-            Eigen::Matrix4d trans = Eigen::Matrix4d::Identity();
-            trans.block<3, 1>(0, 3) = pointcloud.points_[index];
+            Mat4d trans = Mat4d::Identity();
+            trans.block<3, 1>(0, 3) = pointcloud.points_.h_data[index];
             sphere->Transform(trans);
             phong_shader_.InvalidateGeometry();
             if (phong_shader_.Render(*sphere, option, view) == false) {

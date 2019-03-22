@@ -64,7 +64,7 @@ public:
     /// Function to integrate an RGB-D image into the volume
     virtual void Integrate(const geometry::RGBDImage &image,
                            const camera::PinholeCameraIntrinsic &intrinsic,
-                           const Eigen::Matrix4d &extrinsic) = 0;
+                           const Mat4d &extrinsic) = 0;
 
     /// Function to extract a point cloud with normals, using the marching cubes
     /// algorithm (https://en.wikipedia.org/wiki/Marching_cubes)

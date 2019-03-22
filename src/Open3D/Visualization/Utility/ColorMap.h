@@ -47,7 +47,7 @@ public:
 
 public:
     /// Function to get a color from a value in [0..1]
-    virtual Eigen::Vector3d GetColor(double value) const = 0;
+    virtual Vec3d GetColor(double value) const = 0;
 
 protected:
     double Interpolate(
@@ -56,11 +56,11 @@ protected:
         if (value > x1) return y1;
         return (value - x0) * (y1 - y0) / (x1 - x0) + y0;
     }
-    Eigen::Vector3d Interpolate(double value,
-                                const Eigen::Vector3d &y0,
-                                double x0,
-                                const Eigen::Vector3d &y1,
-                                double x1) const {
+    Vec3d Interpolate(double value,
+                      const Vec3d &y0,
+                      double x0,
+                      const Vec3d &y1,
+                      double x1) const {
         if (value < x0) return y0;
         if (value > x1) return y1;
         return (value - x0) * (y1 - y0) / (x1 - x0) + y0;
@@ -69,13 +69,13 @@ protected:
 
 class ColorMapGray final : public ColorMap {
 public:
-    Eigen::Vector3d GetColor(double value) const final;
+    Vec3d GetColor(double value) const final;
 };
 
 /// See Matlab's Jet colormap
 class ColorMapJet final : public ColorMap {
 public:
-    Eigen::Vector3d GetColor(double value) const final;
+    Vec3d GetColor(double value) const final;
 
 protected:
     double JetBase(double value) const {
@@ -96,18 +96,18 @@ protected:
 /// See Matlab's Summer colormap
 class ColorMapSummer final : public ColorMap {
 public:
-    Eigen::Vector3d GetColor(double value) const final;
+    Vec3d GetColor(double value) const final;
 };
 
 /// See Matlab's Winter colormap
 class ColorMapWinter final : public ColorMap {
 public:
-    Eigen::Vector3d GetColor(double value) const final;
+    Vec3d GetColor(double value) const final;
 };
 
 class ColorMapHot final : public ColorMap {
 public:
-    Eigen::Vector3d GetColor(double value) const final;
+    Vec3d GetColor(double value) const final;
 };
 
 /// Interface functions

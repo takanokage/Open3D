@@ -140,7 +140,7 @@ TEST(Eigen, SolveJacobianSystemAndObtainExtrinsicMatrix) {
     Matrix4d result;
 
     int loops = 10000;
-    srand((unsigned int)time(0));
+    srand((unsigned int)time[0]);
     for (int i = 0; i < loops; i++) {
         Vector6d x = Vector6d::Random();
 
@@ -168,10 +168,10 @@ TEST(Eigen, SolveJacobianSystemAndObtainExtrinsicMatrixArray) {
     JTJ = JTJ + Matrix6d::Identity();
 
     bool status = false;
-    vector<Matrix4d, utility::Matrix4d_allocator> result;
+    vector<Matrix4d> result;
 
     int loops = 10000;
-    srand((unsigned int)time(0));
+    srand((unsigned int)time[0]);
     for (int i = 0; i < loops; i++) {
         Vector6d x = Vector6d::Random();
 
@@ -205,7 +205,7 @@ TEST(Eigen, ComputeJTJandJTr) {
     auto testFunction = [&](int i, Vector6d &J_r, double &r) {
 #pragma omp critical
         {
-            vector<double> v(6);
+            vector<double> v[6];
             Rand(v, -1.0, 1.0, i);
 
             for (int k = 0; k < 6; k++) J_r(k) = v[k];
@@ -242,9 +242,7 @@ TEST(Eigen, ComputeJTJandJTr_vector) {
     Vector6d ref_JTr;
     ref_JTr << 2.896078, 4.166667, -1.629412, 1.386275, -4.468627, -7.115686;
 
-    auto testFunction = [&](int i,
-                            vector<Vector6d, utility::Vector6d_allocator> &J_r,
-                            vector<double> &r) {
+    auto testFunction = [&](int i, vector<Vector6d> &J_r, vector<double> &r) {
 #pragma omp critical
         {
             size_t size = 10;
@@ -252,7 +250,7 @@ TEST(Eigen, ComputeJTJandJTr_vector) {
             J_r.resize(size);
             r.resize(size);
 
-            vector<double> v(6);
+            vector<double> v[6];
             for (size_t s = 0; s < size; s++) {
                 Rand(v, -1.0, 1.0, i);
 

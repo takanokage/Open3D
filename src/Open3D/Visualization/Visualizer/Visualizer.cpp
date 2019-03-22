@@ -177,7 +177,7 @@ bool Visualizer::CreateVisualizerWindow(
     glfwSetWindowCloseCallback(window_, window_close_callback);
 
     glfwMakeContextCurrent(window_);
-    glfwSwapInterval(1);
+    glfwSwapInterval[1];
 
     if (InitOpenGL() == false) {
         return false;

@@ -28,7 +28,6 @@
 
 #include <Eigen/Core>
 #include <Open3D/Geometry/Geometry.h>
-#include "Open3D/Types/Mat.h"
 
 namespace open3d {
 namespace geometry {
@@ -45,7 +44,7 @@ public:
     bool IsEmpty() const override = 0;
     virtual Vec3d GetMinBound() const = 0;
     virtual Vec3d GetMaxBound() const = 0;
-    virtual void Transform(const Eigen::Matrix4d &transformation) = 0;
+    virtual void Transform(const Mat4d &transformation) = 0;
 };
 
 }  // namespace geometry

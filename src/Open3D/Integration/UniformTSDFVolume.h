@@ -37,14 +37,14 @@ public:
                       int resolution,
                       double sdf_trunc,
                       TSDFVolumeColorType color_type,
-                      const Eigen::Vector3d &origin = Eigen::Vector3d::Zero());
+                      const Vec3d &origin = Vec3d::Zero());
     ~UniformTSDFVolume() override;
 
 public:
     void Reset() override;
     void Integrate(const geometry::RGBDImage &image,
                    const camera::PinholeCameraIntrinsic &intrinsic,
-                   const Eigen::Matrix4d &extrinsic) override;
+                   const Mat4d &extrinsic) override;
     std::shared_ptr<geometry::PointCloud> ExtractPointCloud() override;
     std::shared_ptr<geometry::TriangleMesh> ExtractTriangleMesh() override;
 
@@ -56,30 +56,30 @@ public:
     void IntegrateWithDepthToCameraDistanceMultiplier(
             const geometry::RGBDImage &image,
             const camera::PinholeCameraIntrinsic &intrinsic,
-            const Eigen::Matrix4d &extrinsic,
+            const Mat4d &extrinsic,
             const geometry::Image &depth_to_camera_distance_multiplier);
 
     inline int IndexOf(int x, int y, int z) const {
         return x * resolution_ * resolution_ + y * resolution_ + z;
     }
 
-    inline int IndexOf(const Eigen::Vector3i &xyz) const {
-        return IndexOf(xyz(0), xyz(1), xyz(2));
+    inline int IndexOf(const Vec3i &xyz) const {
+        return IndexOf(xyz[0], xyz[1], xyz[2]);
     }
 
 public:
-    Eigen::Vector3d origin_;
+    Vec3d origin_;
     double length_;
     int resolution_;
     int voxel_num_;
     std::vector<float> tsdf_;
-    std::vector<Eigen::Vector3f> color_;
+    std::vector<Vec3f> color_;
     std::vector<float> weight_;
 
 private:
-    Eigen::Vector3d GetNormalAt(const Eigen::Vector3d &p);
+    Vec3d GetNormalAt(const Vec3d &p);
 
-    double GetTSDFAt(const Eigen::Vector3d &p);
+    double GetTSDFAt(const Vec3d &p);
 };
 
 }  // namespace integration

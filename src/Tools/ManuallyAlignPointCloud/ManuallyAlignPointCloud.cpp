@@ -30,21 +30,21 @@
 
 #include "VisualizerForAlignment.h"
 
-void PrintTransformation(const Eigen::Matrix4d &transformation) {
+void PrintTransformation(const Mat4d &transformation) {
     using namespace open3d;
     utility::PrintInfo("Current transformation is:\n");
-    utility::PrintInfo("\t%.6f %.6f %.6f %.6f\n", transformation(0, 0),
-                       transformation(0, 1), transformation(0, 2),
-                       transformation(0, 3));
-    utility::PrintInfo("\t%.6f %.6f %.6f %.6f\n", transformation(1, 0),
-                       transformation(1, 1), transformation(1, 2),
-                       transformation(1, 3));
-    utility::PrintInfo("\t%.6f %.6f %.6f %.6f\n", transformation(2, 0),
-                       transformation(2, 1), transformation(2, 2),
-                       transformation(2, 3));
-    utility::PrintInfo("\t%.6f %.6f %.6f %.6f\n", transformation(3, 0),
-                       transformation(3, 1), transformation(3, 2),
-                       transformation(3, 3));
+    utility::PrintInfo("\t%.6f %.6f %.6f %.6f\n", transformation[0][0],
+                       transformation[0][1], transformation[0][2],
+                       transformation[0][3]);
+    utility::PrintInfo("\t%.6f %.6f %.6f %.6f\n", transformation[1][0],
+                       transformation[1][1], transformation[1][2],
+                       transformation[1][3]);
+    utility::PrintInfo("\t%.6f %.6f %.6f %.6f\n", transformation[2][0],
+                       transformation[2][1], transformation[2][2],
+                       transformation[2][3]);
+    utility::PrintInfo("\t%.6f %.6f %.6f %.6f\n", transformation[3][0],
+                       transformation[3][1], transformation[3][2],
+                       transformation[3][3]);
 }
 
 void PrintHelp() {
@@ -133,7 +133,7 @@ int main(int argc, char **argv) {
                                max_corres_distance);
             auto result = registration::RegistrationICP(
                     *source_ptr, *target_ptr, max_corres_distance,
-                    Eigen::Matrix4d::Identity(),
+                    Mat4d::Identity(),
                     registration::TransformationEstimationPointToPoint(true),
                     registration::ICPConvergenceCriteria(1e-6, 1e-6, 30));
             utility::PrintInfo(

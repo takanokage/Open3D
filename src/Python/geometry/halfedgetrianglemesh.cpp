@@ -44,8 +44,8 @@ void pybind_half_edge(py::module &m) {
                  [](const geometry::HalfEdgeTriangleMesh::HalfEdge &he) {
                      std::ostringstream repr;
                      repr << "HalfEdge(vertex_indices {"
-                          << he.vertex_indices_(0) << ", "
-                          << he.vertex_indices_(1) << "}, triangle_index "
+                          << he.vertex_indices_[0] << ", "
+                          << he.vertex_indices_[1] << "}, triangle_index "
                           << he.triangle_index_ << ", next " << he.next_
                           << ", twin " << he.twin_ << ")";
                      return repr.str();

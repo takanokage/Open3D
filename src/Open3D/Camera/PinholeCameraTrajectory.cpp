@@ -83,8 +83,8 @@ bool PinholeCameraTrajectory::ConvertFromJsonValue(const Json::Value &value) {
                     status_object["intrinsic"]) == false) {
             return false;
         }
-        if (EigenMatrix4dFromJsonArray(parameters_[i].extrinsic_,
-                                       status_object["extrinsic"]) == false) {
+        if (Matrix4dFromJsonArray(parameters_[i].extrinsic_,
+                                  status_object["extrinsic"]) == false) {
             return false;
         }
     }

@@ -102,9 +102,9 @@ int main(int argc, char* argv[]) {
     auto target = CreateRGBDImage(*color_target, *depth_target, true);
 
     odometry::OdometryOption option;
-    Eigen::Matrix4d odo_init = Eigen::Matrix4d::Identity();
-    Eigen::Matrix4d trans_odo = Eigen::Matrix4d::Identity();
-    Eigen::Matrix6d info_odo = Eigen::Matrix6d::Zero();
+    Mat4d odo_init = Mat4d::Identity();
+    Mat4d trans_odo = Mat4d::Identity();
+    Mat6d info_odo = Mat6d::Zero();
     bool is_success;
     if (utility::ProgramOptionExists(argc, argv, "--hybrid")) {
         odometry::RGBDOdometryJacobianFromHybridTerm jacobian_method;

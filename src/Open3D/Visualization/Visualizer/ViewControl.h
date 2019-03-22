@@ -58,8 +58,7 @@ public:
     /// Function to set view points
     /// This function obtains OpenGL context and calls OpenGL functions to set
     /// the view point.
-    void SetViewMatrices(
-            const Eigen::Matrix4d &model_matrix = Eigen::Matrix4d::Identity());
+    void SetViewMatrices(const Mat4d &model_matrix = Mat4d::Identity());
 
     /// Function to get equivalent view parameters (support orthogonal)
     bool ConvertToViewParameters(ViewParameters &status) const;
@@ -139,11 +138,11 @@ protected:
     int window_width_ = 0;
     int window_height_ = 0;
     BoundingBox bounding_box_;
-    Eigen::Vector3d eye_;
-    Eigen::Vector3d lookat_;
-    Eigen::Vector3d up_;
-    Eigen::Vector3d front_;
-    Eigen::Vector3d right_;
+    Vec3d eye_;
+    Vec3d lookat_;
+    Vec3d up_;
+    Vec3d front_;
+    Vec3d right_;
     double distance_;
     double field_of_view_;
     double zoom_;

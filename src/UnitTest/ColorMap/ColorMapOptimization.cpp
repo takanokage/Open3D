@@ -120,7 +120,7 @@ vector<geometry::RGBDImage> GenerateRGBDImages(const int& width,
 // ----------------------------------------------------------------------------
 camera::PinholeCameraTrajectory GenerateCamera(const int& width,
                                                const int& height,
-                                               const Eigen::Vector3d& pose) {
+                                               const Vec3d& pose) {
     camera::PinholeCameraTrajectory camera;
     camera.parameters_.resize(1);
 
@@ -136,9 +136,9 @@ camera::PinholeCameraTrajectory GenerateCamera(const int& width,
     camera.parameters_[0].extrinsic_ << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
             0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0;
 
-    camera.parameters_[0].extrinsic_(0, 0) = pose(0, 0);
-    camera.parameters_[0].extrinsic_(1, 1) = pose(1, 0);
-    camera.parameters_[0].extrinsic_(2, 2) = pose(2, 0);
+    camera.parameters_[0].extrinsic_[0][0] = pose[0][0];
+    camera.parameters_[0].extrinsic_[1][1] = pose[1][0];
+    camera.parameters_[0].extrinsic_[2][2] = pose[2][0];
 
     return camera;
 }
@@ -147,7 +147,7 @@ camera::PinholeCameraTrajectory GenerateCamera(const int& width,
 //
 // ----------------------------------------------------------------------------
 TEST(ColorMapOptimization, DISABLED_Project3DPointAndGetUVDepth) {
-    vector<Eigen::Vector3d> ref_points = {
+    vector<Vec3d> ref_points = {
             {1.072613, 0.611307, 42.921570}, {0.897783, 0.859754, 43.784313},
             {1.452353, 1.769294, 18.333334}, {1.181915, 0.663475, 30.411764},
             {1.498387, 0.741398, 20.058823}, {0.814378, 0.620043, 50.254902},
@@ -167,12 +167,12 @@ TEST(ColorMapOptimization, DISABLED_Project3DPointAndGetUVDepth) {
     int width = 320;
     int height = 240;
 
-    Eigen::Vector3d point = {3.3, 4.4, 5.5};
+    Vec3d point = {3.3, 4.4, 5.5};
 
-    vector<Eigen::Vector3d> output;
+    vector<Vec3d> output;
     for (int i = 0; i < ref_points.size(); i++) {
         // change the pose randomly
-        Eigen::Vector3d pose;
+        Vec3d pose;
         Rand(pose, 0.0, 10.0, i);
         camera::PinholeCameraTrajectory camera =
                 GenerateCamera(width, height, pose);
@@ -180,7 +180,7 @@ TEST(ColorMapOptimization, DISABLED_Project3DPointAndGetUVDepth) {
 
         float u, v, d;
         // tie(u, v, d) = Project3DPointAndGetUVDepth(point, camera, camid);
-        ExpectEQ(ref_points[i], Eigen::Vector3d(u, v, d));
+        ExpectEQ(ref_points[i], Vec3d{u, v, d});
     }
 }
 
@@ -224,7 +224,7 @@ TEST(ColorMapOptimization, DISABLED_MakeVertexAndImageVisibility) {
     vector<geometry::Image> images_mask = GenerateImages(
             width, height, num_of_channels, bytes_per_channel, size);
 
-    Eigen::Vector3d pose(-30, -15, -13);
+    Vec3d pose(-30, -15, -13);
     camera::PinholeCameraTrajectory camera =
             GenerateCamera(width, height, pose);
 
@@ -297,31 +297,31 @@ TEST(ColorMapOptimization, DISABLED_QueryImageIntensity) {
     vector<bool> ref_bool = {0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0,
                              0, 1, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0};
 
-    vector<Eigen::Vector3d> ref_float = {{0.000000, 0.000000, 0.000000},
-                                         {10.260207, 10.070588, 10.323875},
-                                         {10.257440, 10.114879, 10.260207},
-                                         {0.000000, 0.000000, 0.000000},
-                                         {10.285121, 10.244983, 10.109343},
-                                         {0.000000, 0.000000, 0.000000},
-                                         {10.229758, 10.322492, 10.073357},
-                                         {10.300346, 10.211764, 10.112111},
-                                         {10.229758, 10.113495, 10.211764},
-                                         {10.261592, 10.318339, 10.346021},
-                                         {0.000000, 0.000000, 0.000000},
-                                         {0.000000, 0.000000, 0.000000},
-                                         {0.000000, 0.000000, 0.000000},
-                                         {0.000000, 0.000000, 0.000000},
-                                         {10.157785, 10.347404, 10.249135},
-                                         {10.343252, 10.102422, 10.271280},
-                                         {10.094118, 10.066436, 10.243599},
-                                         {10.024914, 10.001384, 10.325259},
-                                         {0.000000, 0.000000, 0.000000},
-                                         {10.073357, 10.159169, 10.055364},
-                                         {0.000000, 0.000000, 0.000000},
-                                         {0.000000, 0.000000, 0.000000},
-                                         {0.000000, 0.000000, 0.000000},
-                                         {10.217301, 10.098269, 10.276816},
-                                         {0.000000, 0.000000, 0.000000}};
+    vector<Vec3d> ref_float = {{0.000000, 0.000000, 0.000000},
+                               {10.260207, 10.070588, 10.323875},
+                               {10.257440, 10.114879, 10.260207},
+                               {0.000000, 0.000000, 0.000000},
+                               {10.285121, 10.244983, 10.109343},
+                               {0.000000, 0.000000, 0.000000},
+                               {10.229758, 10.322492, 10.073357},
+                               {10.300346, 10.211764, 10.112111},
+                               {10.229758, 10.113495, 10.211764},
+                               {10.261592, 10.318339, 10.346021},
+                               {0.000000, 0.000000, 0.000000},
+                               {0.000000, 0.000000, 0.000000},
+                               {0.000000, 0.000000, 0.000000},
+                               {0.000000, 0.000000, 0.000000},
+                               {10.157785, 10.347404, 10.249135},
+                               {10.343252, 10.102422, 10.271280},
+                               {10.094118, 10.066436, 10.243599},
+                               {10.024914, 10.001384, 10.325259},
+                               {0.000000, 0.000000, 0.000000},
+                               {10.073357, 10.159169, 10.055364},
+                               {0.000000, 0.000000, 0.000000},
+                               {0.000000, 0.000000, 0.000000},
+                               {0.000000, 0.000000, 0.000000},
+                               {10.217301, 10.098269, 10.276816},
+                               {0.000000, 0.000000, 0.000000}};
 
     int width = 320;
     int height = 240;
@@ -333,7 +333,7 @@ TEST(ColorMapOptimization, DISABLED_QueryImageIntensity) {
     float* const depthData = reinterpret_cast<float*>(&img.data_[0]);
     Rand(depthData, width * height, 10.0, 100.0, 0);
 
-    Eigen::Vector3d pose(62.5, 37.5, 1.85);
+    Vec3d pose(62.5, 37.5, 1.85);
     camera::PinholeCameraTrajectory camera =
             GenerateCamera(width, height, pose);
     int camid = 0;
@@ -342,9 +342,9 @@ TEST(ColorMapOptimization, DISABLED_QueryImageIntensity) {
     size_t size = 25;
 
     for (size_t i = 0; i < size; i++) {
-        vector<double> vData(3);
+        vector<double> vData[3];
         Rand(vData, 10.0, 100.0, i);
-        Eigen::Vector3d V(vData[0], vData[1], vData[2]);
+        Vec3d V(vData[0], vData[1], vData[2]);
 
         bool boolResult = false;
         float floatResult = 0.0;
@@ -355,7 +355,7 @@ TEST(ColorMapOptimization, DISABLED_QueryImageIntensity) {
         //                                                           camid,
         //                                                           0);
         // EXPECT_EQ(ref_bool[i], boolResult);
-        // EXPECT_NEAR(ref_float[i](0, 0), floatResult, THRESHOLD);
+        // EXPECT_NEAR(ref_float[i][0][0], floatResult, THRESHOLD);
 
         // tie(boolResult, floatResult) = QueryImageIntensity<float>(img,
         //                                                           V,
@@ -363,7 +363,7 @@ TEST(ColorMapOptimization, DISABLED_QueryImageIntensity) {
         //                                                           camid,
         //                                                           1);
         // EXPECT_EQ(ref_bool[i], boolResult);
-        // EXPECT_NEAR(ref_float[i](1, 0), floatResult, THRESHOLD);
+        // EXPECT_NEAR(ref_float[i][1][0], floatResult, THRESHOLD);
 
         // tie(boolResult, floatResult) = QueryImageIntensity<float>(img,
         //                                                           V,
@@ -371,7 +371,7 @@ TEST(ColorMapOptimization, DISABLED_QueryImageIntensity) {
         //                                                           camid,
         //                                                           2);
         // EXPECT_EQ(ref_bool[i], boolResult);
-        // EXPECT_NEAR(ref_float[i](2, 0), floatResult, THRESHOLD);
+        // EXPECT_NEAR(ref_float[i][2][0], floatResult, THRESHOLD);
     }
 }
 
@@ -382,31 +382,31 @@ TEST(ColorMapOptimization, DISABLED_QueryImageIntensity_WarpingField) {
     vector<bool> ref_bool = {0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0,
                              0, 1, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0};
 
-    vector<Eigen::Vector3d> ref_float = {{0.000000, 0.000000, 0.000000},
-                                         {10.260207, 10.070588, 10.323875},
-                                         {10.257440, 10.114879, 10.260207},
-                                         {0.000000, 0.000000, 0.000000},
-                                         {10.285121, 10.244983, 10.109343},
-                                         {0.000000, 0.000000, 0.000000},
-                                         {10.229758, 10.322492, 10.073357},
-                                         {10.300346, 10.211764, 10.112111},
-                                         {10.229758, 10.113495, 10.211764},
-                                         {10.261592, 10.318339, 10.346021},
-                                         {0.000000, 0.000000, 0.000000},
-                                         {0.000000, 0.000000, 0.000000},
-                                         {0.000000, 0.000000, 0.000000},
-                                         {0.000000, 0.000000, 0.000000},
-                                         {10.157785, 10.347404, 10.249135},
-                                         {10.343252, 10.102422, 10.271280},
-                                         {10.094118, 10.066436, 10.243599},
-                                         {10.024914, 10.001384, 10.325259},
-                                         {0.000000, 0.000000, 0.000000},
-                                         {10.073357, 10.159169, 10.055364},
-                                         {0.000000, 0.000000, 0.000000},
-                                         {0.000000, 0.000000, 0.000000},
-                                         {0.000000, 0.000000, 0.000000},
-                                         {10.217301, 10.098269, 10.276816},
-                                         {0.000000, 0.000000, 0.000000}};
+    vector<Vec3d> ref_float = {{0.000000, 0.000000, 0.000000},
+                               {10.260207, 10.070588, 10.323875},
+                               {10.257440, 10.114879, 10.260207},
+                               {0.000000, 0.000000, 0.000000},
+                               {10.285121, 10.244983, 10.109343},
+                               {0.000000, 0.000000, 0.000000},
+                               {10.229758, 10.322492, 10.073357},
+                               {10.300346, 10.211764, 10.112111},
+                               {10.229758, 10.113495, 10.211764},
+                               {10.261592, 10.318339, 10.346021},
+                               {0.000000, 0.000000, 0.000000},
+                               {0.000000, 0.000000, 0.000000},
+                               {0.000000, 0.000000, 0.000000},
+                               {0.000000, 0.000000, 0.000000},
+                               {10.157785, 10.347404, 10.249135},
+                               {10.343252, 10.102422, 10.271280},
+                               {10.094118, 10.066436, 10.243599},
+                               {10.024914, 10.001384, 10.325259},
+                               {0.000000, 0.000000, 0.000000},
+                               {10.073357, 10.159169, 10.055364},
+                               {0.000000, 0.000000, 0.000000},
+                               {0.000000, 0.000000, 0.000000},
+                               {0.000000, 0.000000, 0.000000},
+                               {10.217301, 10.098269, 10.276816},
+                               {0.000000, 0.000000, 0.000000}};
 
     int width = 320;
     int height = 240;
@@ -423,7 +423,7 @@ TEST(ColorMapOptimization, DISABLED_QueryImageIntensity_WarpingField) {
     int nr_anchors = 16;
     // open3d::ImageWarpingField field(width, height, nr_anchors);
 
-    Eigen::Vector3d pose(62.5, 37.5, 1.85);
+    Vec3d pose(62.5, 37.5, 1.85);
     camera::PinholeCameraTrajectory camera =
             GenerateCamera(width, height, pose);
     int camid = 0;
@@ -432,9 +432,9 @@ TEST(ColorMapOptimization, DISABLED_QueryImageIntensity_WarpingField) {
     size_t size = 25;
 
     for (size_t i = 0; i < size; i++) {
-        vector<double> vData(3);
+        vector<double> vData[3];
         Rand(vData, 10.0, 100.0, i);
-        Eigen::Vector3d V(vData[0], vData[1], vData[2]);
+        Vec3d V(vData[0], vData[1], vData[2]);
 
         bool boolResult = false;
         float floatResult = 0.0;
@@ -445,7 +445,7 @@ TEST(ColorMapOptimization, DISABLED_QueryImageIntensity_WarpingField) {
         //                                                           camid,
         //                                                           0);
         // EXPECT_EQ(ref_bool[i], boolResult);
-        // EXPECT_NEAR(ref_float[i](0, 0), floatResult, THRESHOLD);
+        // EXPECT_NEAR(ref_float[i][0][0], floatResult, THRESHOLD);
 
         // tie(boolResult, floatResult) = QueryImageIntensity<float>(img,
         //                                                           V,
@@ -453,7 +453,7 @@ TEST(ColorMapOptimization, DISABLED_QueryImageIntensity_WarpingField) {
         //                                                           camid,
         //                                                           1);
         // EXPECT_EQ(ref_bool[i], boolResult);
-        // EXPECT_NEAR(ref_float[i](1, 0), floatResult, THRESHOLD);
+        // EXPECT_NEAR(ref_float[i][1][0], floatResult, THRESHOLD);
 
         // tie(boolResult, floatResult) = QueryImageIntensity<float>(img,
         //                                                           V,
@@ -461,7 +461,7 @@ TEST(ColorMapOptimization, DISABLED_QueryImageIntensity_WarpingField) {
         //                                                           camid,
         //                                                           2);
         // EXPECT_EQ(ref_bool[i], boolResult);
-        // EXPECT_NEAR(ref_float[i](2, 0), floatResult, THRESHOLD);
+        // EXPECT_NEAR(ref_float[i][2][0], floatResult, THRESHOLD);
     }
 }
 
@@ -515,7 +515,7 @@ TEST(ColorMapOptimization, DISABLED_SetProxyIntensityForVertex) {
     vector<shared_ptr<geometry::Image>> images_gray = GenerateSharedImages(
             width, height, num_of_channels, bytes_per_channel, size);
 
-    Eigen::Vector3d pose(30, 15, 0.3);
+    Vec3d pose(30, 15, 0.3);
     camera::PinholeCameraTrajectory camera =
             GenerateCamera(width, height, pose);
     int camid = 0;
@@ -596,7 +596,7 @@ TEST(ColorMapOptimization, DISABLED_SetProxyIntensityForVertex_WarpingField) {
     vector<shared_ptr<geometry::Image>> images_gray = GenerateSharedImages(
             width, height, num_of_channels, bytes_per_channel, size);
 
-    Eigen::Vector3d pose(30, 15, 0.3);
+    Vec3d pose(30, 15, 0.3);
     camera::PinholeCameraTrajectory camera =
             GenerateCamera(width, height, pose);
     int camid = 0;
@@ -661,7 +661,7 @@ TEST(ColorMapOptimization, DISABLED_OptimizeImageCoorNonrigid) {
     //     warping_fields_init.push_back(field);
     // }
 
-    Eigen::Vector3d pose(60, 15, 0.3);
+    Vec3d pose(60, 15, 0.3);
     camera::PinholeCameraTrajectory camera =
             GenerateCamera(width, height, pose);
 
@@ -728,7 +728,7 @@ TEST(ColorMapOptimization, DISABLED_OptimizeImageCoorRigid) {
     vector<shared_ptr<geometry::Image>> images_dy = GenerateSharedImages(
             width, height, num_of_channels, bytes_per_channel, size);
 
-    Eigen::Vector3d pose(30, 15, 0.3);
+    Vec3d pose(30, 15, 0.3);
     camera::PinholeCameraTrajectory camera =
             GenerateCamera(width, height, pose);
 
@@ -766,7 +766,7 @@ TEST(ColorMapOptimization, DISABLED_OptimizeImageCoorRigid) {
 //
 // ----------------------------------------------------------------------------
 TEST(ColorMapOptimization, DISABLED_SetGeometryColorAverage) {
-    vector<Eigen::Vector3d> ref_vertex_colors = {
+    vector<Vec3d> ref_vertex_colors = {
             {0.000000, 0.000000, 0.000000}, {0.000000, 0.000000, 0.000000},
             {0.000000, 0.000000, 0.000000}, {0.325490, 0.737255, 0.200000},
             {0.290196, 0.243137, 0.909804}, {0.000000, 0.000000, 0.000000},
@@ -799,7 +799,7 @@ TEST(ColorMapOptimization, DISABLED_SetGeometryColorAverage) {
     vector<geometry::RGBDImage> images_rgbd =
             GenerateRGBDImages(width, height, size);
 
-    Eigen::Vector3d pose(30, 15, 0.3);
+    Vec3d pose(30, 15, 0.3);
     camera::PinholeCameraTrajectory camera =
             GenerateCamera(width, height, pose);
     int camid = 0;
@@ -823,7 +823,7 @@ TEST(ColorMapOptimization, DISABLED_SetGeometryColorAverage) {
 //
 // ----------------------------------------------------------------------------
 TEST(ColorMapOptimization, DISABLED_SetGeometryColorAverage_WarpingFields) {
-    vector<Eigen::Vector3d> ref_vertex_colors = {
+    vector<Vec3d> ref_vertex_colors = {
             {0.000000, 0.000000, 0.000000}, {0.000000, 0.000000, 0.000000},
             {0.000000, 0.000000, 0.000000}, {0.325490, 0.737255, 0.200000},
             {0.290196, 0.243137, 0.909804}, {0.000000, 0.000000, 0.000000},
@@ -866,7 +866,7 @@ TEST(ColorMapOptimization, DISABLED_SetGeometryColorAverage_WarpingFields) {
     vector<geometry::RGBDImage> images_rgbd =
             GenerateRGBDImages(width, height, size);
 
-    Eigen::Vector3d pose(30, 15, 0.3);
+    Vec3d pose(30, 15, 0.3);
     camera::PinholeCameraTrajectory camera =
             GenerateCamera(width, height, pose);
     int camid = 0;
@@ -1028,52 +1028,52 @@ TEST(ColorMapOptimization, DISABLED_MakeDepthMasks) {
 //
 // ----------------------------------------------------------------------------
 TEST(ColorMapOptimization, DISABLED_ColorMapOptimization) {
-    vector<Eigen::Vector3d> ref_vertices = {{0.000000, 0.000000, 10.000000},
-                                            {0.000000, 0.000000, -10.000000},
-                                            {5.877853, 0.000000, 8.090170},
-                                            {4.755283, 3.454915, 8.090170},
-                                            {1.816356, 5.590170, 8.090170},
-                                            {-1.816356, 5.590170, 8.090170},
-                                            {-4.755283, 3.454915, 8.090170},
-                                            {-5.877853, 0.000000, 8.090170},
-                                            {-4.755283, -3.454915, 8.090170},
-                                            {-1.816356, -5.590170, 8.090170},
-                                            {1.816356, -5.590170, 8.090170},
-                                            {4.755283, -3.454915, 8.090170},
-                                            {9.510565, 0.000000, 3.090170},
-                                            {7.694209, 5.590170, 3.090170},
-                                            {2.938926, 9.045085, 3.090170},
-                                            {-2.938926, 9.045085, 3.090170},
-                                            {-7.694209, 5.590170, 3.090170},
-                                            {-9.510565, 0.000000, 3.090170},
-                                            {-7.694209, -5.590170, 3.090170},
-                                            {-2.938926, -9.045085, 3.090170},
-                                            {2.938926, -9.045085, 3.090170},
-                                            {7.694209, -5.590170, 3.090170},
-                                            {9.510565, 0.000000, -3.090170},
-                                            {7.694209, 5.590170, -3.090170},
-                                            {2.938926, 9.045085, -3.090170},
-                                            {-2.938926, 9.045085, -3.090170},
-                                            {-7.694209, 5.590170, -3.090170},
-                                            {-9.510565, 0.000000, -3.090170},
-                                            {-7.694209, -5.590170, -3.090170},
-                                            {-2.938926, -9.045085, -3.090170},
-                                            {2.938926, -9.045085, -3.090170},
-                                            {7.694209, -5.590170, -3.090170},
-                                            {5.877853, 0.000000, -8.090170},
-                                            {4.755283, 3.454915, -8.090170},
-                                            {1.816356, 5.590170, -8.090170},
-                                            {-1.816356, 5.590170, -8.090170},
-                                            {-4.755283, 3.454915, -8.090170},
-                                            {-5.877853, 0.000000, -8.090170},
-                                            {-4.755283, -3.454915, -8.090170},
-                                            {-1.816356, -5.590170, -8.090170},
-                                            {1.816356, -5.590170, -8.090170},
-                                            {4.755283, -3.454915, -8.090170}};
+    vector<Vec3d> ref_vertices = {{0.000000, 0.000000, 10.000000},
+                                  {0.000000, 0.000000, -10.000000},
+                                  {5.877853, 0.000000, 8.090170},
+                                  {4.755283, 3.454915, 8.090170},
+                                  {1.816356, 5.590170, 8.090170},
+                                  {-1.816356, 5.590170, 8.090170},
+                                  {-4.755283, 3.454915, 8.090170},
+                                  {-5.877853, 0.000000, 8.090170},
+                                  {-4.755283, -3.454915, 8.090170},
+                                  {-1.816356, -5.590170, 8.090170},
+                                  {1.816356, -5.590170, 8.090170},
+                                  {4.755283, -3.454915, 8.090170},
+                                  {9.510565, 0.000000, 3.090170},
+                                  {7.694209, 5.590170, 3.090170},
+                                  {2.938926, 9.045085, 3.090170},
+                                  {-2.938926, 9.045085, 3.090170},
+                                  {-7.694209, 5.590170, 3.090170},
+                                  {-9.510565, 0.000000, 3.090170},
+                                  {-7.694209, -5.590170, 3.090170},
+                                  {-2.938926, -9.045085, 3.090170},
+                                  {2.938926, -9.045085, 3.090170},
+                                  {7.694209, -5.590170, 3.090170},
+                                  {9.510565, 0.000000, -3.090170},
+                                  {7.694209, 5.590170, -3.090170},
+                                  {2.938926, 9.045085, -3.090170},
+                                  {-2.938926, 9.045085, -3.090170},
+                                  {-7.694209, 5.590170, -3.090170},
+                                  {-9.510565, 0.000000, -3.090170},
+                                  {-7.694209, -5.590170, -3.090170},
+                                  {-2.938926, -9.045085, -3.090170},
+                                  {2.938926, -9.045085, -3.090170},
+                                  {7.694209, -5.590170, -3.090170},
+                                  {5.877853, 0.000000, -8.090170},
+                                  {4.755283, 3.454915, -8.090170},
+                                  {1.816356, 5.590170, -8.090170},
+                                  {-1.816356, 5.590170, -8.090170},
+                                  {-4.755283, 3.454915, -8.090170},
+                                  {-5.877853, 0.000000, -8.090170},
+                                  {-4.755283, -3.454915, -8.090170},
+                                  {-1.816356, -5.590170, -8.090170},
+                                  {1.816356, -5.590170, -8.090170},
+                                  {4.755283, -3.454915, -8.090170}};
 
-    vector<Eigen::Vector3d> ref_vertex_normals = {};
+    vector<Vec3d> ref_vertex_normals = {};
 
-    vector<Eigen::Vector3d> ref_vertex_colors = {
+    vector<Vec3d> ref_vertex_colors = {
             {0.000000, 0.000000, 0.000000}, {0.000000, 0.000000, 0.000000},
             {0.000000, 0.000000, 0.000000}, {0.000000, 0.000000, 0.000000},
             {0.000000, 0.000000, 0.000000}, {0.000000, 0.000000, 0.000000},
@@ -1096,7 +1096,7 @@ TEST(ColorMapOptimization, DISABLED_ColorMapOptimization) {
             {0.000000, 0.000000, 0.000000}, {0.000000, 0.000000, 0.000000},
             {0.000000, 0.000000, 0.000000}, {0.000000, 0.000000, 0.000000}};
 
-    vector<Eigen::Vector3i> ref_triangles = {
+    vector<Vec3i> ref_triangles = {
             {0, 2, 3},    {1, 33, 32},  {0, 3, 4},    {1, 34, 33},
             {0, 4, 5},    {1, 35, 34},  {0, 5, 6},    {1, 36, 35},
             {0, 6, 7},    {1, 37, 36},  {0, 7, 8},    {1, 38, 37},
@@ -1118,7 +1118,7 @@ TEST(ColorMapOptimization, DISABLED_ColorMapOptimization) {
             {38, 29, 28}, {38, 39, 29}, {39, 30, 29}, {39, 40, 30},
             {40, 31, 30}, {40, 41, 31}, {41, 22, 31}, {41, 32, 22}};
 
-    vector<Eigen::Vector3d> ref_triangle_normals = {};
+    vector<Vec3d> ref_triangle_normals = {};
 
     size_t size = 10;
     int width = 320;
@@ -1132,7 +1132,7 @@ TEST(ColorMapOptimization, DISABLED_ColorMapOptimization) {
     vector<geometry::RGBDImage> rgbdImages =
             GenerateRGBDImages(width, height, size);
 
-    Eigen::Vector3d pose(60, 15, 0.3);
+    Vec3d pose(60, 15, 0.3);
     camera::PinholeCameraTrajectory camera =
             GenerateCamera(width, height, pose);
 

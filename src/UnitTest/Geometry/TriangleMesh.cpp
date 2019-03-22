@@ -303,9 +303,9 @@ TEST(TriangleMesh, OperatorAppend) {
     EXPECT_EQ(2 * size, tm.triangles_.size());
     for (size_t i = 0; i < size; i++) {
         ExpectEQ(tm0.triangles_[i], tm.triangles_[i + 0]);
-        ExpectEQ(Vector3i(tm1.triangles_[i](0, 0) + size,
-                          tm1.triangles_[i](1, 0) + size,
-                          tm1.triangles_[i](2, 0) + size),
+        ExpectEQ(Vector3i(tm1.triangles_[i][0][0] + size,
+                          tm1.triangles_[i][1][0] + size,
+                          tm1.triangles_[i][2][0] + size),
                  tm.triangles_[i + size]);
     }
 
@@ -379,9 +379,9 @@ TEST(TriangleMesh, OperatorADD) {
     EXPECT_EQ(2 * size, tm.triangles_.size());
     for (size_t i = 0; i < size; i++) {
         ExpectEQ(tm0.triangles_[i], tm.triangles_[i + 0]);
-        ExpectEQ(Vector3i(tm1.triangles_[i](0, 0) + size,
-                          tm1.triangles_[i](1, 0) + size,
-                          tm1.triangles_[i](2, 0) + size),
+        ExpectEQ(Vector3i(tm1.triangles_[i][0][0] + size,
+                          tm1.triangles_[i][1][0] + size,
+                          tm1.triangles_[i][2][0] + size),
                  tm.triangles_[i + size]);
     }
 
@@ -488,19 +488,18 @@ TEST(TriangleMesh, ComputeVertexNormals) {
 // ----------------------------------------------------------------------------
 TEST(TriangleMesh, ComputeAdjacencyList) {
     // 4-sided pyramid with A as top vertex, bottom has two triangles
-    Eigen::Vector3d A(0, 0, 1);    // 0
-    Eigen::Vector3d B(1, 1, 0);    // 1
-    Eigen::Vector3d C(-1, 1, 0);   // 2
-    Eigen::Vector3d D(-1, -1, 0);  // 3
-    Eigen::Vector3d E(1, -1, 0);   // 4
-    std::vector<Eigen::Vector3d> vertices{A, B, C, D, E};
+    Vec3d A(0, 0, 1);    // 0
+    Vec3d B(1, 1, 0);    // 1
+    Vec3d C(-1, 1, 0);   // 2
+    Vec3d D(-1, -1, 0);  // 3
+    Vec3d E(1, -1, 0);   // 4
+    std::vector<Vec3d> vertices{A, B, C, D, E};
 
     geometry::TriangleMesh tm;
     tm.vertices_.insert(tm.vertices_.end(), std::begin(vertices),
                         std::end(vertices));
-    tm.triangles_ = {Eigen::Vector3i(0, 1, 2), Eigen::Vector3i(0, 2, 3),
-                     Eigen::Vector3i(0, 3, 4), Eigen::Vector3i(0, 4, 1),
-                     Eigen::Vector3i(1, 2, 4), Eigen::Vector3i(2, 3, 4)};
+    tm.triangles_ = {Vec3i{0, 1, 2}, Vec3i{0, 2, 3}, Vec3i{0, 3, 4},
+                     Vec3i{0, 4, 1}, Vec3i{1, 2, 4}, Vec3i{2, 3, 4}};
     EXPECT_FALSE(tm.HasAdjacencyList());
     tm.ComputeAdjacencyList();
     EXPECT_TRUE(tm.HasAdjacencyList());
@@ -1300,9 +1299,9 @@ TEST(TriangleMesh, CreateMeshCoordinateFrame) {
     int stride = 300;
     vector<size_t> indices;
     for (size_t i = 0; i < output_tm->triangles_.size(); i += stride) {
-        indices.push_back(output_tm->triangles_[i](0, 0));
-        indices.push_back(output_tm->triangles_[i](1, 0));
-        indices.push_back(output_tm->triangles_[i](2, 0));
+        indices.push_back(output_tm->triangles_[i][0][0]);
+        indices.push_back(output_tm->triangles_[i][1][0]);
+        indices.push_back(output_tm->triangles_[i][2][0]);
     }
     unique(indices.begin(), indices.end());
     sort(indices.begin(), indices.end());

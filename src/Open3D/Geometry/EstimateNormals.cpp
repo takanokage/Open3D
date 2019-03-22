@@ -37,21 +37,21 @@ using namespace geometry;
 
 double sqr(double x) { return x * x; }
 
-Eigen::Vector3d FastEigen3x3(const Eigen::Matrix3d &A) {
+Vec3d FastEigen3x3(const Mat3d &A) {
     // Based on:
     // https://en.wikipedia.org/wiki/Eigenvalue_algorithm#3.C3.973_matrices
-    double p1 = sqr(A(0, 1)) + sqr(A(0, 2)) + sqr(A(1, 2));
-    Eigen::Vector3d eigenvalues;
+    double p1 = sqr(A[0][1]) + sqr(A[0][2]) + sqr(A[1][2]);
+    Vec3d eigenvalues;
     if (p1 == 0.0) {
-        eigenvalues(2) = std::min(A(0, 0), std::min(A(1, 1), A(2, 2)));
-        eigenvalues(0) = std::max(A(0, 0), std::max(A(1, 1), A(2, 2)));
-        eigenvalues(1) = A.trace() - eigenvalues(0) - eigenvalues(2);
+        eigenvalues[2] = std::min(A[0][0], std::min(A[1][1], A[2][2]));
+        eigenvalues[0] = std::max(A[0][0], std::max(A[1][1], A[2][2]));
+        eigenvalues[1] = A.trace() - eigenvalues[0] - eigenvalues[2];
     } else {
         double q = A.trace() / 3.0;
-        double p2 = sqr((A(0, 0) - q)) + sqr(A(1, 1) - q) + sqr(A(2, 2) - q) +
+        double p2 = sqr((A[0][0] - q)) + sqr(A[1][1] - q) + sqr(A[2][2] - q) +
                     2 * p1;
         double p = sqrt(p2 / 6.0);
-        Eigen::Matrix3d B = (1.0 / p) * (A - q * Eigen::Matrix3d::Identity());
+        Mat3d B = (1.0 / p) * (A - q * Mat3d::Identity());
         double r = B.determinant() / 2.0;
         double phi;
         if (r <= -1) {
@@ -61,57 +61,55 @@ Eigen::Vector3d FastEigen3x3(const Eigen::Matrix3d &A) {
         } else {
             phi = std::acos(r) / 3.0;
         }
-        eigenvalues(0) = q + 2.0 * p * std::cos(phi);
-        eigenvalues(2) = q + 2.0 * p * std::cos(phi + 2.0 * M_PI / 3.0);
-        eigenvalues(1) = q * 3.0 - eigenvalues(0) - eigenvalues(2);
+        eigenvalues[0] = q + 2.0 * p * std::cos(phi);
+        eigenvalues[2] = q + 2.0 * p * std::cos(phi + 2.0 * M_PI / 3.0);
+        eigenvalues[1] = q * 3.0 - eigenvalues[0] - eigenvalues[2];
     }
 
-    Eigen::Vector3d eigenvector =
-            (A - Eigen::Matrix3d::Identity() * eigenvalues(0)) *
-            (A.col(0) - Eigen::Vector3d(eigenvalues(1), 0.0, 0.0));
+    Vec3d eigenvector = (A - Mat3d::Identity() * eigenvalues[0]) *
+                        (A.col[0] - Vec3d{eigenvalues[1], 0.0, 0.0});
     double len = eigenvector.norm();
     if (len == 0.0) {
-        return Eigen::Vector3d::Zero();
+        return Vec3d::Zero();
     } else {
         return eigenvector.normalized();
     }
 }
 
-Eigen::Vector3d ComputeNormal(const PointCloud &cloud,
-                              const std::vector<int> &indices) {
+Vec3d ComputeNormal(const PointCloud &cloud, const std::vector<int> &indices) {
     if (indices.size() == 0) {
-        return Eigen::Vector3d::Zero();
+        return Vec3d::Zero();
     }
-    Eigen::Matrix3d covariance;
+    Mat3d covariance;
     Eigen::Matrix<double, 9, 1> cumulants;
     cumulants.setZero();
     for (size_t i = 0; i < indices.size(); i++) {
-        const Eigen::Vector3d &point = cloud.points_[indices[i]];
-        cumulants(0) += point(0);
-        cumulants(1) += point(1);
-        cumulants(2) += point(2);
-        cumulants(3) += point(0) * point(0);
-        cumulants(4) += point(0) * point(1);
-        cumulants(5) += point(0) * point(2);
-        cumulants(6) += point(1) * point(1);
-        cumulants(7) += point(1) * point(2);
-        cumulants(8) += point(2) * point(2);
+        const Vec3d &point = cloud.points_.h_data[indices[i]];
+        cumulants[0] += point[0];
+        cumulants[1] += point[1];
+        cumulants[2] += point[2];
+        cumulants[3] += point[0] * point[0];
+        cumulants[4] += point[0] * point[1];
+        cumulants[5] += point[0] * point[2];
+        cumulants[6] += point[1] * point[1];
+        cumulants[7] += point[1] * point[2];
+        cumulants[8] += point[2] * point[2];
     }
     cumulants /= (double)indices.size();
-    covariance(0, 0) = cumulants(3) - cumulants(0) * cumulants(0);
-    covariance(1, 1) = cumulants(6) - cumulants(1) * cumulants(1);
-    covariance(2, 2) = cumulants(8) - cumulants(2) * cumulants(2);
-    covariance(0, 1) = cumulants(4) - cumulants(0) * cumulants(1);
-    covariance(1, 0) = covariance(0, 1);
-    covariance(0, 2) = cumulants(5) - cumulants(0) * cumulants(2);
-    covariance(2, 0) = covariance(0, 2);
-    covariance(1, 2) = cumulants(7) - cumulants(1) * cumulants(2);
-    covariance(2, 1) = covariance(1, 2);
+    covariance[0][0] = cumulants[3] - cumulants[0] * cumulants[0];
+    covariance[1][1] = cumulants[6] - cumulants[1] * cumulants[1];
+    covariance[2][2] = cumulants[8] - cumulants[2] * cumulants[2];
+    covariance[0][1] = cumulants[4] - cumulants[0] * cumulants[1];
+    covariance[1][0] = covariance[0][1];
+    covariance[0][2] = cumulants[5] - cumulants[0] * cumulants[2];
+    covariance[2][0] = covariance[0][2];
+    covariance[1][2] = cumulants[7] - cumulants[1] * cumulants[2];
+    covariance[2][1] = covariance[1][2];
 
     return FastEigen3x3(covariance);
-    // Eigen::SelfAdjointEigenSolver<Eigen::Matrix3d> solver;
+    // Eigen::SelfAdjointEigenSolver<Mat3d> solver;
     // solver.compute(covariance, Eigen::ComputeEigenvectors);
-    // return solver.eigenvectors().col(0);
+    // return solver.eigenvectors().col[0];
 }
 
 }  // unnamed namespace
@@ -123,7 +121,7 @@ bool EstimateNormals(
         const KDTreeSearchParam &search_param /* = KDTreeSearchParamKNN()*/) {
     bool has_normal = cloud.HasNormals();
     if (cloud.HasNormals() == false) {
-        cloud.normals_.resize(cloud.points_.size());
+        cloud.normals_.h_data.resize(cloud.points_.size());
     }
     KDTreeFlann kdtree;
     kdtree.SetGeometry(cloud);
@@ -133,32 +131,32 @@ bool EstimateNormals(
     for (int i = 0; i < (int)cloud.points_.size(); i++) {
         std::vector<int> indices;
         std::vector<double> distance2;
-        Eigen::Vector3d normal;
-        if (kdtree.Search(cloud.points_[i], search_param, indices, distance2) >=
-            3) {
+        Vec3d normal;
+        if (kdtree.Search(cloud.points_.h_data[i], search_param, indices,
+                          distance2) >= 3) {
             normal = ComputeNormal(cloud, indices);
             if (normal.norm() == 0.0) {
                 if (has_normal) {
-                    normal = cloud.normals_[i];
+                    normal = cloud.normals_.h_data[i];
                 } else {
-                    normal = Eigen::Vector3d(0.0, 0.0, 1.0);
+                    normal = Vec3d{0.0, 0.0, 1.0};
                 }
             }
-            if (has_normal && normal.dot(cloud.normals_[i]) < 0.0) {
+            if (has_normal && normal.dot(cloud.normals_.h_data[i]) < 0.0) {
                 normal *= -1.0;
             }
-            cloud.normals_[i] = normal;
+            cloud.normals_.h_data[i] = normal;
         } else {
-            cloud.normals_[i] = Eigen::Vector3d(0.0, 0.0, 1.0);
+            cloud.normals_.h_data[i] = Vec3d{0.0, 0.0, 1.0};
         }
     }
 
     return true;
 }
 
-bool OrientNormalsToAlignWithDirection(
-        PointCloud &cloud, const Eigen::Vector3d &orientation_reference
-        /* = Eigen::Vector3d(0.0, 0.0, 1.0)*/) {
+bool OrientNormalsToAlignWithDirection(PointCloud &cloud,
+                                       const Vec3d &orientation_reference
+                                       /* = Vec3d{0.0, 0.0, 1.0}*/) {
     if (cloud.HasNormals() == false) {
         utility::PrintDebug(
                 "[OrientNormalsToAlignWithDirection] No normals in the "
@@ -168,7 +166,7 @@ bool OrientNormalsToAlignWithDirection(
 #pragma omp parallel for schedule(static)
 #endif
     for (int i = 0; i < (int)cloud.points_.size(); i++) {
-        auto &normal = cloud.normals_[i];
+        auto &normal = cloud.normals_.h_data[i];
         if (normal.norm() == 0.0) {
             normal = orientation_reference;
         } else if (normal.dot(orientation_reference) < 0.0) {
@@ -179,8 +177,7 @@ bool OrientNormalsToAlignWithDirection(
 }
 
 bool OrientNormalsTowardsCameraLocation(
-        PointCloud &cloud,
-        const Eigen::Vector3d &camera_location /* = Eigen::Vector3d::Zero()*/) {
+        PointCloud &cloud, const Vec3d &camera_location /* = Vec3d::Zero()*/) {
     if (cloud.HasNormals() == false) {
         utility::PrintDebug(
                 "[OrientNormalsTowardsCameraLocation] No normals in the "
@@ -190,13 +187,12 @@ bool OrientNormalsTowardsCameraLocation(
 #pragma omp parallel for schedule(static)
 #endif
     for (int i = 0; i < (int)cloud.points_.size(); i++) {
-        Eigen::Vector3d orientation_reference =
-                camera_location - cloud.points_[i];
-        auto &normal = cloud.normals_[i];
+        Vec3d orientation_reference = camera_location - cloud.points_.h_data[i];
+        auto &normal = cloud.normals_.h_data[i];
         if (normal.norm() == 0.0) {
             normal = orientation_reference;
             if (normal.norm() == 0.0) {
-                normal = Eigen::Vector3d(0.0, 0.0, 1.0);
+                normal = Vec3d{0.0, 0.0, 1.0};
             } else {
                 normal.normalize();
             }

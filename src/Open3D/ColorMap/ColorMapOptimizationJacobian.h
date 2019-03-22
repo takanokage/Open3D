@@ -55,15 +55,15 @@ public:
     /// See RGBDOdometryJacobianFromHybridTerm for this case.
     void ComputeJacobianAndResidualRigid(
             int row,
-            Eigen::Vector6d& J_r,
+            Vec6d& J_r,
             double& r,
             const geometry::TriangleMesh& mesh,
             const std::vector<double>& proxy_intensity,
             const std::shared_ptr<geometry::Image>& images_gray,
             const std::shared_ptr<geometry::Image>& images_dx,
             const std::shared_ptr<geometry::Image>& images_dy,
-            const Eigen::Matrix4d& intrinsic,
-            const Eigen::Matrix4d& extrinsic,
+            const Mat4d& intrinsic,
+            const Mat4d& extrinsic,
             const std::vector<int>& visiblity_image_to_vertex,
             const int image_boundary_margin);
 
@@ -73,9 +73,9 @@ public:
     /// to avoid full matrix multiplication
     void ComputeJacobianAndResidualNonRigid(
             int row,
-            Eigen::Vector14d& J_r,
+            Vec14d& J_r,
             double& r,
-            Eigen::Vector14i& pattern,
+            Vec14i& pattern,
             const geometry::TriangleMesh& mesh,
             const std::vector<double>& proxy_intensity,
             const std::shared_ptr<geometry::Image>& images_gray,
@@ -83,8 +83,8 @@ public:
             const std::shared_ptr<geometry::Image>& images_dy,
             const ImageWarpingField& warping_fields,
             const ImageWarpingField& warping_fields_init,
-            const Eigen::Matrix4d& intrinsic,
-            const Eigen::Matrix4d& extrinsic,
+            const Mat4d& intrinsic,
+            const Mat4d& extrinsic,
             const std::vector<int>& visiblity_image_to_vertex,
             const int image_boundary_margin);
 };

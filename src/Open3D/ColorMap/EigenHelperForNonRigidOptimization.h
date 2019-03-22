@@ -30,13 +30,7 @@
 #include <vector>
 #include <Eigen/Core>
 
-namespace Eigen {
-
-typedef Eigen::Matrix<double, 14, 14> Matrix14d;
-typedef Eigen::Matrix<double, 14, 1> Vector14d;
-typedef Eigen::Matrix<int, 14, 1> Vector14i;
-
-}  // namespace Eigen
+#include "Open3D/Types/Mat.h"
 
 namespace open3d {
 namespace color_map {

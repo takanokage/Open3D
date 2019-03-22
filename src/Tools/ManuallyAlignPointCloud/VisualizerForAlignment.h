@@ -74,7 +74,7 @@ protected:
     double max_correspondence_distance_ = -1.0;
     bool with_scaling_ = true;
     bool use_dialog_ = true;
-    Eigen::Matrix4d transformation_ = Eigen::Matrix4d::Identity();
+    Mat4d transformation_ = Mat4d::Identity();
     std::string polygon_filename_ = "";
     std::shared_ptr<geometry::PointCloud> source_copy_ptr_;
     std::shared_ptr<geometry::PointCloud> target_copy_ptr_;

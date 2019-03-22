@@ -57,7 +57,7 @@ bool ReadPinholeCameraTrajectoryFromLOG(
     }
     char line_buffer[DEFAULT_IO_BUFFER_SIZE];
     int i, j, k;
-    Eigen::Matrix4d trans;
+    Mat4d trans;
     while (fgets(line_buffer, DEFAULT_IO_BUFFER_SIZE, f)) {
         if (strlen(line_buffer) > 0 && line_buffer[0] != '#') {
             if (sscanf(line_buffer, "%d %d %d", &i, &j, &k) != 3) {
@@ -72,8 +72,8 @@ bool ReadPinholeCameraTrajectoryFromLOG(
                 fclose(f);
                 return false;
             } else {
-                sscanf(line_buffer, "%lf %lf %lf %lf", &trans(0, 0),
-                       &trans(0, 1), &trans(0, 2), &trans(0, 3));
+                sscanf(line_buffer, "%lf %lf %lf %lf", &trans[0][0],
+                       &trans[0][1], &trans[0][2], &trans[0][3]);
             }
             if (fgets(line_buffer, DEFAULT_IO_BUFFER_SIZE, f) == 0) {
                 utility::PrintWarning(
@@ -81,8 +81,8 @@ bool ReadPinholeCameraTrajectoryFromLOG(
                 fclose(f);
                 return false;
             } else {
-                sscanf(line_buffer, "%lf %lf %lf %lf", &trans(1, 0),
-                       &trans(1, 1), &trans(1, 2), &trans(1, 3));
+                sscanf(line_buffer, "%lf %lf %lf %lf", &trans[1][0],
+                       &trans[1][1], &trans[1][2], &trans[1][3]);
             }
             if (fgets(line_buffer, DEFAULT_IO_BUFFER_SIZE, f) == 0) {
                 utility::PrintWarning(
@@ -90,8 +90,8 @@ bool ReadPinholeCameraTrajectoryFromLOG(
                 fclose(f);
                 return false;
             } else {
-                sscanf(line_buffer, "%lf %lf %lf %lf", &trans(2, 0),
-                       &trans(2, 1), &trans(2, 2), &trans(2, 3));
+                sscanf(line_buffer, "%lf %lf %lf %lf", &trans[2][0],
+                       &trans[2][1], &trans[2][2], &trans[2][3]);
             }
             if (fgets(line_buffer, DEFAULT_IO_BUFFER_SIZE, f) == 0) {
                 utility::PrintWarning(
@@ -99,8 +99,8 @@ bool ReadPinholeCameraTrajectoryFromLOG(
                 fclose(f);
                 return false;
             } else {
-                sscanf(line_buffer, "%lf %lf %lf %lf", &trans(3, 0),
-                       &trans(3, 1), &trans(3, 2), &trans(3, 3));
+                sscanf(line_buffer, "%lf %lf %lf %lf", &trans[3][0],
+                       &trans[3][1], &trans[3][2], &trans[3][3]);
             }
             auto param = camera::PinholeCameraParameters();
             param.intrinsic_ = intrinsic;
@@ -124,14 +124,14 @@ bool WritePinholeCameraTrajectoryToLOG(
     for (size_t i = 0; i < trajectory.parameters_.size(); i++) {
         const auto &trans = trajectory.parameters_[i].extrinsic_;
         fprintf(f, "%d %d %d\n", (int)i, (int)i, (int)i + 1);
-        fprintf(f, "%.8f %.8f %.8f %.8f\n", trans(0, 0), trans(0, 1),
-                trans(0, 2), trans(0, 3));
-        fprintf(f, "%.8f %.8f %.8f %.8f\n", trans(1, 0), trans(1, 1),
-                trans(1, 2), trans(1, 3));
-        fprintf(f, "%.8f %.8f %.8f %.8f\n", trans(2, 0), trans(2, 1),
-                trans(2, 2), trans(2, 3));
-        fprintf(f, "%.8f %.8f %.8f %.8f\n", trans(3, 0), trans(3, 1),
-                trans(3, 2), trans(3, 3));
+        fprintf(f, "%.8f %.8f %.8f %.8f\n", trans[0][0], trans[0][1],
+                trans[0][2], trans[0][3]);
+        fprintf(f, "%.8f %.8f %.8f %.8f\n", trans[1][0], trans[1][1],
+                trans[1][2], trans[1][3]);
+        fprintf(f, "%.8f %.8f %.8f %.8f\n", trans[2][0], trans[2][1],
+                trans[2][2], trans[2][3]);
+        fprintf(f, "%.8f %.8f %.8f %.8f\n", trans[3][0], trans[3][1],
+                trans[3][2], trans[3][3]);
     }
     fclose(f);
     return true;

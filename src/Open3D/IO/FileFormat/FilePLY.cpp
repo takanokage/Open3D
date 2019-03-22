@@ -59,7 +59,8 @@ int ReadVertexCallback(p_ply_argument argument) {
     }
 
     double value = ply_get_argument_value(argument);
-    state_ptr->pointcloud_ptr->points_[state_ptr->vertex_index][index] = value;
+    state_ptr->pointcloud_ptr->points_.h_data[state_ptr->vertex_index](index) =
+            value;
     if (index == 2) {  // reading 'z'
         state_ptr->vertex_index++;
         utility::AdvanceConsoleProgress();
@@ -77,7 +78,8 @@ int ReadNormalCallback(p_ply_argument argument) {
     }
 
     double value = ply_get_argument_value(argument);
-    state_ptr->pointcloud_ptr->normals_[state_ptr->normal_index][index] = value;
+    state_ptr->pointcloud_ptr->normals_.h_data[state_ptr->normal_index](index) =
+            value;
     if (index == 2) {  // reading 'nz'
         state_ptr->normal_index++;
     }
@@ -94,7 +96,7 @@ int ReadColorCallback(p_ply_argument argument) {
     }
 
     double value = ply_get_argument_value(argument);
-    state_ptr->pointcloud_ptr->colors_[state_ptr->color_index][index] =
+    state_ptr->pointcloud_ptr->colors_.h_data[state_ptr->color_index](index) =
             value / 255.0;
     if (index == 2) {  // reading 'blue'
         state_ptr->color_index++;
@@ -128,7 +130,7 @@ int ReadVertexCallback(p_ply_argument argument) {
     }
 
     double value = ply_get_argument_value(argument);
-    state_ptr->mesh_ptr->vertices_[state_ptr->vertex_index][index] = value;
+    state_ptr->mesh_ptr->vertices_[state_ptr->vertex_index](index) = value;
     if (index == 2) {  // reading 'z'
         state_ptr->vertex_index++;
         utility::AdvanceConsoleProgress();
@@ -146,7 +148,7 @@ int ReadNormalCallback(p_ply_argument argument) {
     }
 
     double value = ply_get_argument_value(argument);
-    state_ptr->mesh_ptr->vertex_normals_[state_ptr->normal_index][index] =
+    state_ptr->mesh_ptr->vertex_normals_[state_ptr->normal_index](index) =
             value;
     if (index == 2) {  // reading 'nz'
         state_ptr->normal_index++;
@@ -164,7 +166,7 @@ int ReadColorCallback(p_ply_argument argument) {
     }
 
     double value = ply_get_argument_value(argument);
-    state_ptr->mesh_ptr->vertex_colors_[state_ptr->color_index][index] =
+    state_ptr->mesh_ptr->vertex_colors_[state_ptr->color_index](index) =
             value / 255.0;
     if (index == 2) {  // reading 'blue'
         state_ptr->color_index++;
@@ -184,7 +186,7 @@ int ReadFaceCallBack(p_ply_argument argument) {
 
     ply_get_argument_property(argument, NULL, &length, &index);
     if ((index >= 0) && (index <= 2)) {
-        state_ptr->mesh_ptr->triangles_[state_ptr->triangle_index][index] =
+        state_ptr->mesh_ptr->triangles_[state_ptr->triangle_index](index) =
                 static_cast<int>(value);
     }
     if (index == 2) {  // reading 'triangles_[n][2]'
@@ -218,7 +220,8 @@ int ReadVertexCallback(p_ply_argument argument) {
     }
 
     double value = ply_get_argument_value(argument);
-    state_ptr->lineset_ptr->points_[state_ptr->vertex_index][index] = value;
+    state_ptr->lineset_ptr->points_.h_data[state_ptr->vertex_index](index) =
+            value;
     if (index == 2) {  // reading 'z'
         state_ptr->vertex_index++;
         utility::AdvanceConsoleProgress();
@@ -236,7 +239,7 @@ int ReadLineCallback(p_ply_argument argument) {
     }
 
     double value = ply_get_argument_value(argument);
-    state_ptr->lineset_ptr->lines_[state_ptr->line_index][index] = value;
+    state_ptr->lineset_ptr->lines_.h_data[state_ptr->line_index](index) = value;
     if (index == 1) {  // reading 'vertex2'
         state_ptr->line_index++;
         utility::AdvanceConsoleProgress();
@@ -254,7 +257,7 @@ int ReadColorCallback(p_ply_argument argument) {
     }
 
     double value = ply_get_argument_value(argument);
-    state_ptr->lineset_ptr->colors_[state_ptr->color_index][index] =
+    state_ptr->lineset_ptr->colors_.h_data[state_ptr->color_index](index) =
             value / 255.0;
     if (index == 2) {  // reading 'blue'
         state_ptr->color_index++;
@@ -282,7 +285,7 @@ int ReadOriginCallback(p_ply_argument argument) {
                                &index);
 
     double value = ply_get_argument_value(argument);
-    state_ptr->voxelgrid_ptr->origin_[index] = value;
+    state_ptr->voxelgrid_ptr->origin_(index) = value;
     return 1;
 }
 
@@ -307,7 +310,8 @@ int ReadVoxelCallback(p_ply_argument argument) {
     }
 
     double value = ply_get_argument_value(argument);
-    state_ptr->voxelgrid_ptr->voxels_[state_ptr->voxel_index][index] = value;
+    state_ptr->voxelgrid_ptr->voxels_.h_data[state_ptr->voxel_index](index) =
+            value;
     if (index == 2) {  // reading 'z'
         state_ptr->voxel_index++;
         utility::AdvanceConsoleProgress();
@@ -325,7 +329,7 @@ int ReadColorCallback(p_ply_argument argument) {
     }
 
     double value = ply_get_argument_value(argument);
-    state_ptr->voxelgrid_ptr->colors_[state_ptr->color_index][index] =
+    state_ptr->voxelgrid_ptr->colors_.h_data[state_ptr->color_index](index) =
             value / 255.0;
     if (index == 2) {  // reading 'blue'
         state_ptr->color_index++;
@@ -384,9 +388,9 @@ bool ReadPointCloudFromPLY(const std::string &filename,
     state.color_index = 0;
 
     pointcloud.Clear();
-    pointcloud.points_.resize(state.vertex_num);
-    pointcloud.normals_.resize(state.normal_num);
-    pointcloud.colors_.resize(state.color_num);
+    pointcloud.points_.h_data.resize(state.vertex_num);
+    pointcloud.normals_.h_data.resize(state.normal_num);
+    pointcloud.colors_.h_data.resize(state.color_num);
 
     utility::ResetConsoleProgress(state.vertex_num + 1, "Reading PLY: ");
 
@@ -445,18 +449,18 @@ bool WritePointCloudToPLY(const std::string &filename,
                                   "Writing PLY: ");
 
     for (size_t i = 0; i < pointcloud.points_.size(); i++) {
-        const Vec3d &point = pointcloud.points_[i];
+        const Vec3d &point = pointcloud.points_.h_data[i];
         ply_write(ply_file, point[0]);
         ply_write(ply_file, point[1]);
         ply_write(ply_file, point[2]);
         if (pointcloud.HasNormals()) {
-            const Vec3d &normal = pointcloud.normals_[i];
+            const Vec3d &normal = pointcloud.normals_.h_data[i];
             ply_write(ply_file, normal[0]);
             ply_write(ply_file, normal[1]);
             ply_write(ply_file, normal[2]);
         }
         if (pointcloud.HasColors()) {
-            const Vec3d &color = pointcloud.colors_[i];
+            const Vec3d &color = pointcloud.colors_.h_data[i];
             ply_write(ply_file,
                       std::min(255.0, std::max(0.0, color[0] * 255.0)));
             ply_write(ply_file,
@@ -667,9 +671,9 @@ bool ReadLineSetFromPLY(const std::string &filename,
     state.color_index = 0;
 
     lineset.Clear();
-    lineset.points_.resize(state.vertex_num);
-    lineset.lines_.resize(state.line_num);
-    lineset.colors_.resize(state.color_num);
+    lineset.points_.h_data.resize(state.vertex_num);
+    lineset.lines_.h_data.resize(state.line_num);
+    lineset.colors_.h_data.resize(state.color_num);
 
     utility::ResetConsoleProgress(
             state.vertex_num + state.line_num + state.color_num,
@@ -732,18 +736,18 @@ bool WriteLineSetToPLY(const std::string &filename,
             "Writing PLY: ");
 
     for (size_t i = 0; i < lineset.points_.size(); i++) {
-        const Vec3d &point = lineset.points_[i];
+        const Vec3d &point = lineset.points_.h_data[i];
         ply_write(ply_file, point[0]);
         ply_write(ply_file, point[1]);
         ply_write(ply_file, point[2]);
         utility::AdvanceConsoleProgress();
     }
     for (size_t i = 0; i < lineset.lines_.size(); i++) {
-        const Eigen::Vector2i &line = lineset.lines_[i];
+        const Vec2i &line = lineset.lines_.h_data[i];
         ply_write(ply_file, line[0]);
         ply_write(ply_file, line[1]);
         if (lineset.HasColors()) {
-            const Vec3d &color = lineset.colors_[i];
+            const Vec3d &color = lineset.colors_.h_data[i];
             ply_write(ply_file,
                       std::min(255.0, std::max(0.0, color[0] * 255.0)));
             ply_write(ply_file,
@@ -802,8 +806,8 @@ bool ReadVoxelGridFromPLY(const std::string &filename,
     state.color_index = 0;
 
     voxelgrid.Clear();
-    voxelgrid.voxels_.resize(state.voxel_num);
-    voxelgrid.colors_.resize(state.color_num);
+    voxelgrid.voxels_.h_data.resize(state.voxel_num);
+    voxelgrid.colors_.h_data.resize(state.color_num);
 
     utility::ResetConsoleProgress(state.voxel_num + state.color_num,
                                   "Reading PLY: ");
@@ -873,12 +877,12 @@ bool WriteVoxelGridToPLY(const std::string &filename,
     ply_write(ply_file, voxelgrid.voxel_size_);
 
     for (size_t i = 0; i < voxelgrid.voxels_.size(); i++) {
-        const Eigen::Vector3i &voxel = voxelgrid.voxels_[i];
+        const Vec3i &voxel = voxelgrid.voxels_.h_data[i];
         ply_write(ply_file, voxel[0]);
         ply_write(ply_file, voxel[1]);
         ply_write(ply_file, voxel[2]);
         if (voxelgrid.HasColors()) {
-            const Vec3d &color = voxelgrid.colors_[i];
+            const Vec3d &color = voxelgrid.colors_.h_data[i];
             ply_write(ply_file,
                       std::min(255.0, std::max(0.0, color[0] * 255.0)));
             ply_write(ply_file,

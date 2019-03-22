@@ -63,8 +63,8 @@ public:
 public:
     void Clear() override;
     bool IsEmpty() const override;
-    Eigen::Vector2d GetMinBound() const final;
-    Eigen::Vector2d GetMaxBound() const final;
+    Vec2d GetMinBound() const final;
+    Vec2d GetMaxBound() const final;
     void FillPolygon(int width, int height);
     std::shared_ptr<geometry::PointCloud> CropPointCloud(
             const geometry::PointCloud &input, const ViewControl &view);
@@ -82,13 +82,13 @@ private:
             const geometry::TriangleMesh &input, const ViewControl &view);
     std::shared_ptr<geometry::TriangleMesh> CropTriangleMeshInPolygon(
             const geometry::TriangleMesh &input, const ViewControl &view);
-    std::vector<size_t> CropInRectangle(
-            const std::vector<Eigen::Vector3d> &input, const ViewControl &view);
-    std::vector<size_t> CropInPolygon(const std::vector<Eigen::Vector3d> &input,
+    std::vector<size_t> CropInRectangle(const std::vector<Vec3d> &input,
+                                        const ViewControl &view);
+    std::vector<size_t> CropInPolygon(const std::vector<Vec3d> &input,
                                       const ViewControl &view);
 
 public:
-    std::vector<Eigen::Vector2d> polygon_;
+    std::vector<Vec2d> polygon_;
     bool is_closed_ = false;
     geometry::Image polygon_interior_mask_;
     SectionPolygonType polygon_type_ = SectionPolygonType::Unfilled;

@@ -83,7 +83,7 @@ Eigen::VectorXd GetProgramOptionAsEigenVectorXd(
         int argc,
         char **argv,
         const std::string &option,
-        const Eigen::VectorXd default_value = Eigen::VectorXd::Zero(0));
+        const Eigen::VectorXd default_value = Eigen::VectorXd::Zero());
 
 bool ProgramOptionExists(int argc, char **argv, const std::string &option);
 

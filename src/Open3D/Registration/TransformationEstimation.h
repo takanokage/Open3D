@@ -31,6 +31,8 @@
 #include <string>
 #include <Eigen/Core>
 
+#include "Open3D/Types/Mat.h"
+
 namespace open3d {
 
 namespace geometry {
@@ -39,7 +41,7 @@ class PointCloud;
 
 namespace registration {
 
-typedef std::vector<Eigen::Vector2i> CorrespondenceSet;
+typedef std::vector<Vec2i> CorrespondenceSet;
 
 enum class TransformationEstimationType {
     Unspecified = 0,
@@ -62,7 +64,7 @@ public:
     virtual double ComputeRMSE(const geometry::PointCloud &source,
                                const geometry::PointCloud &target,
                                const CorrespondenceSet &corres) const = 0;
-    virtual Eigen::Matrix4d ComputeTransformation(
+    virtual Mat4d ComputeTransformation(
             const geometry::PointCloud &source,
             const geometry::PointCloud &target,
             const CorrespondenceSet &corres) const = 0;
@@ -83,10 +85,9 @@ public:
     double ComputeRMSE(const geometry::PointCloud &source,
                        const geometry::PointCloud &target,
                        const CorrespondenceSet &corres) const override;
-    Eigen::Matrix4d ComputeTransformation(
-            const geometry::PointCloud &source,
-            const geometry::PointCloud &target,
-            const CorrespondenceSet &corres) const override;
+    Mat4d ComputeTransformation(const geometry::PointCloud &source,
+                                const geometry::PointCloud &target,
+                                const CorrespondenceSet &corres) const override;
 
 public:
     bool with_scaling_ = false;
@@ -110,10 +111,9 @@ public:
     double ComputeRMSE(const geometry::PointCloud &source,
                        const geometry::PointCloud &target,
                        const CorrespondenceSet &corres) const override;
-    Eigen::Matrix4d ComputeTransformation(
-            const geometry::PointCloud &source,
-            const geometry::PointCloud &target,
-            const CorrespondenceSet &corres) const override;
+    Mat4d ComputeTransformation(const geometry::PointCloud &source,
+                                const geometry::PointCloud &target,
+                                const CorrespondenceSet &corres) const override;
 
 private:
     const TransformationEstimationType type_ =

@@ -40,7 +40,7 @@ public:
     class HalfEdge {
     public:
         HalfEdge() {}
-        HalfEdge(const Eigen::Vector2i &vertex_indices,
+        HalfEdge(const Vec2i &vertex_indices,
                  int triangle_index,
                  int next,
                  int twin);
@@ -52,7 +52,7 @@ public:
         // Index of the twin HalfEdge
         int twin_ = -1;
         // Index of the ordered vertices forming this half edge
-        Eigen::Vector2i vertex_indices_ = Eigen::Vector2i(-1, -1);
+        Vec2i vertex_indices_ = Vec2i{-1, -1};
         // Index of the triangle containing this half edge
         int triangle_index_ = -1;
     };

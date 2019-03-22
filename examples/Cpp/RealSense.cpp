@@ -39,7 +39,7 @@ int main(int argc, char **args) {
         return 1;
     }
 
-    rs::device *dev = ctx.get_device(0);
+    rs::device *dev = ctx.get_device[0];
     utility::PrintInfo("Using device 0, an %s\n", dev->get_name());
     utility::PrintInfo("    Serial number: %s\n", dev->get_serial());
     utility::PrintInfo("    Firmware version: %s\n\n",

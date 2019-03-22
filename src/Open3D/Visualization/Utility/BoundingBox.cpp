@@ -49,12 +49,12 @@ void BoundingBox::FitInGeometry(const geometry::Geometry3D &geometry) {
     } else {
         auto geometry_min_bound = geometry.GetMinBound();
         auto geometry_max_bound = geometry.GetMaxBound();
-        min_bound_(0) = std::min(min_bound_(0), geometry_min_bound(0));
-        min_bound_(1) = std::min(min_bound_(1), geometry_min_bound(1));
-        min_bound_(2) = std::min(min_bound_(2), geometry_min_bound(2));
-        max_bound_(0) = std::max(max_bound_(0), geometry_max_bound(0));
-        max_bound_(1) = std::max(max_bound_(1), geometry_max_bound(1));
-        max_bound_(2) = std::max(max_bound_(2), geometry_max_bound(2));
+        min_bound_[0] = std::min(min_bound_[0], geometry_min_bound[0]);
+        min_bound_[1] = std::min(min_bound_[1], geometry_min_bound[1]);
+        min_bound_[2] = std::min(min_bound_[2], geometry_min_bound[2]);
+        max_bound_[0] = std::max(max_bound_[0], geometry_max_bound[0]);
+        max_bound_[1] = std::max(max_bound_[1], geometry_max_bound[1]);
+        max_bound_[2] = std::max(max_bound_[2], geometry_max_bound[2]);
     }
 }
 

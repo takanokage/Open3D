@@ -38,23 +38,23 @@ bool PointCloudPicker::IsEmpty() const {
     return (!pointcloud_ptr_ || picked_indices_.empty());
 }
 
-Eigen::Vector3d PointCloudPicker::GetMinBound() const {
+Vec3d PointCloudPicker::GetMinBound() const {
     if (pointcloud_ptr_) {
         return ((const geometry::PointCloud &)(*pointcloud_ptr_)).GetMinBound();
     } else {
-        return Eigen::Vector3d(0.0, 0.0, 0.0);
+        return Vec3d{};
     }
 }
 
-Eigen::Vector3d PointCloudPicker::GetMaxBound() const {
+Vec3d PointCloudPicker::GetMaxBound() const {
     if (pointcloud_ptr_) {
         return ((const geometry::PointCloud &)(*pointcloud_ptr_)).GetMaxBound();
     } else {
-        return Eigen::Vector3d(0.0, 0.0, 0.0);
+        return Vec3d{};
     }
 }
 
-void PointCloudPicker::Transform(const Eigen::Matrix4d & /*transformation*/) {
+void PointCloudPicker::Transform(const Mat4d & /*transformation*/) {
     // Do nothing
 }
 

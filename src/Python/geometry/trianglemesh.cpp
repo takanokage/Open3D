@@ -120,5 +120,5 @@ void pybind_trianglemesh_methods(py::module &m) {
           "cone_split"_a = 1);
     m.def("create_mesh_coordinate_frame", &geometry::CreateMeshCoordinateFrame,
           "Factory function to create a coordinate frame mesh", "size"_a = 1.0,
-          "origin"_a = Eigen::Vector3d(0.0, 0.0, 0.0));
+          "origin"_a = Vec3d{});
 }

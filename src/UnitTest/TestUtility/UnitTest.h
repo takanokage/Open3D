@@ -45,10 +45,10 @@ namespace unit_test {
 const double THRESHOLD = 1e-6;
 
 // Eigen Zero()
-const Eigen::Vector2d Zero2d = Eigen::Vector2d::Zero();
-const Eigen::Vector3d Zero3d = Eigen::Vector3d::Zero();
+const Vec2d Zero2d = Vec2d::Zero();
+const Vec3d Zero3d = Vec3d::Zero();
 const Eigen::Matrix<double, 6, 1> Zero6d = Eigen::Matrix<double, 6, 1>::Zero();
-const Eigen::Vector2i Zero2i = Eigen::Vector2i::Zero();
+const Vec2i Zero2i = Vec2i::Zero();
 
 // Mechanism for reporting unit tests for which there is no implementation yet.
 void NotImplemented();

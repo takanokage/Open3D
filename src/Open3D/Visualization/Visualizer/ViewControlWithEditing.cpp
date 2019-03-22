@@ -39,28 +39,28 @@ void ViewControlWithEditing::Reset() {
         lookat_ = bounding_box_.GetCenter();
         switch (editing_mode_) {
             case EditingMode::OrthoPositiveX:
-                up_ = Eigen::Vector3d(0.0, 0.0, 1.0);
-                front_ = Eigen::Vector3d(1.0, 0.0, 0.0);
+                up_ = Vec3d{0.0, 0.0, 1.0};
+                front_ = Vec3d{1.0, 0.0, 0.0};
                 break;
             case EditingMode::OrthoNegativeX:
-                up_ = Eigen::Vector3d(0.0, 0.0, 1.0);
-                front_ = Eigen::Vector3d(-1.0, 0.0, 0.0);
+                up_ = Vec3d{0.0, 0.0, 1.0};
+                front_ = Vec3d{-1.0, 0.0, 0.0};
                 break;
             case EditingMode::OrthoPositiveY:
-                up_ = Eigen::Vector3d(1.0, 0.0, 0.0);
-                front_ = Eigen::Vector3d(0.0, 1.0, 0.0);
+                up_ = Vec3d{1.0, 0.0, 0.0};
+                front_ = Vec3d{0.0, 1.0, 0.0};
                 break;
             case EditingMode::OrthoNegativeY:
-                up_ = Eigen::Vector3d(1.0, 0.0, 0.0);
-                front_ = Eigen::Vector3d(0.0, -1.0, 0.0);
+                up_ = Vec3d{1.0, 0.0, 0.0};
+                front_ = Vec3d{0.0, -1.0, 0.0};
                 break;
             case EditingMode::OrthoPositiveZ:
-                up_ = Eigen::Vector3d(0.0, 1.0, 0.0);
-                front_ = Eigen::Vector3d(0.0, 0.0, 1.0);
+                up_ = Vec3d{0.0, 1.0, 0.0};
+                front_ = Vec3d{0.0, 0.0, 1.0};
                 break;
             case EditingMode::OrthoNegativeZ:
-                up_ = Eigen::Vector3d(0.0, 1.0, 0.0);
-                front_ = Eigen::Vector3d(0.0, 0.0, -1.0);
+                up_ = Vec3d{0.0, 1.0, 0.0};
+                front_ = Vec3d{0.0, 0.0, -1.0};
                 break;
             default:
                 break;

@@ -26,41 +26,23 @@
 
 #pragma once
 
-#include "Open3D/Types/Mat.h"
+#include <vector>
+#include "Mat.h"
 
 namespace open3d {
-namespace geometry {
-
-class Geometry {
-public:
-    enum class GeometryType {
-        Unspecified = 0,
-        PointCloud = 1,
-        VoxelGrid = 2,
-        Octree = 3,
-        LineSet = 4,
-        TriangleMesh = 5,
-        HalfEdgeTriangleMesh = 6,
-        Image = 7,
-    };
-
-public:
-    virtual ~Geometry() {}
-
-protected:
-    Geometry(GeometryType type, int dimension)
-        : geometry_type_(type), dimension_(dimension) {}
-
-public:
-    virtual void Clear() = 0;
-    virtual bool IsEmpty() const = 0;
-    GeometryType GetGeometryType() const { return geometry_type_; }
-    int Dimension() const { return dimension_; }
-
-private:
-    GeometryType geometry_type_ = GeometryType::Unspecified;
-    int dimension_ = 3;
+// 1D tensor, row major
+template <typename V, typename T>
+struct Blob {
+    typedef struct _Type {
+        // host data container
+        std::vector<V> h_data{};
+        // device data pointer
+        T* d_data{};
+        // device id
+        // set to -1 to execute on the CPU
+        int cuda_device_id = 0;
+        // number of elements in this structure
+        inline size_t size() const { return h_data.size(); }
+    } Type;
 };
-
-}  // namespace geometry
 }  // namespace open3d

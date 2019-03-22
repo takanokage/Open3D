@@ -31,40 +31,22 @@
 #include <Eigen/Core>
 #include <Eigen/StdVector>
 
-namespace Eigen {
-
-/// Extending Eigen namespace by adding frequently used matrix type
-typedef Eigen::Matrix<double, 6, 6> Matrix6d;
-typedef Eigen::Matrix<double, 6, 1> Vector6d;
-
-/// Use Eigen::DontAlign for matrices inside classes which are exposed in the
-/// Open3D headers https://github.com/IntelVCL/Open3D/issues/653
-typedef Eigen::Matrix<double, 6, 6, Eigen::DontAlign> Matrix6d_u;
-typedef Eigen::Matrix<double, 4, 4, Eigen::DontAlign> Matrix4d_u;
-
-}  // namespace Eigen
+#include "Open3D/Types/Mat.h"
 
 namespace open3d {
 namespace utility {
 
-using Matrix4d_allocator = Eigen::aligned_allocator<Eigen::Matrix4d>;
-using Matrix6d_allocator = Eigen::aligned_allocator<Eigen::Matrix6d>;
-using Vector2d_allocator = Eigen::aligned_allocator<Eigen::Vector2d>;
-using Vector4i_allocator = Eigen::aligned_allocator<Eigen::Vector4i>;
-using Vector4d_allocator = Eigen::aligned_allocator<Eigen::Vector4d>;
-using Vector6d_allocator = Eigen::aligned_allocator<Eigen::Vector6d>;
-
 /// Function to transform 6D motion vector to 4D motion matrix
 /// Reference:
 /// https://eigen.tuxfamily.org/dox/group__TutorialGeometry.html#TutorialGeoTransform
-Eigen::Matrix4d TransformVector6dToMatrix4d(const Eigen::Vector6d &input);
+Mat4d TransformVector6dToMatrix4d(const Vec6d &input);
 
 /// Function to transform 4D motion matrix to 6D motion vector
 /// this is consistent with the matlab function in
 /// the Aerospace Toolbox
 /// Reference:
 /// https://github.com/qianyizh/ElasticReconstruction/blob/master/Matlab_Toolbox/Core/mrEvaluateRegistration.m
-Eigen::Vector6d TransformMatrix4dToVector6d(const Eigen::Matrix4d &input);
+Vec6d TransformMatrix4dToVector6d(const Mat4d &input);
 
 /// Function to solve Ax=b
 std::tuple<bool, Eigen::VectorXd> SolveLinearSystemPSD(
@@ -78,13 +60,13 @@ std::tuple<bool, Eigen::VectorXd> SolveLinearSystemPSD(
 /// Function to solve Jacobian system
 /// Input: 6x6 Jacobian matrix and 6-dim residual vector.
 /// Output: tuple of is_success, 4x4 extrinsic matrices.
-std::tuple<bool, Eigen::Matrix4d> SolveJacobianSystemAndObtainExtrinsicMatrix(
-        const Eigen::Matrix6d &JTJ, const Eigen::Vector6d &JTr);
+std::tuple<bool, Mat4d> SolveJacobianSystemAndObtainExtrinsicMatrix(
+        const Mat6d &JTJ, const Vec6d &JTr);
 
 /// Function to solve Jacobian system
 /// Input: 6nx6n Jacobian matrix and 6n-dim residual vector.
 /// Output: tuple of is_success, n 4x4 motion matrices.
-std::tuple<bool, std::vector<Eigen::Matrix4d, Matrix4d_allocator>>
+std::tuple<bool, std::vector<Mat4d>>
 SolveJacobianSystemAndObtainExtrinsicMatrixArray(const Eigen::MatrixXd &JTJ,
                                                  const Eigen::VectorXd &JTr);
 

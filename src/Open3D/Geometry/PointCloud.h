@@ -33,7 +33,7 @@
 #include <Eigen/Core>
 #include <Open3D/Geometry/Geometry3D.h>
 #include <Open3D/Geometry/KDTreeSearchParam.h>
-#include "Open3D/Types/Mat.h"
+#include "Open3D/Types/Blob.h"
 
 namespace open3d {
 
@@ -49,14 +49,18 @@ class RGBDImage;
 class PointCloud : public Geometry3D {
 public:
     PointCloud() : Geometry3D(Geometry::GeometryType::PointCloud){};
-    ~PointCloud() override{};
+    ~PointCloud() override {
+        ReleaseDevicePoints();
+        ReleaseDeviceNormals();
+        ReleaseDeviceColors();
+    };
 
 public:
     void Clear() override;
     bool IsEmpty() const override;
     Vec3d GetMinBound() const override;
     Vec3d GetMaxBound() const override;
-    void Transform(const Eigen::Matrix4d &transformation) override;
+    void Transform(const Mat4d &transformation) override;
 
 public:
     PointCloud &operator+=(const PointCloud &cloud);
@@ -75,31 +79,42 @@ public:
 
     void NormalizeNormals() {
         for (size_t i = 0; i < normals_.size(); i++) {
-            normals_[i].normalize();
+            normals_.h_data[i].normalize();
         }
     }
 
     void PaintUniformColor(const Vec3d &color) {
-        colors_.resize(points_.size());
+        colors_.h_data.resize(points_.size());
         for (size_t i = 0; i < points_.size(); i++) {
-            colors_[i] = color;
+            colors_.h_data[i] = color;
         }
     }
 
 public:
-    std::vector<Vec3d> points_;
-    std::vector<Vec3d> normals_;
-    std::vector<Vec3d> colors_;
+    Blob<Vec3d, double>::Type points_;
+    Blob<Vec3d, double>::Type normals_;
+    Blob<Vec3d, double>::Type colors_;
 
 #ifdef OPEN3D_USE_CUDA
 
-public:  // cuda device pointers
-    double *d_points_{};
-    double *d_normals_{};
-    double *d_colors_{};
+public:
+    // device id
     // set to -1 to execute on the CPU
-    // a non zero value must point to a valid device
     int cuda_device_id = 0;
+
+    inline void SetDeviceID(const int &id) {
+        if (cuda_device_id != id) {
+            cuda_device_id = id;
+
+            points_.cuda_device_id = id;
+            normals_.cuda_device_id = id;
+            colors_.cuda_device_id = id;
+
+            UpdateDevicePoints();
+            UpdateDeviceNormals();
+            UpdateDeviceColors();
+        }
+    }
 
 public:
     // update the memory assigned to d_points_
@@ -130,7 +145,7 @@ public:
 std::shared_ptr<PointCloud> CreatePointCloudFromDepthImage(
         const Image &depth,
         const camera::PinholeCameraIntrinsic &intrinsic,
-        const Eigen::Matrix4d &extrinsic = Eigen::Matrix4d::Identity(),
+        const Mat4d &extrinsic = Mat4d::Identity(),
         double depth_scale = 1000.0,
         double depth_trunc = 1000.0,
         int stride = 1);
@@ -141,7 +156,7 @@ std::shared_ptr<PointCloud> CreatePointCloudFromDepthImage(
 std::shared_ptr<PointCloud> CreatePointCloudFromRGBDImage(
         const RGBDImage &image,
         const camera::PinholeCameraIntrinsic &intrinsic,
-        const Eigen::Matrix4d &extrinsic = Eigen::Matrix4d::Identity());
+        const Mat4d &extrinsic = Mat4d::Identity());
 
 /// Function to select points from \param input pointcloud into
 /// \return output pointcloud
@@ -212,7 +227,7 @@ bool OrientNormalsToAlignWithDirection(
 /// \param cloud is the input point cloud. It also stores the output normals.
 /// Normals are oriented with towards \param camera_location
 bool OrientNormalsTowardsCameraLocation(
-        PointCloud &cloud, const Vec3d &camera_location = Vec3d{});
+        PointCloud &cloud, const Vec3d &camera_location = Vec3d::Zero());
 
 /// Function to compute the point to point distances between point clouds
 /// \param source is the first point cloud.
@@ -257,6 +272,6 @@ std::tuple<Vec3d, Mat3d> ComputePointCloudMeanAndCovarianceCUDA(
 
 // compute mean and covariance on the GPU using CUDA
 std::tuple<open3d::Vec3d, open3d::Mat3d> meanAndCovarianceCUDA(
-        const int &devID, double *const d_points, const int &nrPoints);
+        const int &devID, double *const d_points, const uint &nrPoints);
 
 #endif  // OPEN3D_USE_CUDA

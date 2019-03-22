@@ -35,7 +35,7 @@ namespace unit_test {
 // Class for "generating" data.
 class Raw {
 public:
-    Raw() : index(0), step(1) {}
+    Raw() : index[0], step[1] {}
     Raw(const int &seed)
         : index(abs(seed) % SIZE), step((seed <= 0) ? 1 : seed) {}
 
@@ -64,7 +64,7 @@ public:
     // Get the next value.
     template <class T>
     T Next() {
-        return T(0);
+        return T[0];
     }
 };
 

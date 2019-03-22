@@ -52,21 +52,21 @@ public:
         width_ = width;
         height_ = height;
         intrinsic_matrix_.setIdentity();
-        intrinsic_matrix_(0, 0) = fx;
-        intrinsic_matrix_(1, 1) = fy;
-        intrinsic_matrix_(0, 2) = cx;
-        intrinsic_matrix_(1, 2) = cy;
+        intrinsic_matrix_[0][0] = fx;
+        intrinsic_matrix_[1][1] = fy;
+        intrinsic_matrix_[0][2] = cx;
+        intrinsic_matrix_[1][2] = cy;
     }
 
     std::pair<double, double> GetFocalLength() const {
-        return std::make_pair(intrinsic_matrix_(0, 0), intrinsic_matrix_(1, 1));
+        return std::make_pair(intrinsic_matrix_[0][0], intrinsic_matrix_[1][1]);
     }
 
     std::pair<double, double> GetPrincipalPoint() const {
-        return std::make_pair(intrinsic_matrix_(0, 2), intrinsic_matrix_(1, 2));
+        return std::make_pair(intrinsic_matrix_[0][2], intrinsic_matrix_[1][2]);
     }
 
-    double GetSkew() const { return intrinsic_matrix_(0, 1); }
+    double GetSkew() const { return intrinsic_matrix_[0][1]; }
 
     bool IsValid() const { return (width_ > 0 && height_ > 0); }
 
@@ -76,7 +76,7 @@ public:
 public:
     int width_ = -1;
     int height_ = -1;
-    Eigen::Matrix3d intrinsic_matrix_;
+    Mat3d intrinsic_matrix_;
 };
 }  // namespace camera
 }  // namespace open3d

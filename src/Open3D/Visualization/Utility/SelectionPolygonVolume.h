@@ -59,12 +59,11 @@ private:
             const geometry::PointCloud &input) const;
     std::shared_ptr<geometry::TriangleMesh> CropTriangleMeshInPolygon(
             const geometry::TriangleMesh &input) const;
-    std::vector<size_t> CropInPolygon(
-            const std::vector<Eigen::Vector3d> &input) const;
+    std::vector<size_t> CropInPolygon(const std::vector<Vec3d> &input) const;
 
 public:
     std::string orthogonal_axis_ = "";
-    std::vector<Eigen::Vector3d> bounding_polygon_;
+    std::vector<Vec3d> bounding_polygon_;
     double axis_min_ = 0.0;
     double axis_max_ = 0.0;
 };

@@ -35,18 +35,18 @@
 namespace open3d {
 namespace color_map {
 inline std::tuple<float, float, float> Project3DPointAndGetUVDepth(
-        const Eigen::Vector3d X,
+        const Vec3d X,
         const camera::PinholeCameraTrajectory& camera,
         int camid) {
     std::pair<double, double> f =
             camera.parameters_[camid].intrinsic_.GetFocalLength();
     std::pair<double, double> p =
             camera.parameters_[camid].intrinsic_.GetPrincipalPoint();
-    Eigen::Vector4d Vt = camera.parameters_[camid].extrinsic_ *
-                         Eigen::Vector4d(X(0), X(1), X(2), 1);
-    float u = float((Vt(0) * f.first) / Vt(2) + p.first);
-    float v = float((Vt(1) * f.second) / Vt(2) + p.second);
-    float z = float(Vt(2));
+    Vec4d Vt =
+            camera.parameters_[camid].extrinsic_ * Vec4d{X[0], X[1], X[2], 1};
+    float u = float((Vt[0] * f.first) / Vt[2] + p.first);
+    float v = float((Vt[1] * f.second) / Vt[2] + p.second);
+    float z = float(Vt[2]);
     return std::make_tuple(u, v, z);
 }
 
@@ -70,7 +70,7 @@ CreateVertexAndImageVisibility(
     for (int c = 0; c < n_camera; c++) {
         int viscnt = 0;
         for (int vertex_id = 0; vertex_id < n_vertex; vertex_id++) {
-            Eigen::Vector3d X = mesh.vertices_[vertex_id];
+            Vec3d X = mesh.vertices_[vertex_id];
             float u, v, d;
             std::tie(u, v, d) = Project3DPointAndGetUVDepth(X, camera, c);
             int u_d = int(round(u)), v_d = int(round(v));
@@ -104,7 +104,7 @@ CreateVertexAndImageVisibility(
 template <typename T>
 std::tuple<bool, T> QueryImageIntensity(
         const geometry::Image& img,
-        const Eigen::Vector3d& V,
+        const Vec3d& V,
         const camera::PinholeCameraTrajectory& camera,
         int camid,
         int ch /*= -1*/,
@@ -130,7 +130,7 @@ template <typename T>
 std::tuple<bool, T> QueryImageIntensity(
         const geometry::Image& img,
         const ImageWarpingField& field,
-        const Eigen::Vector3d& V,
+        const Vec3d& V,
         const camera::PinholeCameraTrajectory& camera,
         int camid,
         int ch /*= -1*/,
@@ -138,11 +138,11 @@ std::tuple<bool, T> QueryImageIntensity(
     float u, v, depth;
     std::tie(u, v, depth) = Project3DPointAndGetUVDepth(V, camera, camid);
     if (img.TestImageBoundary(u, v, image_boundary_margin)) {
-        Eigen::Vector2d uv_shift = field.GetImageWarpingField(u, v);
-        if (img.TestImageBoundary(uv_shift(0), uv_shift(1),
+        Vec2d uv_shift = field.GetImageWarpingField(u, v);
+        if (img.TestImageBoundary(uv_shift[0], uv_shift[1],
                                   image_boundary_margin)) {
-            int u_shift = int(round(uv_shift(0)));
-            int v_shift = int(round(uv_shift(1)));
+            int u_shift = int(round(uv_shift[0]));
+            int v_shift = int(round(uv_shift[1]));
             if (ch == -1) {
                 return std::make_tuple(
                         true, *geometry::PointerAt<T>(img, u_shift, v_shift));
@@ -240,7 +240,7 @@ void SetGeometryColorAverage(
 #pragma omp parallel for schedule(static)
 #endif
     for (int i = 0; i < n_vertex; i++) {
-        mesh.vertex_colors_[i] = Eigen::Vector3d::Zero();
+        mesh.vertex_colors_[i] = Vec3d::Zero();
         double sum = 0.0;
         for (auto iter = 0; iter < visiblity_vertex_to_image[i].size();
              iter++) {
@@ -260,58 +260,59 @@ void SetGeometryColorAverage(
             float g = (float)g_temp / 255.0f;
             float b = (float)b_temp / 255.0f;
             if (valid) {
-                mesh.vertex_colors_[i] += Eigen::Vector3d(r, g, b);
-                sum += 1.0;
+                mesh.vertex_colors_[i] += Vec3d {
+                    r, g, b{};
+                    sum += 1.0;
+                }
+            }
+            if (sum > 0.0) {
+                mesh.vertex_colors_[i] /= sum;
             }
         }
-        if (sum > 0.0) {
-            mesh.vertex_colors_[i] /= sum;
-        }
     }
-}
 
-void SetGeometryColorAverage(
-        geometry::TriangleMesh& mesh,
-        const std::vector<std::shared_ptr<geometry::Image>>& images_color,
-        const std::vector<ImageWarpingField>& warping_fields,
-        const camera::PinholeCameraTrajectory& camera,
-        const std::vector<std::vector<int>>& visiblity_vertex_to_image,
-        int image_boundary_margin /*= 10*/) {
-    auto n_vertex = mesh.vertices_.size();
-    mesh.vertex_colors_.clear();
-    mesh.vertex_colors_.resize(n_vertex);
+    void SetGeometryColorAverage(
+            geometry::TriangleMesh & mesh,
+            const std::vector<std::shared_ptr<geometry::Image>>& images_color,
+            const std::vector<ImageWarpingField>& warping_fields,
+            const camera::PinholeCameraTrajectory& camera,
+            const std::vector<std::vector<int>>& visiblity_vertex_to_image,
+            int image_boundary_margin /*= 10*/) {
+        auto n_vertex = mesh.vertices_.size();
+        mesh.vertex_colors_.clear();
+        mesh.vertex_colors_.resize(n_vertex);
 #ifdef _OPENMP
 #pragma omp parallel for schedule(static)
 #endif
-    for (int i = 0; i < n_vertex; i++) {
-        mesh.vertex_colors_[i] = Eigen::Vector3d::Zero();
-        double sum = 0.0;
-        for (auto iter = 0; iter < visiblity_vertex_to_image[i].size();
-             iter++) {
-            int j = visiblity_vertex_to_image[i][iter];
-            unsigned char r_temp, g_temp, b_temp;
-            bool valid = false;
-            std::tie(valid, r_temp) = QueryImageIntensity<unsigned char>(
-                    *images_color[j], warping_fields[j], mesh.vertices_[i],
-                    camera, j, 0, image_boundary_margin);
-            std::tie(valid, g_temp) = QueryImageIntensity<unsigned char>(
-                    *images_color[j], warping_fields[j], mesh.vertices_[i],
-                    camera, j, 1, image_boundary_margin);
-            std::tie(valid, b_temp) = QueryImageIntensity<unsigned char>(
-                    *images_color[j], warping_fields[j], mesh.vertices_[i],
-                    camera, j, 2, image_boundary_margin);
-            float r = (float)r_temp / 255.0f;
-            float g = (float)g_temp / 255.0f;
-            float b = (float)b_temp / 255.0f;
-            if (valid) {
-                mesh.vertex_colors_[i] += Eigen::Vector3d(r, g, b);
-                sum += 1.0;
+        for (int i = 0; i < n_vertex; i++) {
+            mesh.vertex_colors_[i] = Vec3d::Zero();
+            double sum = 0.0;
+            for (auto iter = 0; iter < visiblity_vertex_to_image[i].size();
+                 iter++) {
+                int j = visiblity_vertex_to_image[i][iter];
+                unsigned char r_temp, g_temp, b_temp;
+                bool valid = false;
+                std::tie(valid, r_temp) = QueryImageIntensity<unsigned char>(
+                        *images_color[j], warping_fields[j], mesh.vertices_[i],
+                        camera, j, 0, image_boundary_margin);
+                std::tie(valid, g_temp) = QueryImageIntensity<unsigned char>(
+                        *images_color[j], warping_fields[j], mesh.vertices_[i],
+                        camera, j, 1, image_boundary_margin);
+                std::tie(valid, b_temp) = QueryImageIntensity<unsigned char>(
+                        *images_color[j], warping_fields[j], mesh.vertices_[i],
+                        camera, j, 2, image_boundary_margin);
+                float r = (float)r_temp / 255.0f;
+                float g = (float)g_temp / 255.0f;
+                float b = (float)b_temp / 255.0f;
+                if (valid) {
+                    mesh.vertex_colors_[i] += Vec3d{r, g, b};
+                    sum += 1.0;
+                }
+            }
+            if (sum > 0.0) {
+                mesh.vertex_colors_[i] /= sum;
             }
         }
-        if (sum > 0.0) {
-            mesh.vertex_colors_[i] /= sum;
-        }
     }
-}
 }  // namespace color_map
-}  // namespace open3d
+}  // namespace color_map

@@ -33,10 +33,10 @@
 namespace open3d {
 namespace visualization {
 
-ViewParameters::Vector17d ViewParameters::ConvertToVector17d() {
-    ViewParameters::Vector17d v;
-    v(0) = field_of_view_;
-    v(1) = zoom_;
+ViewParameters::Vec17d ViewParameters::ConvertToVector17d() {
+    ViewParameters::Vec17d v;
+    v[0] = field_of_view_;
+    v[1] = zoom_;
     v.block<3, 1>(2, 0) = lookat_;
     v.block<3, 1>(5, 0) = up_;
     v.block<3, 1>(8, 0) = front_;
@@ -45,9 +45,9 @@ ViewParameters::Vector17d ViewParameters::ConvertToVector17d() {
     return v;
 }
 
-void ViewParameters::ConvertFromVector17d(const ViewParameters::Vector17d &v) {
-    field_of_view_ = v(0);
-    zoom_ = v(1);
+void ViewParameters::ConvertFromVector17d(const ViewParameters::Vec17d &v) {
+    field_of_view_ = v[0];
+    zoom_ = v[1];
     lookat_ = v.block<3, 1>(2, 0);
     up_ = v.block<3, 1>(5, 0);
     front_ = v.block<3, 1>(8, 0);
@@ -58,20 +58,20 @@ void ViewParameters::ConvertFromVector17d(const ViewParameters::Vector17d &v) {
 bool ViewParameters::ConvertToJsonValue(Json::Value &value) const {
     value["field_of_view"] = field_of_view_;
     value["zoom"] = zoom_;
-    if (EigenVector3dToJsonArray(lookat_, value["lookat"]) == false) {
+    if (Vector3dToJsonArray(lookat_, value["lookat"]) == false) {
         return false;
     }
-    if (EigenVector3dToJsonArray(up_, value["up"]) == false) {
+    if (Vector3dToJsonArray(up_, value["up"]) == false) {
         return false;
     }
-    if (EigenVector3dToJsonArray(front_, value["front"]) == false) {
+    if (Vector3dToJsonArray(front_, value["front"]) == false) {
         return false;
     }
-    if (EigenVector3dToJsonArray(boundingbox_min_, value["boundingbox_min"]) ==
+    if (Vector3dToJsonArray(boundingbox_min_, value["boundingbox_min"]) ==
         false) {
         return false;
     }
-    if (EigenVector3dToJsonArray(boundingbox_max_, value["boundingbox_max"]) ==
+    if (Vector3dToJsonArray(boundingbox_max_, value["boundingbox_max"]) ==
         false) {
         return false;
     }
@@ -86,29 +86,29 @@ bool ViewParameters::ConvertFromJsonValue(const Json::Value &value) {
     }
     field_of_view_ = value.get("field_of_view", 60.0).asDouble();
     zoom_ = value.get("zoom", 0.7).asDouble();
-    if (EigenVector3dFromJsonArray(lookat_, value["lookat"]) == false) {
+    if (Vector3dFromJsonArray(lookat_, value["lookat"]) == false) {
         utility::PrintWarning(
                 "ViewParameters read JSON failed: wrong format.\n");
         return false;
     }
-    if (EigenVector3dFromJsonArray(up_, value["up"]) == false) {
+    if (Vector3dFromJsonArray(up_, value["up"]) == false) {
         utility::PrintWarning(
                 "ViewParameters read JSON failed: wrong format.\n");
         return false;
     }
-    if (EigenVector3dFromJsonArray(front_, value["front"]) == false) {
+    if (Vector3dFromJsonArray(front_, value["front"]) == false) {
         utility::PrintWarning(
                 "ViewParameters read JSON failed: wrong format.\n");
         return false;
     }
-    if (EigenVector3dFromJsonArray(boundingbox_min_,
-                                   value["boundingbox_min"]) == false) {
+    if (Vector3dFromJsonArray(boundingbox_min_, value["boundingbox_min"]) ==
+        false) {
         utility::PrintWarning(
                 "ViewParameters read JSON failed: wrong format.\n");
         return false;
     }
-    if (EigenVector3dFromJsonArray(boundingbox_max_,
-                                   value["boundingbox_max"]) == false) {
+    if (Vector3dFromJsonArray(boundingbox_max_, value["boundingbox_max"]) ==
+        false) {
         utility::PrintWarning(
                 "ViewParameters read JSON failed: wrong format.\n");
         return false;

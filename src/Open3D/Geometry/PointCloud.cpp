@@ -42,9 +42,9 @@ namespace open3d {
 namespace geometry {
 
 void PointCloud::Clear() {
-    points_.clear();
-    normals_.clear();
-    colors_.clear();
+    points_.h_data.clear();
+    normals_.h_data.clear();
+    colors_.h_data.clear();
 }
 
 bool PointCloud::IsEmpty() const { return !HasPoints(); }
@@ -54,20 +54,14 @@ Vec3d PointCloud::GetMinBound() const {
         return Vec3d{};
     }
     auto itr_x = std::min_element(
-            points_.begin(), points_.end(),
-            [](const Vec3d &a, const Vec3d &b) {
-                return a[0] < b[0];
-            });
+            points_.h_data.begin(), points_.h_data.end(),
+            [](const Vec3d &a, const Vec3d &b) { return a[0] < b[0]; });
     auto itr_y = std::min_element(
-            points_.begin(), points_.end(),
-            [](const Vec3d &a, const Vec3d &b) {
-                return a[1] < b[1];
-            });
+            points_.h_data.begin(), points_.h_data.end(),
+            [](const Vec3d &a, const Vec3d &b) { return a[1] < b[1]; });
     auto itr_z = std::min_element(
-            points_.begin(), points_.end(),
-            [](const Vec3d &a, const Vec3d &b) {
-                return a[2] < b[2];
-            });
+            points_.h_data.begin(), points_.h_data.end(),
+            [](const Vec3d &a, const Vec3d &b) { return a[2] < b[2]; });
     return Vec3d{(*itr_x)[0], (*itr_y)[1], (*itr_z)[2]};
 }
 
@@ -76,35 +70,27 @@ Vec3d PointCloud::GetMaxBound() const {
         return Vec3d{};
     }
     auto itr_x = std::max_element(
-            points_.begin(), points_.end(),
-            [](const Vec3d &a, const Vec3d &b) {
-                return a[0] < b[0];
-            });
+            points_.h_data.begin(), points_.h_data.end(),
+            [](const Vec3d &a, const Vec3d &b) { return a[0] < b[0]; });
     auto itr_y = std::max_element(
-            points_.begin(), points_.end(),
-            [](const Vec3d &a, const Vec3d &b) {
-                return a[1] < b[1];
-            });
+            points_.h_data.begin(), points_.h_data.end(),
+            [](const Vec3d &a, const Vec3d &b) { return a[1] < b[1]; });
     auto itr_z = std::max_element(
-            points_.begin(), points_.end(),
-            [](const Vec3d &a, const Vec3d &b) {
-                return a[2] < b[2];
-            });
+            points_.h_data.begin(), points_.h_data.end(),
+            [](const Vec3d &a, const Vec3d &b) { return a[2] < b[2]; });
     return Vec3d{(*itr_x)[0], (*itr_y)[1], (*itr_z)[2]};
 }
 
-void PointCloud::Transform(const Eigen::Matrix4d &transformation) {
-    for (auto &point : points_) {
-        Eigen::Vector4d new_point =
-                transformation *
-                Eigen::Vector4d(point[0], point[1], point[2], 1.0);
-        point = new_point.block<3, 1>(0, 0);
+void PointCloud::Transform(const Mat4d &transformation) {
+    for (auto &point : points_.h_data) {
+        Vec4d new_point =
+                transformation * Vec4d{point[0], point[1], point[2], 1.0};
+        point = Vec3d{point[0], point[1], point[2]};
     }
-    for (auto &normal : normals_) {
-        Eigen::Vector4d new_normal =
-                transformation *
-                Eigen::Vector4d(normal[0], normal[1], normal[2], 0.0);
-        normal = new_normal.block<3, 1>(0, 0);
+    for (auto &normal : normals_.h_data) {
+        Vec4d new_normal =
+                transformation * Vec4d{normal[0], normal[1], normal[2], 0.0};
+        normal = Vec3d{normal[0], normal[1], normal[2]};
     }
 }
 
@@ -116,22 +102,22 @@ PointCloud &PointCloud::operator+=(const PointCloud &cloud) {
     size_t add_vert_num = cloud.points_.size();
     size_t new_vert_num = old_vert_num + add_vert_num;
     if ((!HasPoints() || HasNormals()) && cloud.HasNormals()) {
-        normals_.resize(new_vert_num);
+        normals_.h_data.resize(new_vert_num);
         for (size_t i = 0; i < add_vert_num; i++)
-            normals_[old_vert_num + i] = cloud.normals_[i];
+            normals_.h_data[old_vert_num + i] = cloud.normals_.h_data[i];
     } else {
-        normals_.clear();
+        normals_.h_data.clear();
     }
     if ((!HasPoints() || HasColors()) && cloud.HasColors()) {
-        colors_.resize(new_vert_num);
+        colors_.h_data.resize(new_vert_num);
         for (size_t i = 0; i < add_vert_num; i++)
-            colors_[old_vert_num + i] = cloud.colors_[i];
+            colors_.h_data[old_vert_num + i] = cloud.colors_.h_data[i];
     } else {
-        colors_.clear();
+        colors_.h_data.clear();
     }
-    points_.resize(new_vert_num);
+    points_.h_data.resize(new_vert_num);
     for (size_t i = 0; i < add_vert_num; i++)
-        points_[old_vert_num + i] = cloud.points_[i];
+        points_.h_data[old_vert_num + i] = cloud.points_.h_data[i];
     return (*this);
 }
 
@@ -148,9 +134,10 @@ std::vector<double> ComputePointCloudToPointCloudDistance(
 #pragma omp parallel for schedule(static)
 #endif
     for (int i = 0; i < (int)source.points_.size(); i++) {
-        std::vector<int> indices(1);
-        std::vector<double> dists(1);
-        if (kdtree.SearchKNN(source.points_[i], 1, indices, dists) == 0) {
+        std::vector<int> indices[1];
+        std::vector<double> dists[1];
+        if (kdtree.SearchKNN(source.points_.h_data[i], 1, indices, dists) ==
+            0) {
             utility::PrintDebug(
                     "[ComputePointCloudToPointCloudDistance] Found a point "
                     "without neighbors.\n");
@@ -162,13 +149,9 @@ std::vector<double> ComputePointCloudToPointCloudDistance(
     return distances;
 }
 
-std::tuple<Vec3d, Mat3d> ComputePointCloudMeanAndCovariance(
-        PointCloud &input) {
-    Vec3d mean{};
-    Mat3d covariance{};
-    covariance[0][0] = 1.0;
-    covariance[1][1] = 1.0;
-    covariance[2][2] = 1.0;
+std::tuple<Vec3d, Mat3d> ComputePointCloudMeanAndCovariance(PointCloud &input) {
+    Vec3d mean = Vec3d::Zero();
+    Mat3d covariance = Mat3d::Identity();
 
     if (input.IsEmpty()) return std::make_tuple(mean, covariance);
 
@@ -182,34 +165,32 @@ std::tuple<Vec3d, Mat3d> ComputePointCloudMeanAndCovariance(
 #endif
 }
 
-std::tuple<Vec3d, Mat3d>
-ComputePointCloudMeanAndCovarianceCPU(const PointCloud &input) {
-    Vec3d mean{};
-    Mat3d covariance{};
-    covariance[0][0] = 1.0;
-    covariance[1][1] = 1.0;
-    covariance[2][2] = 1.0;
+std::tuple<Vec3d, Mat3d> ComputePointCloudMeanAndCovarianceCPU(
+        const PointCloud &input) {
+    Vec3d mean = Vec3d::Zero();
+    Mat3d covariance = Mat3d::Identity();
 
     if (input.IsEmpty()) return std::make_tuple(mean, covariance);
 
     Mat3d cumulants{};
-    for (const auto &point : input.points_) {
-        cumulants[0][0] += point[0];
-        cumulants[0][1] += point[1];
-        cumulants[0][2] += point[2];
-        cumulants[1][0] += point[0] * point[0];
-        cumulants[1][1] += point[0] * point[1];
-        cumulants[1][2] += point[0] * point[2];
-        cumulants[2][0] += point[1] * point[1];
-        cumulants[2][1] += point[1] * point[2];
-        cumulants[2][2] += point[2] * point[2];
+    cumulants.setZero();
+    for (const auto &point : input.points_.h_data) {
+        cumulants[0] += point[0];
+        cumulants[1] += point[1];
+        cumulants[2] += point[2];
+        cumulants[3] += point[0] * point[0];
+        cumulants[4] += point[0] * point[1];
+        cumulants[5] += point[0] * point[2];
+        cumulants[6] += point[1] * point[1];
+        cumulants[7] += point[1] * point[2];
+        cumulants[8] += point[2] * point[2];
     }
 
     cumulants /= (double)input.points_.size();
 
-    mean[0] = cumulants[0][0];
-    mean[1] = cumulants[0][1];
-    mean[2] = cumulants[0][2];
+    mean[0] = cumulants[0];
+    mean[1] = cumulants[1];
+    mean[2] = cumulants[2];
 
     covariance[0][0] = cumulants[1][0] - cumulants[0][0] * cumulants[0][0];
     covariance[1][1] = cumulants[2][0] - cumulants[0][1] * cumulants[0][1];
@@ -234,7 +215,7 @@ std::vector<double> ComputePointCloudMahalanobisDistance(PointCloud &input) {
 #pragma omp parallel for schedule(static)
 #endif
     for (int i = 0; i < (int)input.points_.size(); i++) {
-        Vec3d p = input.points_[i] - mean;
+        Vec3d p = input.points_.h_data[i] - mean;
         mahalanobis[i] = std::sqrt(p.transpose() * cov_inv * p);
     }
     return mahalanobis;
@@ -248,9 +229,9 @@ std::vector<double> ComputePointCloudNearestNeighborDistance(
 #pragma omp parallel for schedule(static)
 #endif
     for (int i = 0; i < (int)input.points_.size(); i++) {
-        std::vector<int> indices(2);
-        std::vector<double> dists(2);
-        if (kdtree.SearchKNN(input.points_[i], 2, indices, dists) <= 1) {
+        std::vector<int> indices[2];
+        std::vector<double> dists[2];
+        if (kdtree.SearchKNN(input.points_.h_data[i], 2, indices, dists) <= 1) {
             utility::PrintDebug(
                     "[ComputePointCloudNearestNeighborDistance] Found a point "
                     "without neighbors.\n");
@@ -264,33 +245,46 @@ std::vector<double> ComputePointCloudNearestNeighborDistance(
 
 #ifdef OPEN3D_USE_CUDA
 
-std::tuple<Vec3d, Mat3d>
-ComputePointCloudMeanAndCovarianceCUDA(PointCloud &input) {
-    input.UpdateDevicePoints();
-    auto output = meanAndCovarianceCUDA(input.cuda_device_id, input.d_points_,
-                                        input.points_.size());
-    return output;
+std::tuple<Vec3d, Mat3d> ComputePointCloudMeanAndCovarianceCUDA(
+        PointCloud &input) {
+    auto output =
+            meanAndCovarianceCUDA(input.points_.cuda_device_id,
+                                  input.points_.d_data, input.points_.size());
+
+    Vec3d meanCUDA = get<0>(output);
+    Mat3d covarianceCUDA = get<1>(output);
+
+    Vec3d mean;
+    Mat3d covariance;
+
+    memcpy(&mean, &meanCUDA, Vec3d::Size * sizeof(double));
+    memcpy(&covariance, &covarianceCUDA, Mat3d::Size * sizeof(double));
+
+    return std::make_tuple(mean, covariance);
 }
 
-// update the memory assigned to d_points_
+// update the memory assigned to points_.d_data
 bool PointCloud::UpdateDevicePoints() {
     size_t size = points_.size() * open3d::Vec3d::Size;
-    return UpdateDeviceMemory(&d_points_, (const double *const)points_.data(),
-                              size, cuda_device_id);
+    return UpdateDeviceMemory(&points_.d_data,
+                              (const double *const)points_.h_data.data(), size,
+                              cuda_device_id);
 }
 
-// update the memory assigned to d_normals_
+// update the memory assigned to normals_.d_data
 bool PointCloud::UpdateDeviceNormals() {
     size_t size = normals_.size() * open3d::Vec3d::Size;
-    return UpdateDeviceMemory(&d_normals_, (const double *const)normals_.data(),
-                              size, cuda_device_id);
+    return UpdateDeviceMemory(&normals_.d_data,
+                              (const double *const)normals_.h_data.data(), size,
+                              cuda_device_id);
 }
 
-// update the memory assigned to d_colors_
+// update the memory assigned to colors_.d_data
 bool PointCloud::UpdateDeviceColors() {
     size_t size = colors_.size() * open3d::Vec3d::Size;
-    return UpdateDeviceMemory(&d_colors_, (const double *const)colors_.data(),
-                              size, cuda_device_id);
+    return UpdateDeviceMemory(&colors_.d_data,
+                              (const double *const)colors_.h_data.data(), size,
+                              cuda_device_id);
 }
 
 // perform cleanup
@@ -302,19 +296,19 @@ bool PointCloud::ReleaseDeviceMemory(double **d_data) {
     *d_data = NULL;
 }
 
-// release the memory asigned to d_points_
+// release the memory asigned to points_.d_data
 bool PointCloud::ReleaseDevicePoints() {
-    return ReleaseDeviceMemory(&d_points_);
+    return ReleaseDeviceMemory(&points_.d_data);
 }
 
-// release the memory asigned to d_normals_
+// release the memory asigned to normals_.d_data
 bool PointCloud::ReleaseDeviceNormals() {
-    return ReleaseDeviceMemory(&d_normals_);
+    return ReleaseDeviceMemory(&normals_.d_data);
 }
 
-// release the memory asigned to d_colors_
+// release the memory asigned to colors_.d_data
 bool PointCloud::ReleaseDeviceColors() {
-    return ReleaseDeviceMemory(&d_colors_);
+    return ReleaseDeviceMemory(&colors_.d_data);
 }
 
 #endif  // OPEN3D_USE_CUDA

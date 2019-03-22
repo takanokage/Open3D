@@ -48,8 +48,8 @@ bool ReadPointCloudFromXYZN(const std::string &filename,
     while (fgets(line_buffer, DEFAULT_IO_BUFFER_SIZE, file)) {
         if (sscanf(line_buffer, "%lf %lf %lf %lf %lf %lf", &x, &y, &z, &nx, &ny,
                    &nz) == 6) {
-            pointcloud.points_.push_back(Eigen::Vector3d(x, y, z));
-            pointcloud.normals_.push_back(Eigen::Vector3d(nx, ny, nz));
+            pointcloud.points_.h_data.push_back(Vec3d{x, y, z});
+            pointcloud.normals_.h_data.push_back(Vec3d{nx, ny, nz});
         }
     }
 
@@ -73,10 +73,10 @@ bool WritePointCloudToXYZN(const std::string &filename,
     }
 
     for (size_t i = 0; i < pointcloud.points_.size(); i++) {
-        const Eigen::Vector3d &point = pointcloud.points_[i];
-        const Eigen::Vector3d &normal = pointcloud.normals_[i];
-        if (fprintf(file, "%.10f %.10f %.10f %.10f %.10f %.10f\n", point(0),
-                    point(1), point(2), normal(0), normal(1), normal(2)) < 0) {
+        const Vec3d &point = pointcloud.points_.h_data[i];
+        const Vec3d &normal = pointcloud.normals_.h_data[i];
+        if (fprintf(file, "%.10f %.10f %.10f %.10f %.10f %.10f\n", point[0],
+                    point[1], point[2], normal[0], normal[1], normal[2]) < 0) {
             utility::PrintWarning(
                     "Write XYZN failed: unable to write file: %s\n",
                     filename.c_str());

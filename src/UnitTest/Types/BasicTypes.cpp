@@ -109,7 +109,7 @@ TEST(BasicTypes, cast) {
 // - with custom alignment the size is different than N x sizeof(TYPE)
 // ----------------------------------------------------------------------------
 TEST(BasicTypes, sizeof_type) {
-    EXPECT_EQ(3 * sizeof(double), sizeof(Eigen::Vector3d));
+    EXPECT_EQ(3 * sizeof(double), sizeof(Vec3d));
 
     EXPECT_EQ(3 * 3 * sizeof(double), sizeof(open3d::Mat3d));
     EXPECT_EQ(3 * 3 * sizeof(float), sizeof(open3d::Mat3f));
@@ -129,10 +129,8 @@ TEST(BasicTypes, sizeof_type) {
 // Test ==, !=, <=, >=.
 // ----------------------------------------------------------------------------
 TEST(BasicTypes, comparison_ops_float) {
-    open3d::Mat3f m0 = {0.0f, 1.0f, 2.0f, 3.0f, 4.0f,
-                           5.0f, 6.0f, 7.0f, 8.0f};
-    open3d::Mat3f m1 = {0.0f, 1.0f, 2.0f, 3.0f, 4.0f,
-                           5.0f, 6.0f, 7.0f, 8.0f};
+    open3d::Mat3f m0 = {0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f};
+    open3d::Mat3f m1 = {0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f};
     EXPECT_TRUE(m0 == m1);
     EXPECT_TRUE(m0 <= m1);
 

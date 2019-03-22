@@ -53,12 +53,12 @@ public:
         PYBIND11_OVERLOAD_PURE(double, TransformationEstimationBase, source,
                                target, corres);
     }
-    Eigen::Matrix4d ComputeTransformation(
+    Mat4d ComputeTransformation(
             const geometry::PointCloud &source,
             const geometry::PointCloud &target,
             const registration::CorrespondenceSet &corres) const override {
-        PYBIND11_OVERLOAD_PURE(Eigen::Matrix4d, TransformationEstimationBase,
-                               source, target, corres);
+        PYBIND11_OVERLOAD_PURE(Mat4d, TransformationEstimationBase, source,
+                               target, corres);
     }
 };
 
@@ -69,7 +69,7 @@ public:
     bool Check(const geometry::PointCloud &source,
                const geometry::PointCloud &target,
                const registration::CorrespondenceSet &corres,
-               const Eigen::Matrix4d &transformation) const override {
+               const Mat4d &transformation) const override {
         PYBIND11_OVERLOAD_PURE(bool, CorrespondenceCheckerBase, source, target,
                                corres, transformation);
     }
@@ -368,18 +368,16 @@ void pybind_registration_methods(py::module &m) {
     m.def("evaluate_registration", &registration::EvaluateRegistration,
           "Function for evaluating registration between point clouds",
           "source"_a, "target"_a, "max_correspondence_distance"_a,
-          "transformation"_a = Eigen::Matrix4d::Identity());
+          "transformation"_a = Mat4d::Identity());
     m.def("registration_icp", &registration::RegistrationICP,
           "Function for ICP registration", "source"_a, "target"_a,
-          "max_correspondence_distance"_a,
-          "init"_a = Eigen::Matrix4d::Identity(),
+          "max_correspondence_distance"_a, "init"_a = Mat4d::Identity(),
           "estimation_method"_a =
                   registration::TransformationEstimationPointToPoint(false),
           "criteria"_a = registration::ICPConvergenceCriteria());
     m.def("registration_colored_icp", &registration::RegistrationColoredICP,
           "Function for Colored ICP registration", "source"_a, "target"_a,
-          "max_correspondence_distance"_a,
-          "init"_a = Eigen::Matrix4d::Identity(),
+          "max_correspondence_distance"_a, "init"_a = Mat4d::Identity(),
           "criteria"_a = registration::ICPConvergenceCriteria(),
           "lambda_geometric"_a = 0.968);
     m.def("registration_ransac_based_on_correspondence",

@@ -55,12 +55,12 @@ template <typename EigenVector>
 std::vector<EigenVector> py_array_to_vectors_double(
         py::array_t<double, py::array::c_style | py::array::forcecast> array) {
     size_t eigen_vector_size = EigenVector::SizeAtCompileTime;
-    if (array.ndim() != 2 || array.shape(1) != eigen_vector_size) {
+    if (array.ndim() != 2 || array.shape[1] != eigen_vector_size) {
         throw py::cast_error();
     }
-    std::vector<EigenVector> eigen_vectors(array.shape(0));
+    std::vector<EigenVector> eigen_vectors(array.shape[0]);
     auto array_unchecked = array.mutable_unchecked<2>();
-    for (auto i = 0; i < array_unchecked.shape(0); ++i) {
+    for (auto i = 0; i < array_unchecked.shape[0]; ++i) {
         // The EigenVector here must be a double-typed eigen vector, since only
         // open3d::Vector3dVector binds to py_array_to_vectors_double.
         // Therefore, we can use the memory map directly.
@@ -73,12 +73,12 @@ template <typename EigenVector>
 std::vector<EigenVector> py_array_to_vectors_int(
         py::array_t<int, py::array::c_style | py::array::forcecast> array) {
     size_t eigen_vector_size = EigenVector::SizeAtCompileTime;
-    if (array.ndim() != 2 || array.shape(1) != eigen_vector_size) {
+    if (array.ndim() != 2 || array.shape[1] != eigen_vector_size) {
         throw py::cast_error();
     }
-    std::vector<EigenVector> eigen_vectors(array.shape(0));
+    std::vector<EigenVector> eigen_vectors(array.shape[0]);
     auto array_unchecked = array.mutable_unchecked<2>();
-    for (auto i = 0; i < array_unchecked.shape(0); ++i) {
+    for (auto i = 0; i < array_unchecked.shape[0]; ++i) {
         eigen_vectors[i] = Eigen::Map<EigenVector>(&array_unchecked(i, 0));
     }
     return eigen_vectors;
@@ -155,13 +155,13 @@ void pybind_eigen_vector_of_vector(py::module &m,
     // We choose to disable them because they do not support slice indices
     // such as [:,:]. It is recommanded to convert it to numpy.asarray()
     // to access raw data.
-    // v.def("__getitem__", [](const std::vector<Eigen::Vector3d> &v,
+    // v.def("__getitem__", [](const std::vector<Vec3d> &v,
     //        std::pair<size_t, size_t> i) {
     //    if (i.first >= v.size() || i.second >= 3)
     //        throw py::index_error();
     //    return v[i.first](i.second);
     //});
-    // v.def("__setitem__", [](std::vector<Eigen::Vector3d> &v,
+    // v.def("__setitem__", [](std::vector<Vec3d> &v,
     //        std::pair<size_t, size_t> i, double x) {
     //    if (i.first >= v.size() || i.second >= 3)
     //        throw py::index_error();
@@ -230,15 +230,15 @@ void pybind_eigen_vector_of_matrix(py::module &m,
 void pybind_eigen(py::module &m) {
     pybind_eigen_vector_of_scalar<int>(m, "IntVector");
     pybind_eigen_vector_of_scalar<double>(m, "DoubleVector");
-    pybind_eigen_vector_of_vector<Eigen::Vector3d>(
-            m, "Vector3dVector", "std::vector<Eigen::Vector3d>",
-            py::py_array_to_vectors_double<Eigen::Vector3d>);
-    pybind_eigen_vector_of_vector<Eigen::Vector3i>(
-            m, "Vector3iVector", "std::vector<Eigen::Vector3i>",
-            py::py_array_to_vectors_int<Eigen::Vector3i>);
-    pybind_eigen_vector_of_vector<Eigen::Vector2i>(
-            m, "Vector2iVector", "std::vector<Eigen::Vector2i>",
-            py::py_array_to_vectors_int<Eigen::Vector2i>);
-    pybind_eigen_vector_of_matrix<Eigen::Matrix4d>(
-            m, "Matrix4dVector", "std::vector<Eigen::Matrix4d>");
+    pybind_eigen_vector_of_vector<Vec3d>(m, "Vector3dVector",
+                                         "std::vector<Vec3d>",
+                                         py::py_array_to_vectors_double<Vec3d>);
+    pybind_eigen_vector_of_vector<Vec3i>(m, "Vector3iVector",
+                                         "std::vector<Vec3i>",
+                                         py::py_array_to_vectors_int<Vec3i>);
+    pybind_eigen_vector_of_vector<Vec2i>(m, "Vector2iVector",
+                                         "std::vector<Vec2i>",
+                                         py::py_array_to_vectors_int<Vec2i>);
+    pybind_eigen_vector_of_matrix<Mat4d>(m, "Matrix4dVector",
+                                         "std::vector<Mat4d>");
 }

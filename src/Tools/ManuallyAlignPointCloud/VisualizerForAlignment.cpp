@@ -140,8 +140,7 @@ void VisualizerForAlignment::KeyPressCallback(
                             max_correspondence_distance_);
                     auto result = registration::RegistrationICP(
                             *source_copy_ptr_, *target_copy_ptr_,
-                            max_correspondence_distance_,
-                            Eigen::Matrix4d::Identity(),
+                            max_correspondence_distance_, Mat4d::Identity(),
                             registration::TransformationEstimationPointToPoint(
                                     true),
                             registration::ICPConvergenceCriteria(1e-6, 1e-6,
@@ -288,7 +287,7 @@ bool VisualizerForAlignment::AlignWithManualAnnotation() {
     registration::TransformationEstimationPointToPoint p2p(with_scaling_);
     registration::CorrespondenceSet corres;
     for (size_t i = 0; i < source_idx.size(); i++) {
-        corres.push_back(Eigen::Vector2i(source_idx[i], target_idx[i]));
+        corres.push_back(Vec2i{source_idx[i], target_idx[i]});
     }
     utility::PrintInfo(
             "Error is %.4f before alignment.\n",
@@ -309,18 +308,18 @@ bool VisualizerForAlignment::AlignWithManualAnnotation() {
 
 void VisualizerForAlignment::PrintTransformation() {
     utility::PrintInfo("Current transformation is:\n");
-    utility::PrintInfo("\t%.6f %.6f %.6f %.6f\n", transformation_(0, 0),
-                       transformation_(0, 1), transformation_(0, 2),
-                       transformation_(0, 3));
-    utility::PrintInfo("\t%.6f %.6f %.6f %.6f\n", transformation_(1, 0),
-                       transformation_(1, 1), transformation_(1, 2),
-                       transformation_(1, 3));
-    utility::PrintInfo("\t%.6f %.6f %.6f %.6f\n", transformation_(2, 0),
-                       transformation_(2, 1), transformation_(2, 2),
-                       transformation_(2, 3));
-    utility::PrintInfo("\t%.6f %.6f %.6f %.6f\n", transformation_(3, 0),
-                       transformation_(3, 1), transformation_(3, 2),
-                       transformation_(3, 3));
+    utility::PrintInfo("\t%.6f %.6f %.6f %.6f\n", transformation_[0][0],
+                       transformation_[0][1], transformation_[0][2],
+                       transformation_[0][3]);
+    utility::PrintInfo("\t%.6f %.6f %.6f %.6f\n", transformation_[1][0],
+                       transformation_[1][1], transformation_[1][2],
+                       transformation_[1][3]);
+    utility::PrintInfo("\t%.6f %.6f %.6f %.6f\n", transformation_[2][0],
+                       transformation_[2][1], transformation_[2][2],
+                       transformation_[2][3]);
+    utility::PrintInfo("\t%.6f %.6f %.6f %.6f\n", transformation_[3][0],
+                       transformation_[3][1], transformation_[3][2],
+                       transformation_[3][3]);
 }
 
 void VisualizerForAlignment::EvaluateAlignmentAndSave(

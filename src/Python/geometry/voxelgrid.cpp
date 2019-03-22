@@ -49,8 +49,8 @@ void pybind_voxelgrid(py::module &m) {
             .def(py::self += py::self)
             .def("has_voxels", &geometry::VoxelGrid::HasVoxels)
             .def("has_colors", &geometry::VoxelGrid::HasColors)
-            .def_readwrite("voxels", &geometry::VoxelGrid::voxels_)
-            .def_readwrite("colors", &geometry::VoxelGrid::colors_)
+            .def_readwrite("voxels", &geometry::VoxelGrid::voxels_.h_data)
+            .def_readwrite("colors", &geometry::VoxelGrid::colors_.h_data)
             .def_readwrite("origin", &geometry::VoxelGrid::origin_)
             .def_readwrite("voxel_size", &geometry::VoxelGrid::voxel_size_);
 }

@@ -31,12 +31,12 @@
 
 namespace unit_test {
 namespace Sort {
-// Greater than or Equal for sorting Eigen::Vector3d elements.
-bool GE(const Eigen::Vector3d& v0, const Eigen::Vector3d& v1);
+// Greater than or Equal for sorting Vec3d elements.
+bool GE(const Vec3d& v0, const Vec3d& v1);
 
-// Sort a vector of Eigen::Vector3d elements.
+// Sort a vector of Vec3d elements.
 // method needed because std::sort failed on TravisCI/macOS (works fine on
 // Linux)
-void Do(std::vector<Eigen::Vector3d>& v);
+void Do(std::vector<Vec3d>& v);
 }  // namespace Sort
 }  // namespace unit_test

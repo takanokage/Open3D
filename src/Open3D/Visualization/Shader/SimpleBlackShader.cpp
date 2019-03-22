@@ -64,7 +64,7 @@ bool SimpleBlackShader::BindGeometry(const geometry::Geometry &geometry,
     UnbindGeometry();
 
     // Prepare data to be passed to GPU
-    std::vector<Eigen::Vector3f> points;
+    std::vector<Vec3f> points;
     if (PrepareBinding(geometry, option, view, points) == false) {
         PrintShaderWarning("Binding failed when preparing data.");
         return false;
@@ -73,8 +73,8 @@ bool SimpleBlackShader::BindGeometry(const geometry::Geometry &geometry,
     // Create buffers and bind the geometry
     glGenBuffers(1, &vertex_position_buffer_);
     glBindBuffer(GL_ARRAY_BUFFER, vertex_position_buffer_);
-    glBufferData(GL_ARRAY_BUFFER, points.size() * sizeof(Eigen::Vector3f),
-                 points.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, points.size() * sizeof(Vec3f), points.data(),
+                 GL_STATIC_DRAW);
 
     bound_ = true;
     return true;
@@ -122,7 +122,7 @@ bool SimpleBlackShaderForPointCloudNormal::PrepareBinding(
         const geometry::Geometry &geometry,
         const RenderOption &option,
         const ViewControl &view,
-        std::vector<Eigen::Vector3f> &points) {
+        std::vector<Vec3f> &points) {
     if (geometry.GetGeometryType() !=
         geometry::Geometry::GeometryType::PointCloud) {
         PrintShaderWarning("Rendering type is not geometry::PointCloud.");
@@ -138,8 +138,8 @@ bool SimpleBlackShaderForPointCloudNormal::PrepareBinding(
     double line_length =
             option.point_size_ * 0.01 * view.GetBoundingBox().GetSize();
     for (size_t i = 0; i < pointcloud.points_.size(); i++) {
-        const auto &point = pointcloud.points_[i];
-        const auto &normal = pointcloud.normals_[i];
+        const auto &point = pointcloud.points_.h_data[i];
+        const auto &normal = pointcloud.normals_.h_data[i];
         points[i * 2] = point.cast<float>();
         points[i * 2 + 1] = (point + normal * line_length).cast<float>();
     }
@@ -171,7 +171,7 @@ bool SimpleBlackShaderForTriangleMeshWireFrame::PrepareBinding(
         const geometry::Geometry &geometry,
         const RenderOption &option,
         const ViewControl &view,
-        std::vector<Eigen::Vector3f> &points) {
+        std::vector<Vec3f> &points) {
     if (geometry.GetGeometryType() !=
                 geometry::Geometry::GeometryType::TriangleMesh &&
         geometry.GetGeometryType() !=

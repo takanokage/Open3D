@@ -74,8 +74,8 @@ void Visualizer::Render() {
     glEnable(GL_MULTISAMPLE);
     glDisable(GL_BLEND);
     auto &background_color = render_option_ptr_->background_color_;
-    glClearColor((GLclampf)background_color(0), (GLclampf)background_color(1),
-                 (GLclampf)background_color(2), 1.0f);
+    glClearColor((GLclampf)background_color[0], (GLclampf)background_color[1],
+                 (GLclampf)background_color[2], 1.0f);
     glClearDepth(1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -428,8 +428,8 @@ void Visualizer::CaptureDepthPointCloud(
             if (p_depth[j] == 1.0) {
                 continue;
             }
-            depth_pointcloud.points_.push_back(GLHelper::Unproject(
-                    Eigen::Vector3d(j + 0.5, i + 0.5, p_depth[j]), mvp_matrix,
+            depth_pointcloud.points_.h_data.push_back(GLHelper::Unproject(
+                    Vec3d{j + 0.5, i + 0.5, p_depth[j]}, mvp_matrix,
                     view_control_ptr_->GetWindowWidth(),
                     view_control_ptr_->GetWindowHeight()));
         }

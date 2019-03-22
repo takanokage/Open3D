@@ -64,11 +64,11 @@ std::tuple<MatOutType, VecOutType, double> ComputeJTJandJTrNonRigid(
             f(i, J_r, r, pattern);
             for (auto x = 0; x < J_r.size(); x++) {
                 for (auto y = 0; y < J_r.size(); y++) {
-                    JTJ_private(pattern(x), pattern(y)) += J_r(x) * J_r(y);
+                    JTJ_private(pattern[x], pattern[y]) += J_r[x] * J_r[y];
                 }
             }
             for (auto x = 0; x < J_r.size(); x++) {
-                JTr_private(pattern(x)) += r * J_r(x);
+                JTr_private(pattern[x]) += r * J_r[x];
             }
             r2_sum_private += r * r;
         }
@@ -92,8 +92,7 @@ std::tuple<MatOutType, VecOutType, double> ComputeJTJandJTrNonRigid(
 
 template std::tuple<Eigen::MatrixXd, Eigen::VectorXd, double>
 ComputeJTJandJTrNonRigid(
-        std::function<
-                void(int, Eigen::Vector14d &, double &, Eigen::Vector14i &)> f,
+        std::function<void(int, Vec14d &, double &, Vec14i &)> f,
         int iteration_num,
         int nonrigidval,
         bool verbose);

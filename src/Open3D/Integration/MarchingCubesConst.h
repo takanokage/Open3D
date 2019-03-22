@@ -28,6 +28,8 @@
 
 #include <Eigen/Core>
 
+#include "Open3D/Types/Mat.h"
+
 namespace {
 
 const int edge_table[256] = {
@@ -316,20 +318,16 @@ const int tri_table[256][16] = {
         {0, 3, 8, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
         {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}};
 
-const Eigen::Vector3i shift[8] = {
-        Eigen::Vector3i(0, 0, 0), Eigen::Vector3i(1, 0, 0),
-        Eigen::Vector3i(1, 1, 0), Eigen::Vector3i(0, 1, 0),
-        Eigen::Vector3i(0, 0, 1), Eigen::Vector3i(1, 0, 1),
-        Eigen::Vector3i(1, 1, 1), Eigen::Vector3i(0, 1, 1),
+const Vec3i shift[8] = {
+        Vec3i{0, 0, 0}, Vec3i{1, 0, 0}, Vec3i{1, 1, 0}, Vec3i{0, 1, 0},
+        Vec3i{0, 0, 1}, Vec3i{1, 0, 1}, Vec3i{1, 1, 1}, Vec3i{0, 1, 1},
 };
 
-const Eigen::Vector4i edge_shift[12] = {
-        Eigen::Vector4i(0, 0, 0, 0), Eigen::Vector4i(1, 0, 0, 1),
-        Eigen::Vector4i(0, 1, 0, 0), Eigen::Vector4i(0, 0, 0, 1),
-        Eigen::Vector4i(0, 0, 1, 0), Eigen::Vector4i(1, 0, 1, 1),
-        Eigen::Vector4i(0, 1, 1, 0), Eigen::Vector4i(0, 0, 1, 1),
-        Eigen::Vector4i(0, 0, 0, 2), Eigen::Vector4i(1, 0, 0, 2),
-        Eigen::Vector4i(1, 1, 0, 2), Eigen::Vector4i(0, 1, 0, 2),
+const Vec4i edge_shift[12] = {
+        Vec4i{0, 0, 0, 0}, Vec4i{1, 0, 0, 1}, Vec4i{0, 1, 0, 0},
+        Vec4i{0, 0, 0, 1}, Vec4i{0, 0, 1, 0}, Vec4i{1, 0, 1, 1},
+        Vec4i{0, 1, 1, 0}, Vec4i{0, 0, 1, 1}, Vec4i{0, 0, 0, 2},
+        Vec4i{1, 0, 0, 2}, Vec4i{1, 1, 0, 2}, Vec4i{0, 1, 0, 2},
 };
 
 const int edge_to_vert[12][2] = {

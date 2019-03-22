@@ -31,7 +31,7 @@
 namespace open3d {
 namespace geometry {
 
-HalfEdgeTriangleMesh::HalfEdge::HalfEdge(const Eigen::Vector2i& vertex_indices,
+HalfEdgeTriangleMesh::HalfEdge::HalfEdge(const Vec2i& vertex_indices,
                                          int triangle_index,
                                          int next,
                                          int twin)
@@ -53,23 +53,22 @@ bool HalfEdgeTriangleMesh::ComputeHalfEdges() {
 
     // Collect half edges
     // Check: for valid manifolds, there mustn't be duplicated half-edges
-    std::unordered_map<Eigen::Vector2i, size_t,
-                       utility::hash_eigen::hash<Eigen::Vector2i>>
+    std::unordered_map<Vec2i, size_t, utility::hash_eigen::hash<Vec2i>>
             vertex_indices_to_half_edge_index;
 
     for (size_t triangle_index = 0; triangle_index < triangles_.size();
          triangle_index++) {
-        const Eigen::Vector3i& triangle = triangles_[triangle_index];
+        const Vec3i& triangle = triangles_[triangle_index];
         size_t num_half_edges = half_edges_.size();
 
         size_t he_0_index = num_half_edges;
         size_t he_1_index = num_half_edges + 1;
         size_t he_2_index = num_half_edges + 2;
-        HalfEdge he_0(Eigen::Vector2i(triangle(0), triangle(1)), triangle_index,
+        HalfEdge he_0(Vec2i{triangle[0], triangle[1]}, triangle_index,
                       he_1_index, -1);
-        HalfEdge he_1(Eigen::Vector2i(triangle(1), triangle(2)), triangle_index,
+        HalfEdge he_1(Vec2i{triangle[1], triangle[2]}, triangle_index,
                       he_2_index, -1);
-        HalfEdge he_2(Eigen::Vector2i(triangle(2), triangle(0)), triangle_index,
+        HalfEdge he_2(Vec2i{triangle[2], triangle[0]}, triangle_index,
                       he_0_index, -1);
 
         if (vertex_indices_to_half_edge_index.find(he_0.vertex_indices_) !=
@@ -96,8 +95,8 @@ bool HalfEdgeTriangleMesh::ComputeHalfEdges() {
     for (size_t this_he_index = 0; this_he_index < half_edges_.size();
          this_he_index++) {
         HalfEdge& this_he = half_edges_[this_he_index];
-        Eigen::Vector2i twin_end_points(this_he.vertex_indices_(1),
-                                        this_he.vertex_indices_(0));
+        Vec2i twin_end_points(this_he.vertex_indices_[1],
+                              this_he.vertex_indices_[0]);
         if (this_he.twin_ == -1 &&
             vertex_indices_to_half_edge_index.find(twin_end_points) !=
                     vertex_indices_to_half_edge_index.end()) {
@@ -114,7 +113,7 @@ bool HalfEdgeTriangleMesh::ComputeHalfEdges() {
     std::vector<std::vector<int>> half_edges_from_vertex(vertices_.size());
     for (size_t half_edge_index = 0; half_edge_index < half_edges_.size();
          half_edge_index++) {
-        int src_vertex_index = half_edges_[half_edge_index].vertex_indices_(0);
+        int src_vertex_index = half_edges_[half_edge_index].vertex_indices_[0];
         half_edges_from_vertex[src_vertex_index].push_back(
                 int(half_edge_index));
     }
@@ -202,7 +201,7 @@ std::vector<int> HalfEdgeTriangleMesh::BoundaryVerticesFromVertex(
     std::vector<int> boundary_vertices;
     for (const int& half_edge_idx : boundary_half_edges) {
         boundary_vertices.push_back(
-                half_edges_[half_edge_idx].vertex_indices_(0));
+                half_edges_[half_edge_idx].vertex_indices_[0]);
     }
     return boundary_vertices;
 }
@@ -250,7 +249,7 @@ int HalfEdgeTriangleMesh::NextHalfEdgeOnBoundary(
     // curr_half_edge's end point and next_half_edge's start point is the same
     // vertex. It is guaranteed that next_half_edge is the first edge
     // in ordered_half_edge_from_vertex_ and next_half_edge is a boundary edge.
-    int vertex_index = half_edges_[curr_half_edge_index].vertex_indices_(1);
+    int vertex_index = half_edges_[curr_half_edge_index].vertex_indices_[1];
     int next_half_edge_index = ordered_half_edge_from_vertex_[vertex_index][0];
     if (!half_edges_[next_half_edge_index].IsBoundary()) {
         utility::PrintError(

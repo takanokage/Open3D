@@ -40,14 +40,13 @@ bool RenderOptionWithEditing::ConvertToJsonValue(Json::Value &value) const {
     if (RenderOption::ConvertToJsonValue(value) == false) {
         return false;
     }
-    if (EigenVector3dToJsonArray(selection_polygon_boundary_color_,
-                                 value["selection_polygon_boundary_color"]) ==
+    if (Vector3dToJsonArray(selection_polygon_boundary_color_,
+                            value["selection_polygon_boundary_color"]) ==
         false) {
         return false;
     }
-    if (EigenVector3dToJsonArray(selection_polygon_mask_color_,
-                                 value["selection_polygon_mask_color"]) ==
-        false) {
+    if (Vector3dToJsonArray(selection_polygon_mask_color_,
+                            value["selection_polygon_mask_color"]) == false) {
         return false;
     }
     value["selection_polygon_mask_alpha"] = selection_polygon_mask_alpha_;
@@ -59,14 +58,13 @@ bool RenderOptionWithEditing::ConvertFromJsonValue(const Json::Value &value) {
     if (RenderOption::ConvertFromJsonValue(value) == false) {
         return false;
     }
-    if (EigenVector3dFromJsonArray(selection_polygon_boundary_color_,
-                                   value["selection_polygon_boundary_color"]) ==
+    if (Vector3dFromJsonArray(selection_polygon_boundary_color_,
+                              value["selection_polygon_boundary_color"]) ==
         false) {
         return false;
     }
-    if (EigenVector3dFromJsonArray(selection_polygon_mask_color_,
-                                   value["selection_polygon_mask_color"]) ==
-        false) {
+    if (Vector3dFromJsonArray(selection_polygon_mask_color_,
+                              value["selection_polygon_mask_color"]) == false) {
         return false;
     }
     selection_polygon_mask_alpha_ = value.get("selection_polygon_mask_alpha",

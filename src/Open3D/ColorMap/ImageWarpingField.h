@@ -38,8 +38,8 @@ public:
     void InitializeWarpingFields(int width,
                                  int height,
                                  int number_of_vertical_anchors);
-    Eigen::Vector2d QueryFlow(int i, int j) const;
-    Eigen::Vector2d GetImageWarpingField(double u, double v) const;
+    Vec2d QueryFlow(int i, int j) const;
+    Vec2d GetImageWarpingField(double u, double v) const;
 
 public:
     bool ConvertToJsonValue(Json::Value &value) const override;

@@ -88,9 +88,7 @@ public:
     std::vector<ViewParameters> view_status_;
     bool is_loop_ = false;
     int interval_ = INTERVAL_DEFAULT;
-    std::vector<ViewParameters::Matrix17x4d,
-                ViewParameters::Matrix17x4d_allocator>
-            coeff_;
+    std::vector<Mat17x4d> coeff_;
 };
 
 }  // namespace visualization

@@ -50,13 +50,13 @@ template <class Geometry3DBase = geometry::Geometry3D>
 class PyGeometry3D : public PyGeometry<Geometry3DBase> {
 public:
     using PyGeometry<Geometry3DBase>::PyGeometry;
-    Eigen::Vector3d GetMinBound() const override {
-        PYBIND11_OVERLOAD_PURE(Eigen::Vector3d, Geometry3DBase, );
+    Vec3d GetMinBound() const override {
+        PYBIND11_OVERLOAD_PURE(Vec3d, Geometry3DBase, );
     }
-    Eigen::Vector3d GetMaxBound() const override {
-        PYBIND11_OVERLOAD_PURE(Eigen::Vector3d, Geometry3DBase, );
+    Vec3d GetMaxBound() const override {
+        PYBIND11_OVERLOAD_PURE(Vec3d, Geometry3DBase, );
     }
-    void Transform(const Eigen::Matrix4d &transformation) override {
+    void Transform(const Mat4d &transformation) override {
         PYBIND11_OVERLOAD_PURE(void, Geometry3DBase, transformation);
     }
 };
@@ -65,11 +65,11 @@ template <class Geometry2DBase = geometry::Geometry2D>
 class PyGeometry2D : public PyGeometry<Geometry2DBase> {
 public:
     using PyGeometry<Geometry2DBase>::PyGeometry;
-    Eigen::Vector2d GetMinBound() const override {
-        PYBIND11_OVERLOAD_PURE(Eigen::Vector2d, Geometry2DBase, );
+    Vec2d GetMinBound() const override {
+        PYBIND11_OVERLOAD_PURE(Vec2d, Geometry2DBase, );
     }
-    Eigen::Vector2d GetMaxBound() const override {
-        PYBIND11_OVERLOAD_PURE(Eigen::Vector2d, Geometry2DBase, );
+    Vec2d GetMaxBound() const override {
+        PYBIND11_OVERLOAD_PURE(Vec2d, Geometry2DBase, );
     }
 };
 

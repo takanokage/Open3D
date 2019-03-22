@@ -80,21 +80,21 @@ void convert(int argc,
                 argc, argv,
                 {"--clip_x_min", "--clip_x_max", "--clip_y_min", "--clip_y_max",
                  "--clip_z_min", "--clip_z_max"})) {
-        Eigen::Vector3d min_bound, max_bound;
-        min_bound(0) = utility::GetProgramOptionAsDouble(
+        Vec3d min_bound, max_bound;
+        min_bound[0] = utility::GetProgramOptionAsDouble(
                 argc, argv, "--clip_x_min",
                 std::numeric_limits<double>::lowest());
-        min_bound(1) = utility::GetProgramOptionAsDouble(
+        min_bound[1] = utility::GetProgramOptionAsDouble(
                 argc, argv, "--clip_y_min",
                 std::numeric_limits<double>::lowest());
-        min_bound(2) = utility::GetProgramOptionAsDouble(
+        min_bound[2] = utility::GetProgramOptionAsDouble(
                 argc, argv, "--clip_z_min",
                 std::numeric_limits<double>::lowest());
-        max_bound(0) = utility::GetProgramOptionAsDouble(
+        max_bound[0] = utility::GetProgramOptionAsDouble(
                 argc, argv, "--clip_x_max", std::numeric_limits<double>::max());
-        max_bound(1) = utility::GetProgramOptionAsDouble(
+        max_bound[1] = utility::GetProgramOptionAsDouble(
                 argc, argv, "--clip_y_max", std::numeric_limits<double>::max());
-        max_bound(2) = utility::GetProgramOptionAsDouble(
+        max_bound[2] = utility::GetProgramOptionAsDouble(
                 argc, argv, "--clip_z_max", std::numeric_limits<double>::max());
         pointcloud_ptr =
                 geometry::CropPointCloud(*pointcloud_ptr, min_bound, max_bound);
@@ -165,8 +165,8 @@ void convert(int argc,
             argc, argv, "--orient_normals");
     if (direction.size() == 3 && pointcloud_ptr->HasNormals()) {
         utility::PrintDebug("Orient normals to [%.2f, %.2f, %.2f].\n",
-                            direction(0), direction(1), direction(2));
-        Eigen::Vector3d dir(direction);
+                            direction[0], direction[1], direction[2]);
+        Vec3d dir(direction);
         geometry::OrientNormalsToAlignWithDirection(*pointcloud_ptr, dir);
         processed = true;
     }
@@ -174,8 +174,8 @@ void convert(int argc,
             argc, argv, "--camera_location");
     if (camera_loc.size() == 3 && pointcloud_ptr->HasNormals()) {
         utility::PrintDebug("Orient normals towards [%.2f, %.2f, %.2f].\n",
-                            camera_loc(0), camera_loc(1), camera_loc(2));
-        Eigen::Vector3d loc(camera_loc);
+                            camera_loc[0], camera_loc[1], camera_loc[2]);
+        Vec3d loc(camera_loc);
         geometry::OrientNormalsTowardsCameraLocation(*pointcloud_ptr, loc);
         processed = true;
     }

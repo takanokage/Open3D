@@ -57,10 +57,8 @@ public:
 
 public:
     // Selection polygon
-    Eigen::Vector3d selection_polygon_boundary_color_ =
-            Eigen::Vector3d(0.3, 0.3, 0.3);
-    Eigen::Vector3d selection_polygon_mask_color_ =
-            Eigen::Vector3d(0.3, 0.3, 0.3);
+    Vec3d selection_polygon_boundary_color_ = Vec3d{0.3, 0.3, 0.3};
+    Vec3d selection_polygon_mask_color_ = Vec3d{0.3, 0.3, 0.3};
     double selection_polygon_mask_alpha_ = 0.5;
 
     // PointCloud Picker

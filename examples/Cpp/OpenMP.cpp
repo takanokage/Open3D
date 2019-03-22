@@ -182,12 +182,12 @@ void TestMatrixMultiplication(int argc, char **argv) {
 }
 
 inline void ComputeSomething(int i,
-                             Eigen::Vector6d &A_r,
+                             Vec6d &A_r,
                              double &r,
-                             std::vector<Eigen::Vector3d> &data) {
-    const Eigen::Vector3d &vs = data[i];
-    const Eigen::Vector3d &vt = data[i];
-    const Eigen::Vector3d &nt = data[i];
+                             std::vector<Vec3d> &data) {
+    const Vec3d &vs = data[i];
+    const Vec3d &vt = data[i];
+    const Vec3d &nt = data[i];
     r = (vs - vt).dot(nt);
     // A_r.setZero();
     A_r.block<3, 1>(0, 0).noalias() = vs.cross(nt);
@@ -199,7 +199,7 @@ inline void ComputeSomething(int i,
 void TestBindedFunction() {
     // data generation
     const int NCORR = 200000000;
-    std::vector<Eigen::Vector3d> data;
+    std::vector<Vec3d> data;
     {
         open3d::utility::ScopeTimer timer1("Data generation");
         data.resize(NCORR);
@@ -207,20 +207,20 @@ void TestBindedFunction() {
 #pragma omp for nowait
 #endif
         for (int i = 0; i < NCORR; i++) {
-            data[i] = Eigen::Vector3d::Random();
+            data[i] = Vec3d::Random();
         }
     }
 
     // data we want to build
-    Eigen::Matrix6d ATA;
-    Eigen::Vector6d ATb;
+    Mat6d ATA;
+    Vec6d ATb;
 
     // to do using private ATA
     // https://stackoverflow.com/questions/24948395/openmp-calling-global-variables-through-functions
     auto f = std::bind(ComputeSomething, std::placeholders::_1,
                        std::placeholders::_2, std::placeholders::_3, data);
 
-    auto f_lambda = [&](int i, Eigen::Vector6d &A_r, double &r) {
+    auto f_lambda = [&](int i, Vec6d &A_r, double &r) {
         ComputeSomething(i, A_r, r, data);
     };
 
@@ -232,15 +232,15 @@ void TestBindedFunction() {
 #pragma omp parallel
         {
 #endif
-            Eigen::Matrix6d ATA_private;
-            Eigen::Vector6d ATb_private;
+            Mat6d ATA_private;
+            Vec6d ATb_private;
             ATA_private.setZero();
             ATb_private.setZero();
 #ifdef _OPENMP
 #pragma omp for nowait
 #endif
             for (int i = 0; i < NCORR; i++) {
-                Eigen::Vector6d A_r;
+                Vec6d A_r;
                 double r;
                 f(i, A_r, r);
                 ATA_private.noalias() += A_r * A_r.transpose();
@@ -268,15 +268,15 @@ void TestBindedFunction() {
 #pragma omp parallel
         {
 #endif
-            Eigen::Matrix6d ATA_private;
-            Eigen::Vector6d ATb_private;
+            Mat6d ATA_private;
+            Vec6d ATb_private;
             ATA_private.setZero();
             ATb_private.setZero();
 #ifdef _OPENMP
 #pragma omp for nowait
 #endif
             for (int i = 0; i < NCORR; i++) {
-                Eigen::Vector6d A_r;
+                Vec6d A_r;
                 double r;
                 f_lambda(i, A_r, r);
                 ATA_private.noalias() += A_r * A_r.transpose();
@@ -304,15 +304,15 @@ void TestBindedFunction() {
 #pragma omp parallel
         {
 #endif
-            Eigen::Matrix6d ATA_private;
-            Eigen::Vector6d ATb_private;
+            Mat6d ATA_private;
+            Vec6d ATb_private;
             ATA_private.setZero();
             ATb_private.setZero();
 #ifdef _OPENMP
 #pragma omp for nowait
 #endif
             for (int i = 0; i < NCORR; i++) {
-                Eigen::Vector6d A_r;
+                Vec6d A_r;
                 double r;
                 ComputeSomething(i, A_r, r, data);
                 ATA_private.noalias() += A_r * A_r.transpose();
@@ -340,19 +340,19 @@ void TestBindedFunction() {
 #pragma omp parallel
         {
 #endif
-            Eigen::Matrix6d ATA_private;
-            Eigen::Vector6d ATb_private;
+            Mat6d ATA_private;
+            Vec6d ATb_private;
             ATA_private.setZero();
             ATb_private.setZero();
 #ifdef _OPENMP
 #pragma omp for nowait
 #endif
             for (int i = 0; i < NCORR; i++) {
-                const Eigen::Vector3d &vs = data[i];
-                const Eigen::Vector3d &vt = data[i];
-                const Eigen::Vector3d &nt = data[i];
+                const Vec3d &vs = data[i];
+                const Vec3d &vt = data[i];
+                const Vec3d &nt = data[i];
                 double r = (vs - vt).dot(nt);
-                Eigen::Vector6d A_r;
+                Vec6d A_r;
                 A_r.block<3, 1>(0, 0).noalias() = vs.cross(nt);
                 A_r.block<3, 1>(3, 0).noalias() = nt;
                 ATA_private.noalias() += A_r * A_r.transpose();

@@ -72,15 +72,15 @@ void ViewTrajectory::ComputeInterpolationCoefficients() {
 
     // Set first and last line
     if (is_loop_) {
-        A(0, 0) = 4.0;
-        A(0, 1) = 1.0;
+        A[0][0] = 4.0;
+        A[0][1] = 1.0;
         A(0, n - 1) = 1.0;
         A(n - 1, 0) = 1.0;
         A(n - 1, n - 2) = 1.0;
         A(n - 1, n - 1) = 4.0;
     } else {
-        A(0, 0) = 2.0;
-        A(0, 1) = 1.0;
+        A[0][0] = 2.0;
+        A[0][1] = 1.0;
         A(n - 1, n - 2) = 1.0;
         A(n - 1, n - 1) = 2.0;
     }
@@ -100,10 +100,10 @@ void ViewTrajectory::ComputeInterpolationCoefficients() {
 
         // Set first and last line
         if (is_loop_) {
-            b(0) = 3.0 * (coeff_[1](k, 0) - coeff_[n - 1](k, 0));
+            b[0] = 3.0 * (coeff_[1](k, 0) - coeff_[n - 1](k, 0));
             b(n - 1) = 3.0 * (coeff_[0](k, 0) - coeff_[n - 2](k, 0));
         } else {
-            b(0) = 3.0 * (coeff_[1](k, 0) - coeff_[0](k, 0));
+            b[0] = 3.0 * (coeff_[1](k, 0) - coeff_[0](k, 0));
             b(n - 1) = 3.0 * (coeff_[n - 1](k, 0) - coeff_[n - 2](k, 0));
         }
 
@@ -135,10 +135,9 @@ std::tuple<bool, ViewParameters> ViewTrajectory::GetInterpolatedFrame(
     size_t segment_index = k / (interval_ + 1);
     double segment_fraction =
             double(k - segment_index * (interval_ + 1)) / double(interval_ + 1);
-    Eigen::Vector4d s(1.0, segment_fraction,
-                      segment_fraction * segment_fraction,
-                      segment_fraction * segment_fraction * segment_fraction);
-    ViewParameters::Vector17d status_in_vector = coeff_[segment_index] * s;
+    Vec4d s(1.0, segment_fraction, segment_fraction * segment_fraction,
+            segment_fraction * segment_fraction * segment_fraction);
+    ViewParameters::Vec17d status_in_vector = coeff_[segment_index] * s;
     status.ConvertFromVector17d(status_in_vector);
     return std::make_tuple(true, status);
 }

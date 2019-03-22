@@ -32,7 +32,6 @@
 #include <Eigen/Core>
 
 #include <Open3D/Geometry/Geometry3D.h>
-#include "Open3D/Types/Mat.h"
 
 namespace open3d {
 namespace geometry {
@@ -47,7 +46,7 @@ public:
     bool IsEmpty() const override;
     Vec3d GetMinBound() const override;
     Vec3d GetMaxBound() const override;
-    void Transform(const Eigen::Matrix4d &transformation) override;
+    void Transform(const Mat4d &transformation) override;
 
 public:
     TriangleMesh &operator+=(const TriangleMesh &mesh);
@@ -139,10 +138,9 @@ std::shared_ptr<TriangleMesh> SelectDownSample(
 /// Function to crop \param input tringlemesh into output tringlemesh
 /// All points with coordinates less than \param min_bound or larger than
 /// \param max_bound are clipped.
-std::shared_ptr<TriangleMesh> CropTriangleMesh(
-        const TriangleMesh &input,
-        const Vec3d &min_bound,
-        const Vec3d &max_bound);
+std::shared_ptr<TriangleMesh> CropTriangleMesh(const TriangleMesh &input,
+                                               const Vec3d &min_bound,
+                                               const Vec3d &max_bound);
 
 /// Factory function to create a box mesh (TriangleMeshFactory.cpp)
 /// The left bottom corner on the front will be placed at (0, 0, 0).
@@ -201,8 +199,7 @@ std::shared_ptr<TriangleMesh> CreateMeshArrow(double cylinder_radius = 1.0,
 /// The x, y, z axis will be rendered as red, green, and blue arrows
 /// respectively. \param size is the length of the axes.
 std::shared_ptr<TriangleMesh> CreateMeshCoordinateFrame(
-        double size = 1.0,
-        const Vec3d &origin = Vec3d{0.0, 0.0, 0.0});
+        double size = 1.0, const Vec3d &origin = Vec3d{});
 
 }  // namespace geometry
 }  // namespace open3d

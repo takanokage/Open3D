@@ -62,7 +62,7 @@ protected:
     virtual bool PrepareBinding(const geometry::Geometry &geometry,
                                 const RenderOption &option,
                                 const ViewControl &view,
-                                std::vector<Eigen::Vector3f> &points) = 0;
+                                std::vector<Vec3f> &points) = 0;
 
 protected:
     GLuint vertex_position_;
@@ -82,7 +82,7 @@ protected:
     bool PrepareBinding(const geometry::Geometry &geometry,
                         const RenderOption &option,
                         const ViewControl &view,
-                        std::vector<Eigen::Vector3f> &points) final;
+                        std::vector<Vec3f> &points) final;
 };
 
 class SimpleBlackShaderForTriangleMeshWireFrame : public SimpleBlackShader {
@@ -97,7 +97,7 @@ protected:
     bool PrepareBinding(const geometry::Geometry &geometry,
                         const RenderOption &option,
                         const ViewControl &view,
-                        std::vector<Eigen::Vector3f> &points) final;
+                        std::vector<Vec3f> &points) final;
 };
 
 }  // namespace glsl

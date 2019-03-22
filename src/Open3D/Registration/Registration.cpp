@@ -44,7 +44,7 @@ RegistrationResult GetRegistrationResultAndCorrespondences(
         const geometry::PointCloud &target,
         const geometry::KDTreeFlann &target_kdtree,
         double max_correspondence_distance,
-        const Eigen::Matrix4d &transformation) {
+        const Mat4d &transformation) {
     RegistrationResult result(transformation);
     if (max_correspondence_distance <= 0.0) {
         return std::move(result);
@@ -62,14 +62,13 @@ RegistrationResult GetRegistrationResultAndCorrespondences(
 #pragma omp for nowait
 #endif
         for (int i = 0; i < (int)source.points_.size(); i++) {
-            std::vector<int> indices(1);
-            std::vector<double> dists(1);
-            const auto &point = source.points_[i];
+            std::vector<int> indices[1];
+            std::vector<double> dists[1];
+            const auto &point = source.points_.h_data[i];
             if (target_kdtree.SearchHybrid(point, max_correspondence_distance,
                                            1, indices, dists) > 0) {
                 error2_private += dists[0];
-                correspondence_set_private.push_back(
-                        Eigen::Vector2i(i, indices[0]));
+                correspondence_set_private.push_back(Vec2i{i, indices[0]});
             }
         }
 #ifdef _OPENMP
@@ -102,14 +101,15 @@ RegistrationResult EvaluateRANSACBasedOnCorrespondence(
         const geometry::PointCloud &target,
         const CorrespondenceSet &corres,
         double max_correspondence_distance,
-        const Eigen::Matrix4d &transformation) {
+        const Mat4d &transformation) {
     RegistrationResult result(transformation);
     double error2 = 0.0;
     int good = 0;
     double max_dis2 = max_correspondence_distance * max_correspondence_distance;
     for (const auto &c : corres) {
         double dis2 =
-                (source.points_[c[0]] - target.points_[c[1]]).squaredNorm();
+                (source.points_.h_data[c[0]] - target.points_.h_data[c[1]])
+                        .squaredNorm();
         if (dis2 < max_dis2) {
             good++;
             error2 += dis2;
@@ -132,8 +132,7 @@ RegistrationResult EvaluateRegistration(
         const geometry::PointCloud &source,
         const geometry::PointCloud &target,
         double max_correspondence_distance,
-        const Eigen::Matrix4d
-                &transformation /* = Eigen::Matrix4d::Identity()*/) {
+        const Mat4d &transformation /* = Mat4d::Identity()*/) {
     geometry::KDTreeFlann kdtree;
     kdtree.SetGeometry(target);
     geometry::PointCloud pcd = source;
@@ -148,7 +147,7 @@ RegistrationResult RegistrationICP(
         const geometry::PointCloud &source,
         const geometry::PointCloud &target,
         double max_correspondence_distance,
-        const Eigen::Matrix4d &init /* = Eigen::Matrix4d::Identity()*/,
+        const Mat4d &init /* = Mat4d::Identity()*/,
         const TransformationEstimation &estimation
         /* = TransformationEstimationPointToPoint(false)*/,
         const ICPConvergenceCriteria
@@ -166,7 +165,7 @@ RegistrationResult RegistrationICP(
         return RegistrationResult(init);
     }
 
-    Eigen::Matrix4d transformation = init;
+    Mat4d transformation = init;
     geometry::KDTreeFlann kdtree;
     kdtree.SetGeometry(target);
     geometry::PointCloud pcd = source;
@@ -179,7 +178,7 @@ RegistrationResult RegistrationICP(
     for (int i = 0; i < criteria.max_iteration_; i++) {
         utility::PrintDebug("ICP Iteration #%d: Fitness %.4f, RMSE %.4f\n", i,
                             result.fitness_, result.inlier_rmse_);
-        Eigen::Matrix4d update = estimation.ComputeTransformation(
+        Mat4d update = estimation.ComputeTransformation(
                 pcd, target, result.correspondence_set_);
         transformation = update * transformation;
         pcd.Transform(update);
@@ -211,8 +210,8 @@ RegistrationResult RegistrationRANSACBasedOnCorrespondence(
         max_correspondence_distance <= 0.0) {
         return RegistrationResult();
     }
-    std::srand((unsigned int)std::time(0));
-    Eigen::Matrix4d transformation;
+    std::srand((unsigned int)std::time[0]);
+    Mat4d transformation;
     CorrespondenceSet ransac_corres(ransac_n);
     RegistrationResult result;
     for (int itr = 0;
@@ -273,9 +272,9 @@ RegistrationResult RegistrationRANSACBasedOnFeatureMatching(
         unsigned int seed_number;
 #ifdef _OPENMP
         // each thread has different seed_number
-        seed_number = (unsigned int)std::time(0) * (omp_get_thread_num() + 1);
+        seed_number = (unsigned int)std::time[0] * (omp_get_thread_num() + 1);
 #else
-    seed_number = (unsigned int)std::time(0);
+    seed_number = (unsigned int)std::time[0];
 #endif
         std::srand(seed_number);
 
@@ -285,7 +284,7 @@ RegistrationResult RegistrationRANSACBasedOnFeatureMatching(
         for (int itr = 0; itr < criteria.max_iteration_; itr++) {
             if (!finished_validation) {
                 std::vector<double> dists(num_similar_features);
-                Eigen::Matrix4d transformation;
+                Mat4d transformation;
                 for (int j = 0; j < ransac_n; j++) {
                     int source_sample_id =
                             std::rand() % (int)source.points_.size();
@@ -300,12 +299,12 @@ RegistrationResult RegistrationRANSACBasedOnFeatureMatching(
 #endif
                         { similar_features[source_sample_id] = indices; }
                     }
-                    ransac_corres[j](0) = source_sample_id;
+                    ransac_corres[j][0] = source_sample_id;
                     if (num_similar_features == 1)
-                        ransac_corres[j](1) =
+                        ransac_corres[j][1] =
                                 similar_features[source_sample_id][0];
                     else
-                        ransac_corres[j](1) =
+                        ransac_corres[j][1] =
                                 similar_features[source_sample_id]
                                                 [std::rand() %
                                                  num_similar_features];
@@ -371,11 +370,10 @@ RegistrationResult RegistrationRANSACBasedOnFeatureMatching(
     return result;
 }
 
-Eigen::Matrix6d GetInformationMatrixFromPointClouds(
-        const geometry::PointCloud &source,
-        const geometry::PointCloud &target,
-        double max_correspondence_distance,
-        const Eigen::Matrix4d &transformation) {
+Mat6d GetInformationMatrixFromPointClouds(const geometry::PointCloud &source,
+                                          const geometry::PointCloud &target,
+                                          double max_correspondence_distance,
+                                          const Mat4d &transformation) {
     geometry::PointCloud pcd = source;
     if (transformation.isIdentity() == false) {
         pcd.Transform(transformation);
@@ -389,35 +387,35 @@ Eigen::Matrix6d GetInformationMatrixFromPointClouds(
     // write q^*
     // see http://redwood-data.org/indoor/registration.html
     // note: I comes first in this implementation
-    Eigen::Matrix6d GTG = Eigen::Matrix6d::Identity();
+    Mat6d GTG = Mat6d::Identity();
 #ifdef _OPENMP
 #pragma omp parallel
     {
 #endif
-        Eigen::Matrix6d GTG_private = Eigen::Matrix6d::Identity();
-        Eigen::Vector6d G_r_private = Eigen::Vector6d::Zero();
+        Mat6d GTG_private = Mat6d::Identity();
+        Vec6d G_r_private = Vec6d::Zero();
 #ifdef _OPENMP
 #pragma omp for nowait
 #endif
         for (auto c = 0; c < result.correspondence_set_.size(); c++) {
-            int t = result.correspondence_set_[c](1);
-            double x = target.points_[t](0);
-            double y = target.points_[t](1);
-            double z = target.points_[t](2);
+            int t = result.correspondence_set_[c][1];
+            double x = target.points_.h_data[t][0];
+            double y = target.points_.h_data[t][1];
+            double z = target.points_.h_data[t][2];
             G_r_private.setZero();
-            G_r_private(1) = z;
-            G_r_private(2) = -y;
-            G_r_private(3) = 1.0;
+            G_r_private[1] = z;
+            G_r_private[2] = -y;
+            G_r_private[3] = 1.0;
             GTG_private.noalias() += G_r_private * G_r_private.transpose();
             G_r_private.setZero();
-            G_r_private(0) = -z;
-            G_r_private(2) = x;
-            G_r_private(4) = 1.0;
+            G_r_private[0] = -z;
+            G_r_private[2] = x;
+            G_r_private[4] = 1.0;
             GTG_private.noalias() += G_r_private * G_r_private.transpose();
             G_r_private.setZero();
-            G_r_private(0) = y;
-            G_r_private(1) = -x;
-            G_r_private(5) = 1.0;
+            G_r_private[0] = y;
+            G_r_private[1] = -x;
+            G_r_private[5] = 1.0;
             GTG_private.noalias() += G_r_private * G_r_private.transpose();
         }
 #ifdef _OPENMP

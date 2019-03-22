@@ -62,7 +62,7 @@ bool KDTreeFlann::SetGeometry(const Geometry &geometry) {
         case Geometry::GeometryType::PointCloud:
             return SetRawData(Eigen::Map<const Eigen::MatrixXd>(
                     (const double *)((const PointCloud &)geometry)
-                            .points_.data(),
+                            .points_.h_data.data(),
                     3, ((const PointCloud &)geometry).points_.size()));
         case Geometry::GeometryType::TriangleMesh:
         case Geometry::GeometryType::HalfEdgeTriangleMesh:
@@ -146,8 +146,8 @@ int KDTreeFlann::SearchRadius(const T &query,
     flann::Matrix<double> query_flann((double *)query.data(), 1, dimension_);
     flann::SearchParams param(-1, 0.0);
     param.max_neighbors = -1;
-    std::vector<std::vector<int>> indices_vec(1);
-    std::vector<std::vector<double>> dists_vec(1);
+    std::vector<std::vector<int>> indices_vec[1];
+    std::vector<std::vector<double>> dists_vec[1];
     int k = flann_index_->radiusSearch(query_flann, indices_vec, dists_vec,
                                        float(radius * radius), param);
     indices = indices_vec[0];
@@ -203,23 +203,22 @@ bool KDTreeFlann::SetRawData(const Eigen::Map<const Eigen::MatrixXd> &data) {
     return true;
 }
 
-template int KDTreeFlann::Search<Eigen::Vector3d>(
-        const Eigen::Vector3d &query,
-        const KDTreeSearchParam &param,
-        std::vector<int> &indices,
-        std::vector<double> &distance2) const;
-template int KDTreeFlann::SearchKNN<Eigen::Vector3d>(
-        const Eigen::Vector3d &query,
+template int KDTreeFlann::Search<Vec3d>(const Vec3d &query,
+                                        const KDTreeSearchParam &param,
+                                        std::vector<int> &indices,
+                                        std::vector<double> &distance2) const;
+template int KDTreeFlann::SearchKNN<Vec3d>(
+        const Vec3d &query,
         int knn,
         std::vector<int> &indices,
         std::vector<double> &distance2) const;
-template int KDTreeFlann::SearchRadius<Eigen::Vector3d>(
-        const Eigen::Vector3d &query,
+template int KDTreeFlann::SearchRadius<Vec3d>(
+        const Vec3d &query,
         double radius,
         std::vector<int> &indices,
         std::vector<double> &distance2) const;
-template int KDTreeFlann::SearchHybrid<Eigen::Vector3d>(
-        const Eigen::Vector3d &query,
+template int KDTreeFlann::SearchHybrid<Vec3d>(
+        const Vec3d &query,
         double radius,
         int max_nn,
         std::vector<int> &indices,

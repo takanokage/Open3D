@@ -63,8 +63,8 @@ bool Simple2DShader::BindGeometry(const geometry::Geometry &geometry,
     UnbindGeometry();
 
     // Prepare data to be passed to GPU
-    std::vector<Eigen::Vector3f> points;
-    std::vector<Eigen::Vector3f> colors;
+    std::vector<Vec3f> points;
+    std::vector<Vec3f> colors;
     if (PrepareBinding(geometry, option, view, points, colors) == false) {
         PrintShaderWarning("Binding failed when preparing data.");
         return false;
@@ -73,12 +73,12 @@ bool Simple2DShader::BindGeometry(const geometry::Geometry &geometry,
     // Create buffers and bind the geometry
     glGenBuffers(1, &vertex_position_buffer_);
     glBindBuffer(GL_ARRAY_BUFFER, vertex_position_buffer_);
-    glBufferData(GL_ARRAY_BUFFER, points.size() * sizeof(Eigen::Vector3f),
-                 points.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, points.size() * sizeof(Vec3f), points.data(),
+                 GL_STATIC_DRAW);
     glGenBuffers(1, &vertex_color_buffer_);
     glBindBuffer(GL_ARRAY_BUFFER, vertex_color_buffer_);
-    glBufferData(GL_ARRAY_BUFFER, colors.size() * sizeof(Eigen::Vector3f),
-                 colors.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, colors.size() * sizeof(Vec3f), colors.data(),
+                 GL_STATIC_DRAW);
 
     bound_ = true;
     return true;
@@ -131,8 +131,8 @@ bool Simple2DShaderForSelectionPolygon::PrepareBinding(
         const geometry::Geometry &geometry,
         const RenderOption &option,
         const ViewControl &view,
-        std::vector<Eigen::Vector3f> &points,
-        std::vector<Eigen::Vector3f> &colors) {
+        std::vector<Vec3f> &points,
+        std::vector<Vec3f> &colors) {
     if (geometry.GetGeometryType() !=
         geometry::Geometry::GeometryType::Unspecified) {
         PrintShaderWarning("Rendering type is illegal.");
@@ -164,12 +164,10 @@ bool Simple2DShaderForSelectionPolygon::PrepareBinding(
         size_t j = (i + 1) % polygon.polygon_.size();
         const auto &vi = polygon.polygon_[i];
         const auto &vj = polygon.polygon_[j];
-        points[i * 2] =
-                Eigen::Vector3f((float)(vi(0) / width * 2.0 - 1.0),
-                                (float)(vi(1) / height * 2.0 - 1.0), 0.0f);
-        points[i * 2 + 1] =
-                Eigen::Vector3f((float)(vj(0) / width * 2.0 - 1.0),
-                                (float)(vj(1) / height * 2.0 - 1.0), 0.0f);
+        points[i * 2] = Vec3f{(float)(vi[0] / width * 2.0 - 1.0),
+                              (float)(vi[1] / height * 2.0 - 1.0), 0.0f};
+        points[i * 2 + 1] = Vec3f{(float)(vj[0] / width * 2.0 - 1.0),
+                                  (float)(vj[1] / height * 2.0 - 1.0), 0.0f};
         colors[i * 2] = colors[i * 2 + 1] =
                 _option.selection_polygon_boundary_color_.cast<float>();
     }

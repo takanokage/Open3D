@@ -165,7 +165,7 @@ TEST(ImageWarpingField, QueryFlow) {
                      0,  0,   0,  210, 15,  0,   3,   2,   0,  7,   157, 3,  3,
                      0,  205, 3,  228, 135, 0,   79,  198, 83, 141, 0};
 
-    vector<Eigen::Vector2d> ref_output = {
+    vector<Vec2d> ref_output = {
             {0.00, 0.00},     {0.00, 0.00},     {112.00, 0.00},
             {160.00, 240.00}, {208.00, 80.00},  {256.00, 192.00},
             {288.00, 176.00}, {320.00, 64.00},  {320.00, 64.00},
@@ -210,7 +210,7 @@ TEST(ImageWarpingField, GetImageWarpingField) {
                      0,  0,   0,  210, 15,  0,   3,   2,   0,  7,   157, 3,  3,
                      0,  205, 3,  228, 135, 0,   79,  198, 83, 141, 0};
 
-    vector<Eigen::Vector2d> ref_output = {
+    vector<Vec2d> ref_output = {
             {5.00, 81.00},    {6.00, 109.00},   {7.00, 0.00},
             {10.00, 15.00},   {13.00, 5.00},    {16.00, 12.00},
             {18.00, 11.00},   {20.00, 4.00},    {20.00, 4.00},
@@ -237,7 +237,7 @@ TEST(ImageWarpingField, GetImageWarpingField) {
 
     // for (size_t i = 0; i < ref_output.size(); i++)
     // {
-    //     Eigen::Vector2d elem = field.GetImageWarpingField(x[i], y[i]);
+    //     Vec2d elem = field.GetImageWarpingField(x[i], y[i]);
 
     //     unit_test::ExpectEQ(ref_output[i], elem);
     // }

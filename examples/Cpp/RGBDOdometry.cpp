@@ -81,12 +81,11 @@ int main(int argc, char* argv[]) {
     auto source = ReadRGBDImage(argv[1], argv[2], intrinsic, visualize);
     auto target = ReadRGBDImage(argv[3], argv[4], intrinsic, visualize);
 
-    Eigen::Matrix4d odo_init = Eigen::Matrix4d::Identity();
-    std::tuple<bool, Eigen::Matrix4d, Eigen::Matrix6d> rgbd_odo =
-            odometry::ComputeRGBDOdometry(
-                    *source, *target, intrinsic, odo_init,
-                    odometry::RGBDOdometryJacobianFromHybridTerm(),
-                    odometry::OdometryOption());
+    Mat4d odo_init = Mat4d::Identity();
+    std::tuple<bool, Mat4d, Mat6d> rgbd_odo = odometry::ComputeRGBDOdometry(
+            *source, *target, intrinsic, odo_init,
+            odometry::RGBDOdometryJacobianFromHybridTerm(),
+            odometry::OdometryOption());
     std::cout << "RGBD Odometry" << std::endl;
     std::cout << std::get<1>(rgbd_odo) << std::endl;
     return 0;

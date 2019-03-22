@@ -55,15 +55,13 @@ int main(int argc, char **argv) {
     // test posegraph read and write
     registration::PoseGraph pose_graph_test;
     pose_graph_test.nodes_.push_back(
-            registration::PoseGraphNode(Eigen::Matrix4d::Random()));
+            registration::PoseGraphNode(Mat4d::Random()));
     pose_graph_test.nodes_.push_back(
-            registration::PoseGraphNode(Eigen::Matrix4d::Random()));
-    pose_graph_test.edges_.push_back(
-            registration::PoseGraphEdge(0, 1, Eigen::Matrix4d::Random(),
-                                        Eigen::Matrix6d::Random(), false, 1.0));
-    pose_graph_test.edges_.push_back(
-            registration::PoseGraphEdge(0, 2, Eigen::Matrix4d::Random(),
-                                        Eigen::Matrix6d::Random(), true, 0.2));
+            registration::PoseGraphNode(Mat4d::Random()));
+    pose_graph_test.edges_.push_back(registration::PoseGraphEdge(
+            0, 1, Mat4d::Random(), Mat6d::Random(), false, 1.0));
+    pose_graph_test.edges_.push_back(registration::PoseGraphEdge(
+            0, 2, Mat4d::Random(), Mat6d::Random(), true, 0.2));
     io::WritePoseGraph("test_pose_graph.json", pose_graph_test);
     registration::PoseGraph pose_graph;
     io::ReadPoseGraph("test_pose_graph.json", pose_graph);

@@ -32,7 +32,7 @@
 
 bool ReadLogFile(const std::string &filename,
                  std::vector<std::tuple<int, int, int>> &metadata,
-                 std::vector<Eigen::Matrix4d> &transformations) {
+                 std::vector<Mat4d> &transformations) {
     using namespace open3d;
     metadata.clear();
     transformations.clear();
@@ -43,7 +43,7 @@ bool ReadLogFile(const std::string &filename,
     }
     char line_buffer[DEFAULT_IO_BUFFER_SIZE];
     int i, j, k;
-    Eigen::Matrix4d trans;
+    Mat4d trans;
     while (fgets(line_buffer, DEFAULT_IO_BUFFER_SIZE, f)) {
         if (strlen(line_buffer) > 0 && line_buffer[0] != '#') {
             if (sscanf(line_buffer, "%d %d %d", &i, &j, &k) != 3) {
@@ -56,32 +56,32 @@ bool ReadLogFile(const std::string &filename,
                         "Read LOG failed: unrecognized format.\n");
                 return false;
             } else {
-                sscanf(line_buffer, "%lf %lf %lf %lf", &trans(0, 0),
-                       &trans(0, 1), &trans(0, 2), &trans(0, 3));
+                sscanf(line_buffer, "%lf %lf %lf %lf", &trans[0][0],
+                       &trans[0][1], &trans[0][2], &trans[0][3]);
             }
             if (fgets(line_buffer, DEFAULT_IO_BUFFER_SIZE, f) == 0) {
                 utility::PrintWarning(
                         "Read LOG failed: unrecognized format.\n");
                 return false;
             } else {
-                sscanf(line_buffer, "%lf %lf %lf %lf", &trans(1, 0),
-                       &trans(1, 1), &trans(1, 2), &trans(1, 3));
+                sscanf(line_buffer, "%lf %lf %lf %lf", &trans[1][0],
+                       &trans[1][1], &trans[1][2], &trans[1][3]);
             }
             if (fgets(line_buffer, DEFAULT_IO_BUFFER_SIZE, f) == 0) {
                 utility::PrintWarning(
                         "Read LOG failed: unrecognized format.\n");
                 return false;
             } else {
-                sscanf(line_buffer, "%lf %lf %lf %lf", &trans(2, 0),
-                       &trans(2, 1), &trans(2, 2), &trans(2, 3));
+                sscanf(line_buffer, "%lf %lf %lf %lf", &trans[2][0],
+                       &trans[2][1], &trans[2][2], &trans[2][3]);
             }
             if (fgets(line_buffer, DEFAULT_IO_BUFFER_SIZE, f) == 0) {
                 utility::PrintWarning(
                         "Read LOG failed: unrecognized format.\n");
                 return false;
             } else {
-                sscanf(line_buffer, "%lf %lf %lf %lf", &trans(3, 0),
-                       &trans(3, 1), &trans(3, 2), &trans(3, 3));
+                sscanf(line_buffer, "%lf %lf %lf %lf", &trans[3][0],
+                       &trans[3][1], &trans[3][2], &trans[3][3]);
             }
             metadata.push_back(std::make_tuple(i, j, k));
             transformations.push_back(trans);
@@ -116,12 +116,10 @@ int main(int argc, char *argv[]) {
         return 1;
     }
     const int NUM_OF_COLOR_PALETTE = 5;
-    Eigen::Vector3d color_palette[NUM_OF_COLOR_PALETTE] = {
-            Eigen::Vector3d(255, 180, 0) / 255.0,
-            Eigen::Vector3d(0, 166, 237) / 255.0,
-            Eigen::Vector3d(246, 81, 29) / 255.0,
-            Eigen::Vector3d(127, 184, 0) / 255.0,
-            Eigen::Vector3d(13, 44, 84) / 255.0,
+    Vec3d color_palette[NUM_OF_COLOR_PALETTE] = {
+            Vec3d{255, 180, 0} / 255.0, Vec3d{0, 166, 237} / 255.0,
+            Vec3d{246, 81, 29} / 255.0, Vec3d{127, 184, 0} / 255.0,
+            Vec3d{13, 44, 84} / 255.0,
     };
 
     int verbose = utility::GetProgramOptionAsInt(argc, argv, "--verbose", 2);
@@ -137,7 +135,7 @@ int main(int argc, char *argv[]) {
     }
 
     std::vector<std::tuple<int, int, int>> metadata;
-    std::vector<Eigen::Matrix4d> transformations;
+    std::vector<Mat4d> transformations;
     ReadLogFile(log_filename, metadata, transformations);
 
     for (auto k = 0; k < metadata.size(); k++) {
@@ -145,14 +143,14 @@ int main(int argc, char *argv[]) {
         utility::PrintInfo("Showing matched point cloud #%d and #%d.\n", i, j);
         auto pcd_target = io::CreatePointCloudFromFile(
                 pcd_dirname + "cloud_bin_" + std::to_string(i) + ".pcd");
-        pcd_target->colors_.clear();
-        pcd_target->colors_.resize(pcd_target->points_.size(),
-                                   color_palette[0]);
+        pcd_target->colors_.h_data.clear();
+        pcd_target->colors_.h_data.resize(pcd_target->points_.size(),
+                                          color_palette[0]);
         auto pcd_source = io::CreatePointCloudFromFile(
                 pcd_dirname + "cloud_bin_" + std::to_string(j) + ".pcd");
-        pcd_source->colors_.clear();
-        pcd_source->colors_.resize(pcd_source->points_.size(),
-                                   color_palette[1]);
+        pcd_source->colors_.h_data.clear();
+        pcd_source->colors_.h_data.resize(pcd_source->points_.size(),
+                                          color_palette[1]);
         pcd_source->Transform(transformations[k]);
         visualization::DrawGeometriesWithCustomAnimation(
                 {pcd_target, pcd_source}, "ViewPCDMatch", 1600, 900);

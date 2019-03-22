@@ -32,8 +32,8 @@ void PrintVoxelGridInformation(const geometry::VoxelGrid& voxel_grid) {
     utility::PrintDebug("geometry::VoxelGrid with %d voxels\n",
                         voxel_grid.voxels_.size());
     utility::PrintDebug("               origin: [%f %f %f]\n",
-                        voxel_grid.origin_(0), voxel_grid.origin_(1),
-                        voxel_grid.origin_(2));
+                        voxel_grid.origin_[0], voxel_grid.origin_[1],
+                        voxel_grid.origin_[2]);
     utility::PrintDebug("               voxel_size: %f\n",
                         voxel_grid.voxel_size_);
     return;

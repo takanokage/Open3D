@@ -37,24 +37,24 @@ void PrintPointCloud(const open3d::geometry::PointCloud &pointcloud) {
     utility::PrintInfo("Pointcloud has %d points.\n",
                        (int)pointcloud.points_.size());
 
-    Eigen::Vector3d min_bound = pointcloud.GetMinBound();
-    Eigen::Vector3d max_bound = pointcloud.GetMaxBound();
+    Vec3d min_bound = pointcloud.GetMinBound();
+    Vec3d max_bound = pointcloud.GetMaxBound();
     utility::PrintInfo(
             "Bounding box is: (%.4f, %.4f, %.4f) - (%.4f, %.4f, %.4f)\n",
-            min_bound(0), min_bound(1), min_bound(2), max_bound(0),
-            max_bound(1), max_bound(2));
+            min_bound[0], min_bound[1], min_bound[2], max_bound[0],
+            max_bound[1], max_bound[2]);
 
     for (size_t i = 0; i < pointcloud.points_.size(); i++) {
         if (pointcloud_has_normal) {
-            const Eigen::Vector3d &point = pointcloud.points_[i];
-            const Eigen::Vector3d &normal = pointcloud.normals_[i];
-            utility::PrintDebug("%.6f %.6f %.6f %.6f %.6f %.6f\n", point(0),
-                                point(1), point(2), normal(0), normal(1),
-                                normal(2));
+            const Vec3d &point = pointcloud.points_.h_data[i];
+            const Vec3d &normal = pointcloud.normals_.h_data[i];
+            utility::PrintDebug("%.6f %.6f %.6f %.6f %.6f %.6f\n", point[0],
+                                point[1], point[2], normal[0], normal[1],
+                                normal[2]);
         } else {
-            const Eigen::Vector3d &point = pointcloud.points_[i];
-            utility::PrintDebug("%.6f %.6f %.6f\n", point(0), point(1),
-                                point(2));
+            const Vec3d &point = pointcloud.points_.h_data[i];
+            utility::PrintDebug("%.6f %.6f %.6f\n", point[0], point[1],
+                                point[2]);
         }
     }
     utility::PrintDebug("End of the list.\n\n");
@@ -81,8 +81,8 @@ int main(int argc, char *argv[]) {
                     *pcd, open3d::geometry::KDTreeSearchParamKNN(20));
         }
     }
-    std::cout << pcd->normals_[0] << std::endl;
-    std::cout << pcd->normals_[10] << std::endl;
+    std::cout << pcd->normals_.h_data[0] << std::endl;
+    std::cout << pcd->normals_.h_data[10] << std::endl;
 
     {
         utility::ScopeTimer timer("Normal estimation with Radius 0.01666");
@@ -91,8 +91,8 @@ int main(int argc, char *argv[]) {
                     *pcd, open3d::geometry::KDTreeSearchParamRadius(0.01666));
         }
     }
-    std::cout << pcd->normals_[0] << std::endl;
-    std::cout << pcd->normals_[10] << std::endl;
+    std::cout << pcd->normals_.h_data[0] << std::endl;
+    std::cout << pcd->normals_.h_data[10] << std::endl;
 
     {
         utility::ScopeTimer timer("Normal estimation with Hybrid 0.01666, 60");
@@ -102,8 +102,8 @@ int main(int argc, char *argv[]) {
                     open3d::geometry::KDTreeSearchParamHybrid(0.01666, 60));
         }
     }
-    std::cout << pcd->normals_[0] << std::endl;
-    std::cout << pcd->normals_[10] << std::endl;
+    std::cout << pcd->normals_.h_data[0] << std::endl;
+    std::cout << pcd->normals_.h_data[10] << std::endl;
 
     auto downpcd = geometry::VoxelDownSample(*pcd, 0.05);
 
@@ -112,10 +112,10 @@ int main(int argc, char *argv[]) {
     geometry::PointCloud pointcloud;
     PrintPointCloud(pointcloud);
 
-    pointcloud.points_.push_back(Eigen::Vector3d(0.0, 0.0, 0.0));
-    pointcloud.points_.push_back(Eigen::Vector3d(1.0, 0.0, 0.0));
-    pointcloud.points_.push_back(Eigen::Vector3d(0.0, 1.0, 0.0));
-    pointcloud.points_.push_back(Eigen::Vector3d(0.0, 0.0, 1.0));
+    pointcloud.points_.h_data.push_back(Vec3d{});
+    pointcloud.points_.h_data.push_back(Vec3d{1.0, 0.0, 0.0});
+    pointcloud.points_.h_data.push_back(Vec3d{0.0, 1.0, 0.0});
+    pointcloud.points_.h_data.push_back(Vec3d{0.0, 0.0, 1.0});
     PrintPointCloud(pointcloud);
 
     // 2. test pointcloud IO.
@@ -159,11 +159,11 @@ int main(int argc, char *argv[]) {
     std::shared_ptr<geometry::PointCloud> pointcloud_transformed_ptr(
             new geometry::PointCloud);
     *pointcloud_transformed_ptr = *pointcloud_ptr;
-    Eigen::Matrix4d trans_to_origin = Eigen::Matrix4d::Identity();
+    Mat4d trans_to_origin = Mat4d::Identity();
     trans_to_origin.block<3, 1>(0, 3) = bounding_box.GetCenter() * -1.0;
-    Eigen::Matrix4d transformation = Eigen::Matrix4d::Identity();
-    transformation.block<3, 3>(0, 0) = static_cast<Eigen::Matrix3d>(
-            Eigen::AngleAxisd(M_PI / 4.0, Eigen::Vector3d::UnitX()));
+    Mat4d transformation = Mat4d::Identity();
+    transformation.block<3, 3>(0, 0) =
+            static_cast<Mat3d>(Eigen::AngleAxisd(M_PI / 4.0, Vec3d::UnitX()));
     pointcloud_transformed_ptr->Transform(trans_to_origin.inverse() *
                                           transformation * trans_to_origin);
 

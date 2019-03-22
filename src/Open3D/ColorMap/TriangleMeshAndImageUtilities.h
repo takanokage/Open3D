@@ -51,7 +51,7 @@ class ImageWarpingField;
 class ColorMapOptimizationOption;
 
 inline std::tuple<float, float, float> Project3DPointAndGetUVDepth(
-        const Eigen::Vector3d X,
+        const Vec3d X,
         const camera::PinholeCameraTrajectory& camera,
         int camid);
 
@@ -67,7 +67,7 @@ CreateVertexAndImageVisibility(
 template <typename T>
 std::tuple<bool, T> QueryImageIntensity(
         const geometry::Image& img,
-        const Eigen::Vector3d& V,
+        const Vec3d& V,
         const camera::PinholeCameraTrajectory& camera,
         int camid,
         int ch = -1,
@@ -77,7 +77,7 @@ template <typename T>
 std::tuple<bool, T> QueryImageIntensity(
         const geometry::Image& img,
         const ImageWarpingField& field,
-        const Eigen::Vector3d& V,
+        const Vec3d& V,
         const camera::PinholeCameraTrajectory& camera,
         int camid,
         int ch = -1,

@@ -49,7 +49,7 @@ PreprocessPointCloud(const char *file_name) {
 
 void VisualizeRegistration(const open3d::geometry::PointCloud &source,
                            const open3d::geometry::PointCloud &target,
-                           const Eigen::Matrix4d &Transformation) {
+                           const Mat4d &Transformation) {
     std::shared_ptr<geometry::PointCloud> source_transformed_ptr(
             new geometry::PointCloud);
     std::shared_ptr<geometry::PointCloud> target_ptr(new geometry::PointCloud);

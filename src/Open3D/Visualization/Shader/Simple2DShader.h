@@ -60,8 +60,8 @@ protected:
     virtual bool PrepareBinding(const geometry::Geometry &geometry,
                                 const RenderOption &option,
                                 const ViewControl &view,
-                                std::vector<Eigen::Vector3f> &points,
-                                std::vector<Eigen::Vector3f> &colors) = 0;
+                                std::vector<Vec3f> &points,
+                                std::vector<Vec3f> &colors) = 0;
 
 protected:
     GLuint vertex_position_;
@@ -82,8 +82,8 @@ protected:
     bool PrepareBinding(const geometry::Geometry &geometry,
                         const RenderOption &option,
                         const ViewControl &view,
-                        std::vector<Eigen::Vector3f> &points,
-                        std::vector<Eigen::Vector3f> &colors) final;
+                        std::vector<Vec3f> &points,
+                        std::vector<Vec3f> &colors) final;
 };
 
 }  // namespace glsl

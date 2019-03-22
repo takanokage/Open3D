@@ -86,14 +86,14 @@ public:
     RenderOption() {
         // VS2013 does not fully support C++11
         // Array initialization has to be done in constructors.
-        light_position_relative_[0] = Eigen::Vector3d(0, 0, 2);
-        light_position_relative_[1] = Eigen::Vector3d(0, 0, 2);
-        light_position_relative_[2] = Eigen::Vector3d(0, 0, -2);
-        light_position_relative_[3] = Eigen::Vector3d(0, 0, -2);
-        light_color_[0] = Eigen::Vector3d::Ones();
-        light_color_[1] = Eigen::Vector3d::Ones();
-        light_color_[2] = Eigen::Vector3d::Ones();
-        light_color_[3] = Eigen::Vector3d::Ones();
+        light_position_relative_[0] = Vec3d{0, 0, 2};
+        light_position_relative_[1] = Vec3d{0, 0, 2};
+        light_position_relative_[2] = Vec3d{0, 0, -2};
+        light_position_relative_[3] = Vec3d{0, 0, -2};
+        light_color_[0] = Vec3d::Ones();
+        light_color_[1] = Vec3d::Ones();
+        light_color_[2] = Vec3d::Ones();
+        light_color_[3] = Vec3d::Ones();
         light_diffuse_power_[0] = 0.66;
         light_diffuse_power_[1] = 0.66;
         light_diffuse_power_[2] = 0.66;
@@ -159,15 +159,15 @@ public:
 
 public:
     // global options
-    Eigen::Vector3d background_color_ = Eigen::Vector3d::Ones();
+    Vec3d background_color_ = Vec3d::Ones();
     TextureInterpolationOption interpolation_option_ =
             TextureInterpolationOption::Nearest;
 
     // Phong lighting options
     bool light_on_ = true;
-    Eigen::Vector3d light_position_relative_[4];
-    Eigen::Vector3d light_color_[4];
-    Eigen::Vector3d light_ambient_color_ = Eigen::Vector3d::Zero();
+    Vec3d light_position_relative_[4];
+    Vec3d light_color_[4];
+    Vec3d light_ambient_color_ = Vec3d::Zero();
     double light_diffuse_power_[4];
     double light_specular_power_[4];
     double light_specular_shininess_[4];
@@ -182,7 +182,7 @@ public:
     MeshColorOption mesh_color_option_ = MeshColorOption::Color;
     bool mesh_show_back_face_ = false;
     bool mesh_show_wireframe_ = false;
-    Eigen::Vector3d default_mesh_color_ = Eigen::Vector3d(0.7, 0.7, 0.7);
+    Vec3d default_mesh_color_ = Vec3d{0.7, 0.7, 0.7};
 
     // LineSet options
     double line_width_ = LINE_WIDTH_DEFAULT;

@@ -84,13 +84,12 @@ public:
 /// Class that contains the registration result
 class RegistrationResult {
 public:
-    RegistrationResult(
-            const Eigen::Matrix4d &transformation = Eigen::Matrix4d::Identity())
+    RegistrationResult(const Mat4d &transformation = Mat4d::Identity())
         : transformation_(transformation), inlier_rmse_(0.0), fitness_(0.0) {}
     ~RegistrationResult() {}
 
 public:
-    Eigen::Matrix4d_u transformation_;
+    Mat4d transformation_;
     CorrespondenceSet correspondence_set_;
     double inlier_rmse_;
     double fitness_;
@@ -101,14 +100,14 @@ RegistrationResult EvaluateRegistration(
         const geometry::PointCloud &source,
         const geometry::PointCloud &target,
         double max_correspondence_distance,
-        const Eigen::Matrix4d &transformation = Eigen::Matrix4d::Identity());
+        const Mat4d &transformation = Mat4d::Identity());
 
 /// Functions for ICP registration
 RegistrationResult RegistrationICP(
         const geometry::PointCloud &source,
         const geometry::PointCloud &target,
         double max_correspondence_distance,
-        const Eigen::Matrix4d &init = Eigen::Matrix4d::Identity(),
+        const Mat4d &init = Mat4d::Identity(),
         const TransformationEstimation &estimation =
                 TransformationEstimationPointToPoint(false),
         const ICPConvergenceCriteria &criteria = ICPConvergenceCriteria());
@@ -142,11 +141,10 @@ RegistrationResult RegistrationRANSACBasedOnFeatureMatching(
                 RANSACConvergenceCriteria());
 
 /// Function for computing information matrix from RegistrationResult
-Eigen::Matrix6d GetInformationMatrixFromPointClouds(
-        const geometry::PointCloud &source,
-        const geometry::PointCloud &target,
-        double max_correspondence_distance,
-        const Eigen::Matrix4d &transformation);
+Mat6d GetInformationMatrixFromPointClouds(const geometry::PointCloud &source,
+                                          const geometry::PointCloud &target,
+                                          double max_correspondence_distance,
+                                          const Mat4d &transformation);
 
 }  // namespace registration
 }  // namespace open3d

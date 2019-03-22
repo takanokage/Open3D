@@ -48,9 +48,9 @@ public:
 public:
     void Clear() override;
     bool IsEmpty() const override;
-    Eigen::Vector3d GetMinBound() const final;
-    Eigen::Vector3d GetMaxBound() const final;
-    void Transform(const Eigen::Matrix4d& transformation) override;
+    Vec3d GetMinBound() const final;
+    Vec3d GetMaxBound() const final;
+    void Transform(const Mat4d& transformation) override;
     bool SetPointCloud(std::shared_ptr<const geometry::Geometry> ptr);
 
 public:

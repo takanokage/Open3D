@@ -60,7 +60,7 @@ protected:
     virtual bool PrepareBinding(const geometry::Geometry &geometry,
                                 const RenderOption &option,
                                 const ViewControl &view,
-                                std::vector<Eigen::Vector3f> &points,
+                                std::vector<Vec3f> &points,
                                 std::vector<float> &indices) = 0;
 
 protected:
@@ -83,7 +83,7 @@ protected:
     bool PrepareBinding(const geometry::Geometry &geometry,
                         const RenderOption &option,
                         const ViewControl &view,
-                        std::vector<Eigen::Vector3f> &points,
+                        std::vector<Vec3f> &points,
                         std::vector<float> &indices) final;
 };
 

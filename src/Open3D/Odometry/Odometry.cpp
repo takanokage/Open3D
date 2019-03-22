@@ -120,16 +120,16 @@ int CountCorrespondence(const geometry::Image &correspondence_map) {
 }
 
 std::shared_ptr<CorrespondenceSetPixelWise> ComputeCorrespondence(
-        const Eigen::Matrix3d intrinsic_matrix,
-        const Eigen::Matrix4d &extrinsic,
+        const Mat3d intrinsic_matrix,
+        const Mat4d &extrinsic,
         const geometry::Image &depth_s,
         const geometry::Image &depth_t,
         const OdometryOption &option) {
-    const Eigen::Matrix3d K = intrinsic_matrix;
-    const Eigen::Matrix3d K_inv = K.inverse();
-    const Eigen::Matrix3d R = extrinsic.block<3, 3>(0, 0);
-    const Eigen::Matrix3d KRK_inv = K * R * K_inv;
-    Eigen::Vector3d Kt = K * extrinsic.block<3, 1>(0, 3);
+    const Mat3d K = intrinsic_matrix;
+    const Mat3d K_inv = K.inverse();
+    const Mat3d R = extrinsic.block<3, 3>(0, 0);
+    const Mat3d KRK_inv = K * R * K_inv;
+    Vec3d Kt = K * extrinsic.block<3, 1>(0, 3);
 
     std::shared_ptr<geometry::Image> correspondence_map;
     std::shared_ptr<geometry::Image> depth_buffer;
@@ -151,11 +151,10 @@ std::shared_ptr<CorrespondenceSetPixelWise> ComputeCorrespondence(
             for (int u_s = 0; u_s < depth_s.width_; u_s++) {
                 double d_s = *geometry::PointerAt<float>(depth_s, u_s, v_s);
                 if (!std::isnan(d_s)) {
-                    Eigen::Vector3d uv_in_s =
-                            d_s * KRK_inv * Eigen::Vector3d(u_s, v_s, 1.0) + Kt;
-                    double transformed_d_s = uv_in_s(2);
-                    int u_t = (int)(uv_in_s(0) / transformed_d_s + 0.5);
-                    int v_t = (int)(uv_in_s(1) / transformed_d_s + 0.5);
+                    Vec3d uv_in_s = d_s * KRK_inv * Vec3d{u_s, v_s, 1.0} + Kt;
+                    double transformed_d_s = uv_in_s[2];
+                    int u_t = (int)(uv_in_s[0] / transformed_d_s + 0.5);
+                    int v_t = (int)(uv_in_s[1] / transformed_d_s + 0.5);
                     if (u_t >= 0 && u_t < depth_t.width_ && v_t >= 0 &&
                         v_t < depth_t.height_) {
                         double d_t =
@@ -195,7 +194,7 @@ std::shared_ptr<CorrespondenceSetPixelWise> ComputeCorrespondence(
             int v_t =
                     *geometry::PointerAt<int>(*correspondence_map, u_s, v_s, 1);
             if (u_t != -1 && v_t != -1) {
-                Eigen::Vector4i pixel_correspondence(u_s, v_s, u_t, v_t);
+                Vec4i pixel_correspondence(u_s, v_s, u_t, v_t);
                 (*correspondence)[cnt] = pixel_correspondence;
                 cnt++;
             }
@@ -205,17 +204,17 @@ std::shared_ptr<CorrespondenceSetPixelWise> ComputeCorrespondence(
 }
 
 std::shared_ptr<geometry::Image> ConvertDepthImageToXYZImage(
-        const geometry::Image &depth, const Eigen::Matrix3d &intrinsic_matrix) {
+        const geometry::Image &depth, const Mat3d &intrinsic_matrix) {
     auto image_xyz = std::make_shared<geometry::Image>();
     if (depth.num_of_channels_ != 1 || depth.bytes_per_channel_ != 4) {
         utility::PrintDebug(
                 "[ConvertDepthImageToXYZImage] Unsupported image format.\n");
         return image_xyz;
     }
-    const double inv_fx = 1.0 / intrinsic_matrix(0, 0);
-    const double inv_fy = 1.0 / intrinsic_matrix(1, 1);
-    const double ox = intrinsic_matrix(0, 2);
-    const double oy = intrinsic_matrix(1, 2);
+    const double inv_fx = 1.0 / intrinsic_matrix[0][0];
+    const double inv_fy = 1.0 / intrinsic_matrix[1][1];
+    const double ox = intrinsic_matrix[0][2];
+    const double oy = intrinsic_matrix[1][2];
     image_xyz->PrepareImage(depth.width_, depth.height_, 3, 4);
 
     for (int y = 0; y < image_xyz->height_; y++) {
@@ -232,25 +231,25 @@ std::shared_ptr<geometry::Image> ConvertDepthImageToXYZImage(
     return image_xyz;
 }
 
-std::vector<Eigen::Matrix3d> CreateCameraMatrixPyramid(
+std::vector<Mat3d> CreateCameraMatrixPyramid(
         const camera::PinholeCameraIntrinsic &pinhole_camera_intrinsic,
         int levels) {
-    std::vector<Eigen::Matrix3d> pyramid_camera_matrix;
+    std::vector<Mat3d> pyramid_camera_matrix;
     pyramid_camera_matrix.reserve(levels);
     for (int i = 0; i < levels; i++) {
-        Eigen::Matrix3d level_camera_matrix;
+        Mat3d level_camera_matrix;
         if (i == 0)
             level_camera_matrix = pinhole_camera_intrinsic.intrinsic_matrix_;
         else
             level_camera_matrix = 0.5 * pyramid_camera_matrix[i - 1];
-        level_camera_matrix(2, 2) = 1.;
+        level_camera_matrix[2][2] = 1.;
         pyramid_camera_matrix.push_back(level_camera_matrix);
     }
     return pyramid_camera_matrix;
 }
 
-Eigen::Matrix6d CreateInformationMatrix(
-        const Eigen::Matrix4d &extrinsic,
+Mat6d CreateInformationMatrix(
+        const Mat4d &extrinsic,
         const camera::PinholeCameraIntrinsic &pinhole_camera_intrinsic,
         const geometry::Image &depth_s,
         const geometry::Image &depth_t,
@@ -265,36 +264,36 @@ Eigen::Matrix6d CreateInformationMatrix(
     // write q^*
     // see http://redwood-data.org/indoor/registration.html
     // note: I comes first and q_skew is scaled by factor 2.
-    Eigen::Matrix6d GTG = Eigen::Matrix6d::Identity();
+    Mat6d GTG = Mat6d::Identity();
 #ifdef _OPENMP
 #pragma omp parallel
     {
 #endif
-        Eigen::Matrix6d GTG_private = Eigen::Matrix6d::Identity();
-        Eigen::Vector6d G_r_private = Eigen::Vector6d::Zero();
+        Mat6d GTG_private = Mat6d::Identity();
+        Vec6d G_r_private = Vec6d::Zero();
 #ifdef _OPENMP
 #pragma omp for nowait
 #endif
         for (auto row = 0; row < correspondence->size(); row++) {
-            int u_t = (*correspondence)[row](2);
-            int v_t = (*correspondence)[row](3);
+            int u_t = (*correspondence)[row][2];
+            int v_t = (*correspondence)[row][3];
             double x = *geometry::PointerAt<float>(*xyz_t, u_t, v_t, 0);
             double y = *geometry::PointerAt<float>(*xyz_t, u_t, v_t, 1);
             double z = *geometry::PointerAt<float>(*xyz_t, u_t, v_t, 2);
             G_r_private.setZero();
-            G_r_private(1) = z;
-            G_r_private(2) = -y;
-            G_r_private(3) = 1.0;
+            G_r_private[1] = z;
+            G_r_private[2] = -y;
+            G_r_private[3] = 1.0;
             GTG_private.noalias() += G_r_private * G_r_private.transpose();
             G_r_private.setZero();
-            G_r_private(0) = -z;
-            G_r_private(2) = x;
-            G_r_private(4) = 1.0;
+            G_r_private[0] = -z;
+            G_r_private[2] = x;
+            G_r_private[4] = 1.0;
             GTG_private.noalias() += G_r_private * G_r_private.transpose();
             G_r_private.setZero();
-            G_r_private(0) = y;
-            G_r_private(1) = -x;
-            G_r_private(5) = 1.0;
+            G_r_private[0] = y;
+            G_r_private[1] = -x;
+            G_r_private[5] = 1.0;
             GTG_private.noalias() += G_r_private * G_r_private.transpose();
         }
 #ifdef _OPENMP
@@ -319,10 +318,10 @@ void NormalizeIntensity(geometry::Image &image_s,
     }
     double mean_s = 0.0, mean_t = 0.0;
     for (int row = 0; row < correspondence.size(); row++) {
-        int u_s = correspondence[row](0);
-        int v_s = correspondence[row](1);
-        int u_t = correspondence[row](2);
-        int v_t = correspondence[row](3);
+        int u_s = correspondence[row][0];
+        int v_s = correspondence[row][1];
+        int u_t = correspondence[row][2];
+        int v_t = correspondence[row][3];
         mean_s += *geometry::PointerAt<float>(image_s, u_s, v_s);
         mean_t += *geometry::PointerAt<float>(image_t, u_t, v_t);
     }
@@ -382,7 +381,7 @@ InitializeRGBDOdometry(
         const geometry::RGBDImage &source,
         const geometry::RGBDImage &target,
         const camera::PinholeCameraIntrinsic &pinhole_camera_intrinsic,
-        const Eigen::Matrix4d &odo_init,
+        const Mat4d &odo_init,
         const OdometryOption &option) {
     auto source_gray = geometry::FilterImage(
             source.color_, geometry::Image::FilterType::Gaussian3);
@@ -405,7 +404,7 @@ InitializeRGBDOdometry(
     return std::make_tuple(source_out, target_out);
 }
 
-std::tuple<bool, Eigen::Matrix4d> DoSingleIteration(
+std::tuple<bool, Mat4d> DoSingleIteration(
         int iter,
         int level,
         const geometry::RGBDImage &source,
@@ -413,48 +412,44 @@ std::tuple<bool, Eigen::Matrix4d> DoSingleIteration(
         const geometry::Image &source_xyz,
         const geometry::RGBDImage &target_dx,
         const geometry::RGBDImage &target_dy,
-        const Eigen::Matrix3d intrinsic,
-        const Eigen::Matrix4d &extrinsic_initial,
+        const Mat3d intrinsic,
+        const Mat4d &extrinsic_initial,
         const RGBDOdometryJacobian &jacobian_method,
         const OdometryOption &option) {
     auto correspondence = ComputeCorrespondence(
             intrinsic, extrinsic_initial, source.depth_, target.depth_, option);
     int corresps_count = (int)correspondence->size();
 
-    auto f_lambda =
-            [&](int i,
-                std::vector<Eigen::Vector6d, utility::Vector6d_allocator> &J_r,
-                std::vector<double> &r) {
-                jacobian_method.ComputeJacobianAndResidual(
-                        i, J_r, r, source, target, source_xyz, target_dx,
-                        target_dy, intrinsic, extrinsic_initial,
-                        *correspondence);
-            };
+    auto f_lambda = [&](int i, std::vector<Vec6d> &J_r,
+                        std::vector<double> &r) {
+        jacobian_method.ComputeJacobianAndResidual(
+                i, J_r, r, source, target, source_xyz, target_dx, target_dy,
+                intrinsic, extrinsic_initial, *correspondence);
+    };
     utility::PrintDebug("Iter : %d, Level : %d, ", iter, level);
-    Eigen::Matrix6d JTJ;
-    Eigen::Vector6d JTr;
+    Mat6d JTJ;
+    Vec6d JTr;
     double r2;
     std::tie(JTJ, JTr, r2) =
-            utility::ComputeJTJandJTr<Eigen::Matrix6d, Eigen::Vector6d>(
-                    f_lambda, corresps_count);
+            utility::ComputeJTJandJTr<Mat6d, Vec6d>(f_lambda, corresps_count);
 
     bool is_success;
-    Eigen::Matrix4d extrinsic;
+    Mat4d extrinsic;
     std::tie(is_success, extrinsic) =
             utility::SolveJacobianSystemAndObtainExtrinsicMatrix(JTJ, JTr);
     if (!is_success) {
         utility::PrintWarning("[ComputeOdometry] no solution!\n");
-        return std::make_tuple(false, Eigen::Matrix4d::Identity());
+        return std::make_tuple(false, Mat4d::Identity());
     } else {
         return std::make_tuple(true, extrinsic);
     }
 }
 
-std::tuple<bool, Eigen::Matrix4d> ComputeMultiscale(
+std::tuple<bool, Mat4d> ComputeMultiscale(
         const geometry::RGBDImage &source,
         const geometry::RGBDImage &target,
         const camera::PinholeCameraIntrinsic &pinhole_camera_intrinsic,
-        const Eigen::Matrix4d &extrinsic_initial,
+        const Mat4d &extrinsic_initial,
         const RGBDOdometryJacobian &jacobian_method,
         const OdometryOption &option) {
     std::vector<int> iter_counts = option.iteration_number_per_pyramid_level_;
@@ -467,17 +462,14 @@ std::tuple<bool, Eigen::Matrix4d> ComputeMultiscale(
     auto target_pyramid_dy = geometry::FilterRGBDImagePyramid(
             target_pyramid, geometry::Image::FilterType::Sobel3Dy);
 
-    Eigen::Matrix4d result_odo = extrinsic_initial.isZero()
-                                         ? Eigen::Matrix4d::Identity()
-                                         : extrinsic_initial;
+    Mat4d result_odo =
+            extrinsic_initial.isZero() ? Mat4d::Identity() : extrinsic_initial;
 
-    std::vector<Eigen::Matrix3d> pyramid_camera_matrix =
-            CreateCameraMatrixPyramid(pinhole_camera_intrinsic,
-                                      (int)iter_counts.size());
+    std::vector<Mat3d> pyramid_camera_matrix = CreateCameraMatrixPyramid(
+            pinhole_camera_intrinsic, (int)iter_counts.size());
 
     for (int level = num_levels - 1; level >= 0; level--) {
-        const Eigen::Matrix3d level_camera_matrix =
-                pyramid_camera_matrix[level];
+        const Mat3d level_camera_matrix = pyramid_camera_matrix[level];
 
         auto source_xyz_level = ConvertDepthImageToXYZImage(
                 source_pyramid[level]->depth_, level_camera_matrix);
@@ -491,7 +483,7 @@ std::tuple<bool, Eigen::Matrix4d> ComputeMultiscale(
                                              target_pyramid_dy[level]->depth_);
 
         for (int iter = 0; iter < iter_counts[num_levels - level - 1]; iter++) {
-            Eigen::Matrix4d curr_odo;
+            Mat4d curr_odo;
             bool is_success;
             std::tie(is_success, curr_odo) = DoSingleIteration(
                     iter, level, *source_level, *target_level,
@@ -501,7 +493,7 @@ std::tuple<bool, Eigen::Matrix4d> ComputeMultiscale(
 
             if (!is_success) {
                 utility::PrintWarning("[ComputeOdometry] no solution!\n");
-                return std::make_tuple(false, Eigen::Matrix4d::Identity());
+                return std::make_tuple(false, Mat4d::Identity());
             }
         }
     }
@@ -512,41 +504,39 @@ std::tuple<bool, Eigen::Matrix4d> ComputeMultiscale(
 
 namespace odometry {
 
-std::tuple<bool, Eigen::Matrix4d, Eigen::Matrix6d> ComputeRGBDOdometry(
+std::tuple<bool, Mat4d, Mat6d> ComputeRGBDOdometry(
         const geometry::RGBDImage &source,
         const geometry::RGBDImage &target,
         const camera::PinholeCameraIntrinsic &pinhole_camera_intrinsic
         /*= camera::PinholeCameraIntrinsic()*/,
-        const Eigen::Matrix4d &odo_init /*= Eigen::Matrix4d::Identity()*/,
+        const Mat4d &odo_init /*= Mat4d::Identity()*/,
         const RGBDOdometryJacobian &jacobian_method
         /*=RGBDOdometryJacobianFromHybridTerm*/,
         const OdometryOption &option /*= OdometryOption()*/) {
     if (!CheckRGBDImagePair(source, target)) {
         utility::PrintError(
                 "[RGBDOdometry] Two RGBD pairs should be same in size.\n");
-        return std::make_tuple(false, Eigen::Matrix4d::Identity(),
-                               Eigen::Matrix6d::Zero());
+        return std::make_tuple(false, Mat4d::Identity(), Mat6d::Zero());
     }
 
     std::shared_ptr<geometry::RGBDImage> source_processed, target_processed;
     std::tie(source_processed, target_processed) = InitializeRGBDOdometry(
             source, target, pinhole_camera_intrinsic, odo_init, option);
 
-    Eigen::Matrix4d extrinsic;
+    Mat4d extrinsic;
     bool is_success;
     std::tie(is_success, extrinsic) = ComputeMultiscale(
             *source_processed, *target_processed, pinhole_camera_intrinsic,
             odo_init, jacobian_method, option);
 
     if (is_success) {
-        Eigen::Matrix4d trans_output = extrinsic;
+        Mat4d trans_output = extrinsic;
         Eigen::MatrixXd info_output = CreateInformationMatrix(
                 extrinsic, pinhole_camera_intrinsic, source_processed->depth_,
                 target_processed->depth_, option);
         return std::make_tuple(true, trans_output, info_output);
     } else {
-        return std::make_tuple(false, Eigen::Matrix4d::Identity(),
-                               Eigen::Matrix6d::Identity());
+        return std::make_tuple(false, Mat4d::Identity(), Mat6d::Identity());
     }
 }
 

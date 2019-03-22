@@ -190,9 +190,9 @@ bool ImageShaderForImage::PrepareRendering(const geometry::Geometry &geometry,
             ratio_y = GLfloat(image.height_) / GLfloat(view.GetWindowHeight());
             break;
     }
-    vertex_scale_data_(0) = ratio_x;
-    vertex_scale_data_(1) = ratio_y;
-    vertex_scale_data_(2) = 1.0f;
+    vertex_scale_data_[0] = ratio_x;
+    vertex_scale_data_[1] = ratio_y;
+    vertex_scale_data_[2] = 1.0f;
     glDisable(GL_DEPTH_TEST);
     return true;
 }
@@ -254,10 +254,10 @@ bool ImageShaderForImage::PrepareBinding(const geometry::Geometry &geometry,
             for (int i = 0; i < image.height_ * image.width_; i++) {
                 uint16_t *p = (uint16_t *)(image.data_.data() + i * 2);
                 double depth = std::min(double(*p) / double(max_depth), 1.0);
-                Eigen::Vector3d color = global_color_map.GetColor(depth);
-                render_image.data_[i * 3] = (uint8_t)(color(0) * 255);
-                render_image.data_[i * 3 + 1] = (uint8_t)(color(1) * 255);
-                render_image.data_[i * 3 + 2] = (uint8_t)(color(2) * 255);
+                Vec3d color = global_color_map.GetColor(depth);
+                render_image.data_[i * 3] = (uint8_t)(color[0] * 255);
+                render_image.data_[i * 3 + 1] = (uint8_t)(color[1] * 255);
+                render_image.data_[i * 3 + 2] = (uint8_t)(color[2] * 255);
             }
         }
     }

@@ -37,8 +37,7 @@ namespace registration {
 
 class PoseGraphNode : public utility::IJsonConvertible {
 public:
-    PoseGraphNode(const Eigen::Matrix4d &pose = Eigen::Matrix4d::Identity())
-        : pose_(pose){};
+    PoseGraphNode(const Mat4d &pose = Mat4d::Identity()) : pose_(pose){};
     ~PoseGraphNode();
 
 public:
@@ -46,18 +45,17 @@ public:
     bool ConvertFromJsonValue(const Json::Value &value) override;
 
 public:
-    Eigen::Matrix4d_u pose_;
+    Mat4d pose_;
 };
 
 class PoseGraphEdge : public utility::IJsonConvertible {
 public:
-    PoseGraphEdge(
-            int source_node_id = -1,
-            int target_node_id = -1,
-            const Eigen::Matrix4d &transformation = Eigen::Matrix4d::Identity(),
-            const Eigen::Matrix6d &information = Eigen::Matrix6d::Identity(),
-            bool uncertain = false,
-            double confidence = 1.0)
+    PoseGraphEdge(int source_node_id = -1,
+                  int target_node_id = -1,
+                  const Mat4d &transformation = Mat4d::Identity(),
+                  const Mat6d &information = Mat6d::Identity(),
+                  bool uncertain = false,
+                  double confidence = 1.0)
         : source_node_id_(source_node_id),
           target_node_id_(target_node_id),
           transformation_(transformation),
@@ -73,8 +71,8 @@ public:
 public:
     int source_node_id_;
     int target_node_id_;
-    Eigen::Matrix4d_u transformation_;
-    Eigen::Matrix6d_u information_;
+    Mat4d transformation_;
+    Mat6d information_;
     /// odometry edge has uncertain == false
     /// loop closure edges has uncertain == true
     bool uncertain_;

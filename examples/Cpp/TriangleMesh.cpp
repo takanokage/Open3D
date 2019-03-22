@@ -36,8 +36,7 @@ void PrintHelp() {
     utility::PrintInfo("    > TriangleMesh normal <file1> <file2>\n");
 }
 
-void PaintMesh(open3d::geometry::TriangleMesh &mesh,
-               const Eigen::Vector3d &color) {
+void PaintMesh(open3d::geometry::TriangleMesh &mesh, const Vec3d &color) {
     mesh.vertex_colors_.resize(mesh.vertices_.size());
     for (size_t i = 0; i < mesh.vertices_.size(); i++) {
         mesh.vertex_colors_[i] = color;
@@ -112,8 +111,8 @@ int main(int argc, char *argv[]) {
     } else if (option == "scale") {
         auto mesh = io::CreateMeshFromFile(argv[2]);
         double scale = std::stod(argv[4]);
-        Eigen::Matrix4d trans = Eigen::Matrix4d::Identity();
-        trans(0, 0) = trans(1, 1) = trans(2, 2) = scale;
+        Mat4d trans = Mat4d::Identity();
+        trans[0][0] = trans[1][1] = trans[2][2] = scale;
         mesh->Transform(trans);
         io::WriteTriangleMesh(argv[3], *mesh);
     } else if (option == "unify") {
@@ -123,12 +122,12 @@ int main(int argc, char *argv[]) {
         bbox.FitInGeometry(*mesh);
         double scale1 = std::stod(argv[4]);
         double scale2 = std::stod(argv[5]);
-        Eigen::Matrix4d trans = Eigen::Matrix4d::Identity();
-        trans(0, 0) = trans(1, 1) = trans(2, 2) = scale1 / bbox.GetSize();
+        Mat4d trans = Mat4d::Identity();
+        trans[0][0] = trans[1][1] = trans[2][2] = scale1 / bbox.GetSize();
         mesh->Transform(trans);
         trans.setIdentity();
         trans.block<3, 1>(0, 3) =
-                Eigen::Vector3d(scale2 / 2.0, scale2 / 2.0, scale2 / 2.0) -
+                Vec3d{scale2 / 2.0, scale2 / 2.0, scale2 / 2.0} -
                 bbox.GetCenter() * scale1 / bbox.GetSize();
         mesh->Transform(trans);
         io::WriteTriangleMesh(argv[3], *mesh);
@@ -139,13 +138,13 @@ int main(int argc, char *argv[]) {
         mesh1->vertex_colors_.resize(mesh1->vertices_.size());
         geometry::KDTreeFlann kdtree;
         kdtree.SetGeometry(*mesh2);
-        std::vector<int> indices(1);
-        std::vector<double> dists(1);
+        std::vector<int> indices[1];
+        std::vector<double> dists[1];
         double r = 0.0;
         for (size_t i = 0; i < mesh1->vertices_.size(); i++) {
             kdtree.SearchKNN(mesh1->vertices_[i], 1, indices, dists);
             double color = std::min(sqrt(dists[0]) / scale, 1.0);
-            mesh1->vertex_colors_[i] = Eigen::Vector3d(color, color, color);
+            mesh1->vertex_colors_[i] = Vec3d{color, color, color};
             r += sqrt(dists[0]);
         }
         utility::PrintInfo("Average distance is %.6f.\n",
@@ -156,9 +155,9 @@ int main(int argc, char *argv[]) {
         visualization::DrawGeometries({mesh1});
     } else if (option == "showboth") {
         auto mesh1 = io::CreateMeshFromFile(argv[2]);
-        PaintMesh(*mesh1, Eigen::Vector3d(1.0, 0.75, 0.0));
+        PaintMesh(*mesh1, Vec3d{1.0, 0.75, 0.0});
         auto mesh2 = io::CreateMeshFromFile(argv[3]);
-        PaintMesh(*mesh2, Eigen::Vector3d(0.25, 0.25, 1.0));
+        PaintMesh(*mesh2, Vec3d{0.25, 0.25, 1.0});
         std::vector<std::shared_ptr<const geometry::Geometry>> meshes;
         meshes.push_back(mesh1);
         meshes.push_back(mesh2);
@@ -176,7 +175,7 @@ int main(int argc, char *argv[]) {
         std::vector<std::shared_ptr<const geometry::Geometry>> ptrs;
         ptrs.push_back(mesh);
         auto mesh_sphere = geometry::CreateMeshSphere(0.05);
-        Eigen::Matrix4d trans;
+        Mat4d trans;
         trans.setIdentity();
         trans.block<3, 1>(0, 3) = mesh->vertices_[idx];
         mesh_sphere->Transform(trans);
@@ -189,19 +188,18 @@ int main(int argc, char *argv[]) {
             sprintf(buffer, "image/image_%06d.png", (int)i + 1);
             auto image = io::CreateImageFromFile(buffer);
             auto fimage = CreateFloatImageFromImage(*image);
-            Eigen::Vector4d pt_in_camera =
+            Vec4d pt_in_camera =
                     trajectory.parameters_[i].extrinsic_ *
-                    Eigen::Vector4d(mesh->vertices_[idx](0),
-                                    mesh->vertices_[idx](1),
-                                    mesh->vertices_[idx](2), 1.0);
-            Eigen::Vector3d pt_in_plane =
+                    Vec4d{mesh->vertices_[idx][0], mesh->vertices_[idx][1],
+                          mesh->vertices_[idx][2], 1.0};
+            Vec3d pt_in_plane =
                     trajectory.parameters_[i].intrinsic_.intrinsic_matrix_ *
                     pt_in_camera.block<3, 1>(0, 0);
-            Eigen::Vector3d uv = pt_in_plane / pt_in_plane(2);
+            Vec3d uv = pt_in_plane / pt_in_plane[2];
             std::cout << pt_in_camera << std::endl;
             std::cout << pt_in_plane << std::endl;
-            std::cout << pt_in_plane / pt_in_plane(2) << std::endl;
-            auto result = fimage->FloatValueAt(uv(0), uv(1));
+            std::cout << pt_in_plane / pt_in_plane[2] << std::endl;
+            auto result = fimage->FloatValueAt(uv[0], uv[1]);
             if (result.first) {
                 utility::PrintWarning("%.6f\n", result.second);
             }

@@ -77,9 +77,9 @@ bool PhongShader::BindGeometry(const geometry::Geometry &geometry,
     UnbindGeometry();
 
     // Prepare data to be passed to GPU
-    std::vector<Eigen::Vector3f> points;
-    std::vector<Eigen::Vector3f> normals;
-    std::vector<Eigen::Vector3f> colors;
+    std::vector<Vec3f> points;
+    std::vector<Vec3f> normals;
+    std::vector<Vec3f> colors;
     if (PrepareBinding(geometry, option, view, points, normals, colors) ==
         false) {
         PrintShaderWarning("Binding failed when preparing data.");
@@ -89,16 +89,16 @@ bool PhongShader::BindGeometry(const geometry::Geometry &geometry,
     // Create buffers and bind the geometry
     glGenBuffers(1, &vertex_position_buffer_);
     glBindBuffer(GL_ARRAY_BUFFER, vertex_position_buffer_);
-    glBufferData(GL_ARRAY_BUFFER, points.size() * sizeof(Eigen::Vector3f),
-                 points.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, points.size() * sizeof(Vec3f), points.data(),
+                 GL_STATIC_DRAW);
     glGenBuffers(1, &vertex_normal_buffer_);
     glBindBuffer(GL_ARRAY_BUFFER, vertex_normal_buffer_);
-    glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(Eigen::Vector3f),
+    glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(Vec3f),
                  normals.data(), GL_STATIC_DRAW);
     glGenBuffers(1, &vertex_color_buffer_);
     glBindBuffer(GL_ARRAY_BUFFER, vertex_color_buffer_);
-    glBufferData(GL_ARRAY_BUFFER, colors.size() * sizeof(Eigen::Vector3f),
-                 colors.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, colors.size() * sizeof(Vec3f), colors.data(),
+                 GL_STATIC_DRAW);
     bound_ = true;
     return true;
 }
@@ -156,26 +156,25 @@ void PhongShader::SetLighting(const ViewControl &view,
         light_position_world_data_.block<3, 1>(0, i) =
                 box.GetCenter().cast<GLfloat>() +
                 (float)box.GetSize() *
-                        ((float)option.light_position_relative_[i](0) *
+                        ((float)option.light_position_relative_[i][0] *
                                  view.GetRight() +
-                         (float)option.light_position_relative_[i](1) *
+                         (float)option.light_position_relative_[i][1] *
                                  view.GetUp() +
-                         (float)option.light_position_relative_[i](2) *
+                         (float)option.light_position_relative_[i][2] *
                                  view.GetFront());
         light_color_data_.block<3, 1>(0, i) =
                 option.light_color_[i].cast<GLfloat>();
     }
     if (option.light_on_) {
         light_diffuse_power_data_ =
-                Eigen::Vector4d(option.light_diffuse_power_).cast<GLfloat>();
+                Vec4d(option.light_diffuse_power_).cast<GLfloat>();
         light_specular_power_data_ =
-                Eigen::Vector4d(option.light_specular_power_).cast<GLfloat>();
+                Vec4d(option.light_specular_power_).cast<GLfloat>();
         light_specular_shininess_data_ =
-                Eigen::Vector4d(option.light_specular_shininess_)
-                        .cast<GLfloat>();
+                Vec4d(option.light_specular_shininess_).cast<GLfloat>();
         light_ambient_data_.block<3, 1>(0, 0) =
                 option.light_ambient_color_.cast<GLfloat>();
-        light_ambient_data_(3) = 1.0f;
+        light_ambient_data_[3] = 1.0f;
     } else {
         light_diffuse_power_data_ = GLHelper::GLVector4f::Zero();
         light_specular_power_data_ = GLHelper::GLVector4f::Zero();
@@ -204,9 +203,9 @@ bool PhongShaderForPointCloud::PrepareBinding(
         const geometry::Geometry &geometry,
         const RenderOption &option,
         const ViewControl &view,
-        std::vector<Eigen::Vector3f> &points,
-        std::vector<Eigen::Vector3f> &normals,
-        std::vector<Eigen::Vector3f> &colors) {
+        std::vector<Vec3f> &points,
+        std::vector<Vec3f> &normals,
+        std::vector<Vec3f> &colors) {
     if (geometry.GetGeometryType() !=
         geometry::Geometry::GeometryType::PointCloud) {
         PrintShaderWarning("Rendering type is not geometry::PointCloud.");
@@ -227,32 +226,32 @@ bool PhongShaderForPointCloud::PrepareBinding(
     normals.resize(pointcloud.points_.size());
     colors.resize(pointcloud.points_.size());
     for (size_t i = 0; i < pointcloud.points_.size(); i++) {
-        const auto &point = pointcloud.points_[i];
-        const auto &normal = pointcloud.normals_[i];
+        const auto &point = pointcloud.points_.h_data[i];
+        const auto &normal = pointcloud.normals_.h_data[i];
         points[i] = point.cast<float>();
         normals[i] = normal.cast<float>();
-        Eigen::Vector3d color;
+        Vec3d color;
         switch (option.point_color_option_) {
             case RenderOption::PointColorOption::XCoordinate:
                 color = global_color_map.GetColor(
-                        view.GetBoundingBox().GetXPercentage(point(0)));
+                        view.GetBoundingBox().GetXPercentage(point[0]));
                 break;
             case RenderOption::PointColorOption::YCoordinate:
                 color = global_color_map.GetColor(
-                        view.GetBoundingBox().GetYPercentage(point(1)));
+                        view.GetBoundingBox().GetYPercentage(point[1]));
                 break;
             case RenderOption::PointColorOption::ZCoordinate:
                 color = global_color_map.GetColor(
-                        view.GetBoundingBox().GetZPercentage(point(2)));
+                        view.GetBoundingBox().GetZPercentage(point[2]));
                 break;
             case RenderOption::PointColorOption::Color:
             case RenderOption::PointColorOption::Default:
             default:
                 if (pointcloud.HasColors()) {
-                    color = pointcloud.colors_[i];
+                    color = pointcloud.colors_.h_data[i];
                 } else {
                     color = global_color_map.GetColor(
-                            view.GetBoundingBox().GetZPercentage(point(2)));
+                            view.GetBoundingBox().GetZPercentage(point[2]));
                 }
                 break;
         }
@@ -296,9 +295,9 @@ bool PhongShaderForTriangleMesh::PrepareBinding(
         const geometry::Geometry &geometry,
         const RenderOption &option,
         const ViewControl &view,
-        std::vector<Eigen::Vector3f> &points,
-        std::vector<Eigen::Vector3f> &normals,
-        std::vector<Eigen::Vector3f> &colors) {
+        std::vector<Vec3f> &points,
+        std::vector<Vec3f> &normals,
+        std::vector<Vec3f> &colors) {
     if (geometry.GetGeometryType() !=
                 geometry::Geometry::GeometryType::TriangleMesh &&
         geometry.GetGeometryType() !=
@@ -331,19 +330,19 @@ bool PhongShaderForTriangleMesh::PrepareBinding(
             const auto &vertex = mesh.vertices_[vi];
             points[idx] = vertex.cast<float>();
 
-            Eigen::Vector3d color;
+            Vec3d color;
             switch (option.mesh_color_option_) {
                 case RenderOption::MeshColorOption::XCoordinate:
                     color = global_color_map.GetColor(
-                            view.GetBoundingBox().GetXPercentage(vertex(0)));
+                            view.GetBoundingBox().GetXPercentage(vertex[0]));
                     break;
                 case RenderOption::MeshColorOption::YCoordinate:
                     color = global_color_map.GetColor(
-                            view.GetBoundingBox().GetYPercentage(vertex(1)));
+                            view.GetBoundingBox().GetYPercentage(vertex[1]));
                     break;
                 case RenderOption::MeshColorOption::ZCoordinate:
                     color = global_color_map.GetColor(
-                            view.GetBoundingBox().GetZPercentage(vertex(2)));
+                            view.GetBoundingBox().GetZPercentage(vertex[2]));
                     break;
                 case RenderOption::MeshColorOption::Color:
                     if (mesh.HasVertexColors()) {

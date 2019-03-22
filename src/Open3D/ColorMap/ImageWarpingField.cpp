@@ -55,17 +55,16 @@ void ImageWarpingField::InitializeWarpingFields(
     }
 }
 
-Eigen::Vector2d ImageWarpingField::QueryFlow(int i, int j) const {
+Vec2d ImageWarpingField::QueryFlow(int i, int j) const {
     int baseidx = (i + j * anchor_w_) * 2;
     // exceptional case: quried anchor index is out of pre-defined space
     if (baseidx < 0 || baseidx >= anchor_w_ * anchor_h_ * 2)
-        return Eigen::Vector2d(0.0, 0.0);
+        return Vec2d{0.0, 0.0};
     else
-        return Eigen::Vector2d(flow_(baseidx), flow_(baseidx + 1));
+        return Vec2d{flow_(baseidx), flow_(baseidx + 1)};
 }
 
-Eigen::Vector2d ImageWarpingField::GetImageWarpingField(double u,
-                                                        double v) const {
+Vec2d ImageWarpingField::GetImageWarpingField(double u, double v) const {
     int i = (int)(u / anchor_step_);
     int j = (int)(v / anchor_step_);
     double p = (u - i * anchor_step_) / anchor_step_;

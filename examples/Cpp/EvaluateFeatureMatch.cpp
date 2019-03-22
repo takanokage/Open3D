@@ -43,8 +43,8 @@ public:
         fread(&dimension_, sizeof(int), 1, fid);
         data_.resize(dataset_size_ * dimension_);
         for (int i = 0; i < dataset_size_; i++) {
-            Eigen::Vector3f pts;
-            fread(&pts(0), sizeof(float), 3, fid);
+            Vec3f pts;
+            fread(&pts[0], sizeof(float), 3, fid);
             fread(((float *)data_.data()) + i * dimension_, sizeof(float),
                   dimension_, fid);
         }
@@ -100,7 +100,7 @@ void PrintHelp() {
 
 bool ReadLogFile(const std::string &filename,
                  std::vector<std::pair<int, int>> &pair_ids,
-                 std::vector<Eigen::Matrix4d> &transformations) {
+                 std::vector<Mat4d> &transformations) {
     using namespace open3d;
     pair_ids.clear();
     transformations.clear();
@@ -111,7 +111,7 @@ bool ReadLogFile(const std::string &filename,
     }
     char line_buffer[DEFAULT_IO_BUFFER_SIZE];
     int i, j, k;
-    Eigen::Matrix4d trans;
+    Mat4d trans;
     while (fgets(line_buffer, DEFAULT_IO_BUFFER_SIZE, f)) {
         if (strlen(line_buffer) > 0 && line_buffer[0] != '#') {
             if (sscanf(line_buffer, "%d %d %d", &i, &j, &k) != 3) {
@@ -124,32 +124,32 @@ bool ReadLogFile(const std::string &filename,
                         "Read LOG failed: unrecognized format.\n");
                 return false;
             } else {
-                sscanf(line_buffer, "%lf %lf %lf %lf", &trans(0, 0),
-                       &trans(0, 1), &trans(0, 2), &trans(0, 3));
+                sscanf(line_buffer, "%lf %lf %lf %lf", &trans[0][0],
+                       &trans[0][1], &trans[0][2], &trans[0][3]);
             }
             if (fgets(line_buffer, DEFAULT_IO_BUFFER_SIZE, f) == 0) {
                 utility::PrintWarning(
                         "Read LOG failed: unrecognized format.\n");
                 return false;
             } else {
-                sscanf(line_buffer, "%lf %lf %lf %lf", &trans(1, 0),
-                       &trans(1, 1), &trans(1, 2), &trans(1, 3));
+                sscanf(line_buffer, "%lf %lf %lf %lf", &trans[1][0],
+                       &trans[1][1], &trans[1][2], &trans[1][3]);
             }
             if (fgets(line_buffer, DEFAULT_IO_BUFFER_SIZE, f) == 0) {
                 utility::PrintWarning(
                         "Read LOG failed: unrecognized format.\n");
                 return false;
             } else {
-                sscanf(line_buffer, "%lf %lf %lf %lf", &trans(2, 0),
-                       &trans(2, 1), &trans(2, 2), &trans(2, 3));
+                sscanf(line_buffer, "%lf %lf %lf %lf", &trans[2][0],
+                       &trans[2][1], &trans[2][2], &trans[2][3]);
             }
             if (fgets(line_buffer, DEFAULT_IO_BUFFER_SIZE, f) == 0) {
                 utility::PrintWarning(
                         "Read LOG failed: unrecognized format.\n");
                 return false;
             } else {
-                sscanf(line_buffer, "%lf %lf %lf %lf", &trans(3, 0),
-                       &trans(3, 1), &trans(3, 2), &trans(3, 3));
+                sscanf(line_buffer, "%lf %lf %lf %lf", &trans[3][0],
+                       &trans[3][1], &trans[3][2], &trans[3][3]);
             }
             pair_ids.push_back(std::make_pair(i, j));
             transformations.push_back(trans);
@@ -206,17 +206,17 @@ int main(int argc, char *argv[]) {
     }
 
     std::vector<std::pair<int, int>> pair_ids;
-    std::vector<Eigen::Matrix4d> transformations;
+    std::vector<Mat4d> transformations;
     ReadLogFile(log_filename, pair_ids, transformations);
     int total_point_num = 0;
     int total_correspondence_num = 0;
     for (auto k = 0; k < pair_ids.size(); k++) {
         geometry::PointCloud source = pcds[pair_ids[k].second];
         source.Transform(transformations[k]);
-        std::vector<int> indices(1);
-        std::vector<double> distance2(1);
+        std::vector<int> indices[1];
+        std::vector<double> distance2[1];
         int correspondence_num = 0;
-        for (const auto &pt : source.points_) {
+        for (const auto &pt : source.points_.h_data) {
             if (kdtrees[pair_ids[k].first].SearchKNN(pt, 1, indices,
                                                      distance2) > 0) {
                 if (distance2[0] < threshold2) {
@@ -260,15 +260,15 @@ int main(int argc, char *argv[]) {
         for (auto k = 0; k < pair_ids.size(); k++) {
             geometry::PointCloud source = pcds[pair_ids[k].second];
             source.Transform(transformations[k]);
-            std::vector<int> indices(1);
-            std::vector<double> distance2(1);
-            std::vector<float> fdistance2(1);
+            std::vector<int> indices[1];
+            std::vector<double> distance2[1];
+            std::vector<float> fdistance2[1];
             int positive = 0;
             int correspondence_num = 0;
             std::vector<bool> has_correspondence(
                     pcds[pair_ids[k].second].points_.size(), false);
             for (auto i = 0; i < source.points_.size(); i++) {
-                const auto &pt = source.points_[i];
+                const auto &pt = source.points_.h_data[i];
                 if (kdtrees[pair_ids[k].first].SearchKNN(pt, 1, indices,
                                                          distance2) > 0) {
                     if (distance2[0] < threshold2) {
@@ -286,10 +286,10 @@ int main(int argc, char *argv[]) {
                     if (feature_trees[pair_ids[k].first].SearchKNN(
                                 feature_trees[pair_ids[k].second].data_, i, 1,
                                 indices, fdistance2) > 0) {
-                        double new_dis =
-                                (source.points_[i] -
-                                 pcds[pair_ids[k].first].points_[indices[0]])
-                                        .norm();
+                        double new_dis = (source.points_.h_data[i] -
+                                          pcds[pair_ids[k].first]
+                                                  .points_.h_data[indices[0]])
+                                                 .norm();
                         true_dis[total_point_num + i] = new_dis;
                         if (new_dis < threshold) {
 #ifdef _OPENMP

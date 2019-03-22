@@ -38,7 +38,7 @@ bool SelectionPolygonVolume::ConvertToJsonValue(Json::Value &value) const {
     Json::Value polygon_array;
     for (const auto &point : bounding_polygon_) {
         Json::Value point_object;
-        if (EigenVector3dToJsonArray(point, point_object) == false) {
+        if (Vector3dToJsonArray(point, point_object) == false) {
             return false;
         }
         polygon_array.append(point_object);
@@ -80,7 +80,7 @@ bool SelectionPolygonVolume::ConvertFromJsonValue(const Json::Value &value) {
     bounding_polygon_.resize(polygon_array.size());
     for (int i = 0; i < (int)polygon_array.size(); i++) {
         const Json::Value &point_object = polygon_array[i];
-        if (EigenVector3dFromJsonArray(bounding_polygon_[i], point_object) ==
+        if (Vector3dFromJsonArray(bounding_polygon_[i], point_object) ==
             false) {
             return false;
         }
@@ -98,7 +98,8 @@ std::shared_ptr<geometry::PointCloud> SelectionPolygonVolume::CropPointCloud(
 std::shared_ptr<geometry::PointCloud>
 SelectionPolygonVolume::CropPointCloudInPolygon(
         const geometry::PointCloud &input) const {
-    return geometry::SelectDownSample(input, CropInPolygon(input.points_));
+    return geometry::SelectDownSample(input,
+                                      CropInPolygon(input.points_.h_data));
 }
 
 std::shared_ptr<geometry::TriangleMesh>
@@ -123,7 +124,7 @@ SelectionPolygonVolume::CropTriangleMeshInPolygon(
 }
 
 std::vector<size_t> SelectionPolygonVolume::CropInPolygon(
-        const std::vector<Eigen::Vector3d> &input) const {
+        const std::vector<Vec3d> &input) const {
     std::vector<size_t> output_index;
     int u, v, w;
     if (orthogonal_axis_ == "x" || orthogonal_axis_ == "X") {

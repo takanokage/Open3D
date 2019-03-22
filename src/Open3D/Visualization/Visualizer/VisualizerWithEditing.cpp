@@ -243,7 +243,7 @@ int VisualizerWithEditing::PickPoint(double x, double y) {
     glReadPixels((int)(x + 0.5), (int)(view.GetWindowHeight() - y + 0.5), 1, 1,
                  GL_RGBA, GL_UNSIGNED_BYTE, rgba);
     int index = GLHelper::ColorCodeToPickIndex(
-            Eigen::Vector4i(rgba[0], rgba[1], rgba[2], rgba[3]));
+            Vec4i{rgba[0], rgba[1], rgba[2], rgba[3]});
     // Recover rendering state
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glEnable(GL_MULTISAMPLE);
@@ -490,14 +490,14 @@ void VisualizerWithEditing::MouseMoveCallback(GLFWwindow *window,
         double y_inv = view_control.GetWindowHeight() - y;
         if (selection_mode_ == SelectionMode::None) {
         } else if (selection_mode_ == SelectionMode::Rectangle) {
-            selection_polygon_ptr_->polygon_[1](0) = x;
-            selection_polygon_ptr_->polygon_[2](0) = x;
-            selection_polygon_ptr_->polygon_[2](1) = y_inv;
-            selection_polygon_ptr_->polygon_[3](1) = y_inv;
+            selection_polygon_ptr_->polygon_[1][0] = x;
+            selection_polygon_ptr_->polygon_[2][0] = x;
+            selection_polygon_ptr_->polygon_[2][1] = y_inv;
+            selection_polygon_ptr_->polygon_[3][1] = y_inv;
             selection_polygon_renderer_ptr_->UpdateGeometry();
             is_redraw_required_ = true;
         } else if (selection_mode_ == SelectionMode::Polygon) {
-            selection_polygon_ptr_->polygon_.back() = Eigen::Vector2d(x, y_inv);
+            selection_polygon_ptr_->polygon_.back() = Vec2d{x, y_inv};
             selection_polygon_renderer_ptr_->UpdateGeometry();
             is_redraw_required_ = true;
         }
@@ -537,29 +537,29 @@ void VisualizerWithEditing::MouseButtonCallback(GLFWwindow *window,
                     if (mods & GLFW_MOD_CONTROL) {
                         selection_mode_ = SelectionMode::Polygon;
                         selection_polygon_ptr_->polygon_.push_back(
-                                Eigen::Vector2d(x, y_inv));
+                                Vec2d{x, y_inv});
                         selection_polygon_ptr_->polygon_.push_back(
-                                Eigen::Vector2d(x, y_inv));
+                                Vec2d{x, y_inv});
                     } else {
                         selection_mode_ = SelectionMode::Rectangle;
                         selection_polygon_ptr_->is_closed_ = true;
                         selection_polygon_ptr_->polygon_.push_back(
-                                Eigen::Vector2d(x, y_inv));
+                                Vec2d{x, y_inv});
                         selection_polygon_ptr_->polygon_.push_back(
-                                Eigen::Vector2d(x, y_inv));
+                                Vec2d{x, y_inv});
                         selection_polygon_ptr_->polygon_.push_back(
-                                Eigen::Vector2d(x, y_inv));
+                                Vec2d{x, y_inv});
                         selection_polygon_ptr_->polygon_.push_back(
-                                Eigen::Vector2d(x, y_inv));
+                                Vec2d{x, y_inv});
                     }
                     selection_polygon_renderer_ptr_->UpdateGeometry();
                 } else if (selection_mode_ == SelectionMode::Rectangle) {
                 } else if (selection_mode_ == SelectionMode::Polygon) {
                     if (mods & GLFW_MOD_CONTROL) {
                         selection_polygon_ptr_->polygon_.back() =
-                                Eigen::Vector2d(x, y_inv);
+                                Vec2d{x, y_inv};
                         selection_polygon_ptr_->polygon_.push_back(
-                                Eigen::Vector2d(x, y_inv));
+                                Vec2d{x, y_inv});
                         selection_polygon_renderer_ptr_->UpdateGeometry();
                     }
                 }
@@ -609,11 +609,11 @@ void VisualizerWithEditing::MouseButtonCallback(GLFWwindow *window,
             } else {
                 const auto &point =
                         ((const geometry::PointCloud &)(*geometry_ptrs_[0]))
-                                .points_[index];
+                                .points_.h_data[index];
                 utility::PrintInfo(
                         "Picked point #%d (%.2f, %.2f, %.2f) to add in "
                         "queue.\n",
-                        index, point(0), point(1), point(2));
+                        index, point[0], point[1], point[2]);
                 pointcloud_picker_ptr_->picked_indices_.push_back(
                         (size_t)index);
                 is_redraw_required_ = true;

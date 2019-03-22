@@ -106,20 +106,19 @@ void pybind_kdtreeflann(py::module &m) {
             // expose them in Python binding. Considering writing C++ functions
             // if performance is an issue.
             //.def("search_vector_3d_in_place",
-            //&KDTreeFlann::Search<Eigen::Vector3d>,
+            //&KDTreeFlann::Search<Vec3d>,
             //        "query"_a, "search_param"_a, "indices"_a, "distance2"_a)
             //.def("search_knn_vector_3d_in_place",
-            //        &KDTreeFlann::SearchKNN<Eigen::Vector3d>,
+            //        &KDTreeFlann::SearchKNN<Vec3d>,
             //        "query"_a, "knn"_a, "indices"_a, "distance2"_a)
             //.def("search_radius_vector_3d_in_place",
-            //        &KDTreeFlann::SearchRadius<Eigen::Vector3d>, "query"_a,
+            //        &KDTreeFlann::SearchRadius<Vec3d>, "query"_a,
             //        "radius"_a, "indices"_a, "distance2"_a)
             //.def("search_hybrid_vector_3d_in_place",
-            //        &KDTreeFlann::SearchHybrid<Eigen::Vector3d>, "query"_a,
+            //        &KDTreeFlann::SearchHybrid<Vec3d>, "query"_a,
             //        "radius"_a, "max_nn"_a, "indices"_a, "distance2"_a)
             .def("search_vector_3d",
-                 [](const geometry::KDTreeFlann &tree,
-                    const Eigen::Vector3d &query,
+                 [](const geometry::KDTreeFlann &tree, const Vec3d &query,
                     const geometry::KDTreeSearchParam &param) {
                      std::vector<int> indices;
                      std::vector<double> distance2;
@@ -130,8 +129,8 @@ void pybind_kdtreeflann(py::module &m) {
                  },
                  "query"_a, "search_param"_a)
             .def("search_knn_vector_3d",
-                 [](const geometry::KDTreeFlann &tree,
-                    const Eigen::Vector3d &query, int knn) {
+                 [](const geometry::KDTreeFlann &tree, const Vec3d &query,
+                    int knn) {
                      std::vector<int> indices;
                      std::vector<double> distance2;
                      int k = tree.SearchKNN(query, knn, indices, distance2);
@@ -142,8 +141,8 @@ void pybind_kdtreeflann(py::module &m) {
                  },
                  "query"_a, "knn"_a)
             .def("search_radius_vector_3d",
-                 [](const geometry::KDTreeFlann &tree,
-                    const Eigen::Vector3d &query, double radius) {
+                 [](const geometry::KDTreeFlann &tree, const Vec3d &query,
+                    double radius) {
                      std::vector<int> indices;
                      std::vector<double> distance2;
                      int k = tree.SearchRadius(query, radius, indices,
@@ -155,8 +154,8 @@ void pybind_kdtreeflann(py::module &m) {
                  },
                  "query"_a, "radius"_a)
             .def("search_hybrid_vector_3d",
-                 [](const geometry::KDTreeFlann &tree,
-                    const Eigen::Vector3d &query, double radius, int max_nn) {
+                 [](const geometry::KDTreeFlann &tree, const Vec3d &query,
+                    double radius, int max_nn) {
                      std::vector<int> indices;
                      std::vector<double> distance2;
                      int k = tree.SearchHybrid(query, radius, max_nn, indices,

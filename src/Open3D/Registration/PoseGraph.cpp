@@ -40,7 +40,7 @@ bool PoseGraphNode::ConvertToJsonValue(Json::Value &value) const {
     value["version_minor"] = 0;
 
     Json::Value pose_object;
-    if (EigenMatrix4dToJsonArray(pose_, pose_object) == false) {
+    if (Matrix4dToJsonArray(pose_, pose_object) == false) {
         return false;
     }
     value["pose"] = pose_object;
@@ -62,7 +62,7 @@ bool PoseGraphNode::ConvertFromJsonValue(const Json::Value &value) {
     }
 
     const Json::Value &pose_object = value["pose"];
-    if (EigenMatrix4dFromJsonArray(pose_, pose_object) == false) {
+    if (Matrix4dFromJsonArray(pose_, pose_object) == false) {
         return false;
     }
     return true;
@@ -80,13 +80,12 @@ bool PoseGraphEdge::ConvertToJsonValue(Json::Value &value) const {
     value["uncertain"] = uncertain_;
     value["confidence"] = confidence_;
     Json::Value transformation_object;
-    if (EigenMatrix4dToJsonArray(transformation_, transformation_object) ==
-        false) {
+    if (Matrix4dToJsonArray(transformation_, transformation_object) == false) {
         return false;
     }
     value["transformation"] = transformation_object;
     Json::Value information_object;
-    if (EigenMatrix6dToJsonArray(information_, information_object) == false) {
+    if (Matrix6dToJsonArray(information_, information_object) == false) {
         return false;
     }
     value["information"] = information_object;
@@ -112,12 +111,12 @@ bool PoseGraphEdge::ConvertFromJsonValue(const Json::Value &value) {
     uncertain_ = value.get("uncertain", false).asBool();
     confidence_ = value.get("confidence", 1.0).asDouble();
     const Json::Value &transformation_object = value["transformation"];
-    if (EigenMatrix4dFromJsonArray(transformation_, transformation_object) ==
+    if (Matrix4dFromJsonArray(transformation_, transformation_object) ==
         false) {
         return false;
     }
     const Json::Value &information_object = value["information"];
-    if (EigenMatrix6dFromJsonArray(information_, information_object) == false) {
+    if (Matrix6dFromJsonArray(information_, information_object) == false) {
         return false;
     }
     return true;

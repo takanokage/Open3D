@@ -37,16 +37,14 @@ using namespace unit_test;
 
 // [0: (-1, 2)]__________[1: (1, 2)]
 //             \        /\
-//              \  (0) /  \
-//               \    / (1)\
+//              \  [0] /  \
+//               \    / [1]\
 //                \  /      \
-//      [2: (0, 0)]\/________\[3: (2, 0)]
+//      [2: [0][0]]\/________\[3: (2, 0)]
 geometry::TriangleMesh get_mesh_two_triangles() {
-    std::vector<Eigen::Vector3d> vertices{
-            Eigen::Vector3d(-1, 2, 0), Eigen::Vector3d(1, 2, 0),
-            Eigen::Vector3d(0, 0, 0), Eigen::Vector3d(2, 0, 0)};
-    std::vector<Eigen::Vector3i> triangles{Eigen::Vector3i(0, 2, 1),
-                                           Eigen::Vector3i(1, 2, 3)};
+    std::vector<Vec3d> vertices{Vec3d{-1, 2, 0}, Vec3d{1, 2, 0}, Vec3d{0, 0, 0},
+                                Vec3d{2, 0, 0}};
+    std::vector<Vec3i> triangles{Vec3i{0, 2, 1}, Vec3i{1, 2, 3}};
     geometry::TriangleMesh mesh;
     mesh.vertices_ = vertices;
     mesh.triangles_ = triangles;
@@ -55,19 +53,16 @@ geometry::TriangleMesh get_mesh_two_triangles() {
 
 // [0: (-1, 2)]__________[1: (1, 2)]     [4: (9, 2)]__________[5: (11, 2)]
 //             \        /\                           \        /\
-//              \  (0) /  \                           \  (0) /  \
-//               \    / (1)\                           \    / (1)\
+//              \  [0] /  \                           \  [0] /  \
+//               \    / [1]\                           \    / [1]\
 //                \  /      \                           \  /      \
-//      [2: (0, 0)]\/________\[3: (2, 0)]    [6: (10, 0)]\/________\[7: (12, 0)]
+//      [2: [0][0]]\/________\[3: (2, 0)]    [6: (10, 0)]\/________\[7: (12, 0)]
 geometry::TriangleMesh get_mesh_four_triangles_disconnect() {
-    std::vector<Eigen::Vector3d> vertices{
-            Eigen::Vector3d(-1, 2, 0), Eigen::Vector3d(1, 2, 0),
-            Eigen::Vector3d(0, 0, 0),  Eigen::Vector3d(2, 0, 0),
-            Eigen::Vector3d(9, 2, 0),  Eigen::Vector3d(11, 2, 0),
-            Eigen::Vector3d(10, 0, 0), Eigen::Vector3d(12, 0, 0)};
-    std::vector<Eigen::Vector3i> triangles{
-            Eigen::Vector3i(0, 2, 1), Eigen::Vector3i(1, 2, 3),
-            Eigen::Vector3i(4, 6, 5), Eigen::Vector3i(5, 6, 7)};
+    std::vector<Vec3d> vertices{
+            Vec3d{-1, 2, 0}, Vec3d{1, 2, 0},  Vec3d{0, 0, 0},  Vec3d{2, 0, 0},
+            Vec3d{9, 2, 0},  Vec3d{11, 2, 0}, Vec3d{10, 0, 0}, Vec3d{12, 0, 0}};
+    std::vector<Vec3i> triangles{Vec3i{0, 2, 1}, Vec3i{1, 2, 3}, Vec3i{4, 6, 5},
+                                 Vec3i{5, 6, 7}};
     geometry::TriangleMesh mesh;
     mesh.vertices_ = vertices;
     mesh.triangles_ = triangles;
@@ -76,18 +71,16 @@ geometry::TriangleMesh get_mesh_four_triangles_disconnect() {
 
 // [0: (-1, 2)]__________[1: (1, 2)]
 //             \        /\
-//              \  (0) /  \
-//               \    / (1)\
+//              \  [0] /  \
+//               \    / [1]\
 //                \  /      \
-//      [2: (0, 0)]\/________\[3: (2, 0)]
+//      [2: [0][0]]\/________\[3: (2, 0)]
 //
-// Non-manifold: triangle (1) is flipped
+// Non-manifold: triangle [1] is flipped
 geometry::TriangleMesh get_mesh_two_triangles_flipped() {
-    std::vector<Eigen::Vector3d> vertices{
-            Eigen::Vector3d(-1, 2, 0), Eigen::Vector3d(1, 2, 0),
-            Eigen::Vector3d(0, 0, 0), Eigen::Vector3d(2, 0, 0)};
-    std::vector<Eigen::Vector3i> triangles{Eigen::Vector3i(0, 2, 1),
-                                           Eigen::Vector3i(1, 3, 2)};
+    std::vector<Vec3d> vertices{Vec3d{-1, 2, 0}, Vec3d{1, 2, 0}, Vec3d{0, 0, 0},
+                                Vec3d{2, 0, 0}};
+    std::vector<Vec3i> triangles{Vec3i{0, 2, 1}, Vec3i{1, 3, 2}};
     geometry::TriangleMesh mesh;
     mesh.vertices_ = vertices;
     mesh.triangles_ = triangles;
@@ -96,25 +89,22 @@ geometry::TriangleMesh get_mesh_two_triangles_flipped() {
 
 //  [0: (-1, 2)]__________[1: (1, 2)]
 //              \        /
-//               \  (0) /
+//               \  [0] /
 //                \    /
 //                 \  /
-//                  \/ [2: (0, 0)]
+//                  \/ [2: [0][0]]
 //                  /\
 //                 /  \
 //                /    \
-//               /  (1) \
+//               /  [1] \
 //              /________\
 // [3: (-1, -2)]          [4: (1, -2)]
 //
 // Non-manifold
 geometry::TriangleMesh get_mesh_two_triangles_invalid_vertex() {
-    std::vector<Eigen::Vector3d> vertices{
-            Eigen::Vector3d(-1, 2, 0), Eigen::Vector3d(1, 2, 0),
-            Eigen::Vector3d(0, 0, 0), Eigen::Vector3d(-1, -2, 0),
-            Eigen::Vector3d(1, -2, 0)};
-    std::vector<Eigen::Vector3i> triangles{Eigen::Vector3i(0, 2, 1),
-                                           Eigen::Vector3i(2, 3, 4)};
+    std::vector<Vec3d> vertices{Vec3d{-1, 2, 0}, Vec3d{1, 2, 0}, Vec3d{0, 0, 0},
+                                Vec3d{-1, -2, 0}, Vec3d{1, -2, 0}};
+    std::vector<Vec3i> triangles{Vec3i{0, 2, 1}, Vec3i{2, 3, 4}};
     geometry::TriangleMesh mesh;
     mesh.vertices_ = vertices;
     mesh.triangles_ = triangles;
@@ -123,26 +113,23 @@ geometry::TriangleMesh get_mesh_two_triangles_invalid_vertex() {
 
 //          [0: (-1, 2)]__________[1: (1, 2)]
 //                     /\        /\
-//                    /  \  (1) /  \
-//                   / (0)\    / (2)\
+//                    /  \  [1] /  \
+//                   / [0]\    / [2]\
 //                  /      \  /      \
 //     [2: (-2, 0)]/____[3: (O, 0)]___\[4: (2, 0)]
 //                 \        /\        /
-//                  \  (3) /  \  (5) /
+//                  \  [3] /  \  [5] /
 //                   \    /    \    /
-//                    \  /  (4) \  /
+//                    \  /  [4] \  /
 //                     \/________\/
 //         [5: (-1, -2)]          [6: (1, -2)]
 geometry::TriangleMesh get_mesh_hexagon() {
-    std::vector<Eigen::Vector3d> vertices{
-            Eigen::Vector3d(-1, 2, 0), Eigen::Vector3d(1, 2, 0),
-            Eigen::Vector3d(-2, 0, 0), Eigen::Vector3d(0, 0, 0),
-            Eigen::Vector3d(2, 0, 0),  Eigen::Vector3d(-1, -2, 0),
-            Eigen::Vector3d(1, -2, 0)};
-    std::vector<Eigen::Vector3i> triangles{
-            Eigen::Vector3i(0, 2, 3), Eigen::Vector3i(0, 3, 1),
-            Eigen::Vector3i(1, 3, 4), Eigen::Vector3i(2, 5, 3),
-            Eigen::Vector3i(3, 5, 6), Eigen::Vector3i(3, 6, 4)};
+    std::vector<Vec3d> vertices{
+            Vec3d{-1, 2, 0}, Vec3d{1, 2, 0},   Vec3d{-2, 0, 0}, Vec3d{0, 0, 0},
+            Vec3d{2, 0, 0},  Vec3d{-1, -2, 0}, Vec3d{1, -2, 0}};
+    std::vector<Vec3i> triangles{Vec3i{0, 2, 3}, Vec3i{0, 3, 1},
+                                 Vec3i{1, 3, 4}, Vec3i{2, 5, 3},
+                                 Vec3i{3, 5, 6}, Vec3i{3, 6, 4}};
     geometry::TriangleMesh mesh;
     mesh.vertices_ = vertices;
     mesh.triangles_ = triangles;
@@ -151,26 +138,22 @@ geometry::TriangleMesh get_mesh_hexagon() {
 
 //          [0: (-1, 2)]__________[1: (1, 2)]
 //                     /\        /\
-//                    /  \  (1) /  \
-//                   / (0)\    / (2)\
+//                    /  \  [1] /  \
+//                   / [0]\    / [2]\
 //                  /      \  /      \
 //     [2: (-2, 0)]/____[3: (O, 0)]___\[4: (2, 0)]
 //                 \        /\
-//                  \  (3) /  \
+//                  \  [3] /  \
 //                   \    /    \
-//                    \  /  (4) \
+//                    \  /  [4] \
 //                     \/________\
 //         [5: (-1, -2)]          [6: (1, -2)]
 geometry::TriangleMesh get_mesh_partial_hexagon() {
-    std::vector<Eigen::Vector3d> vertices{
-            Eigen::Vector3d(-1, 2, 0), Eigen::Vector3d(1, 2, 0),
-            Eigen::Vector3d(-2, 0, 0), Eigen::Vector3d(0, 0, 0),
-            Eigen::Vector3d(2, 0, 0),  Eigen::Vector3d(-1, -2, 0),
-            Eigen::Vector3d(1, -2, 0)};
-    std::vector<Eigen::Vector3i> triangles{
-            Eigen::Vector3i(0, 2, 3), Eigen::Vector3i(0, 3, 1),
-            Eigen::Vector3i(1, 3, 4), Eigen::Vector3i(2, 5, 3),
-            Eigen::Vector3i(3, 5, 6)};
+    std::vector<Vec3d> vertices{
+            Vec3d{-1, 2, 0}, Vec3d{1, 2, 0},   Vec3d{-2, 0, 0}, Vec3d{0, 0, 0},
+            Vec3d{2, 0, 0},  Vec3d{-1, -2, 0}, Vec3d{1, -2, 0}};
+    std::vector<Vec3i> triangles{Vec3i{0, 2, 3}, Vec3i{0, 3, 1}, Vec3i{1, 3, 4},
+                                 Vec3i{2, 5, 3}, Vec3i{3, 5, 6}};
     geometry::TriangleMesh mesh;
     mesh.vertices_ = vertices;
     mesh.triangles_ = triangles;
@@ -328,13 +311,13 @@ TEST(HalfEdgeTriangleMesh, BoundaryHalfEdgesFromVertex_TwoTriangles) {
     auto mesh = geometry::CreateHalfEdgeMeshFromMesh(get_mesh_two_triangles());
     EXPECT_FALSE(mesh->IsEmpty());
 
-    assert_ordreded_edges(mesh, mesh->BoundaryHalfEdgesFromVertex(0),
+    assert_ordreded_edges(mesh, mesh->BoundaryHalfEdgesFromVertex[0],
                           {{0, 2}, {2, 3}, {3, 1}, {1, 0}});
-    assert_ordreded_edges(mesh, mesh->BoundaryHalfEdgesFromVertex(1),
+    assert_ordreded_edges(mesh, mesh->BoundaryHalfEdgesFromVertex[1],
                           {{1, 0}, {0, 2}, {2, 3}, {3, 1}});
-    assert_ordreded_edges(mesh, mesh->BoundaryHalfEdgesFromVertex(2),
+    assert_ordreded_edges(mesh, mesh->BoundaryHalfEdgesFromVertex[2],
                           {{2, 3}, {3, 1}, {1, 0}, {0, 2}});
-    assert_ordreded_edges(mesh, mesh->BoundaryHalfEdgesFromVertex(3),
+    assert_ordreded_edges(mesh, mesh->BoundaryHalfEdgesFromVertex[3],
                           {{3, 1}, {1, 0}, {0, 2}, {2, 3}});
 }
 
@@ -342,19 +325,19 @@ TEST(HalfEdgeTriangleMesh, BoundaryHalfEdgesFromVertex_Hexagon) {
     auto mesh = geometry::CreateHalfEdgeMeshFromMesh(get_mesh_hexagon());
     EXPECT_FALSE(mesh->IsEmpty());
 
-    assert_ordreded_edges(mesh, mesh->BoundaryHalfEdgesFromVertex(0),
+    assert_ordreded_edges(mesh, mesh->BoundaryHalfEdgesFromVertex[0],
                           {{0, 2}, {2, 5}, {5, 6}, {6, 4}, {4, 1}, {1, 0}});
-    assert_ordreded_edges(mesh, mesh->BoundaryHalfEdgesFromVertex(1),
+    assert_ordreded_edges(mesh, mesh->BoundaryHalfEdgesFromVertex[1],
                           {{1, 0}, {0, 2}, {2, 5}, {5, 6}, {6, 4}, {4, 1}});
-    assert_ordreded_edges(mesh, mesh->BoundaryHalfEdgesFromVertex(2),
+    assert_ordreded_edges(mesh, mesh->BoundaryHalfEdgesFromVertex[2],
                           {{2, 5}, {5, 6}, {6, 4}, {4, 1}, {1, 0}, {0, 2}});
-    assert_ordreded_edges(mesh, mesh->BoundaryHalfEdgesFromVertex(3),
+    assert_ordreded_edges(mesh, mesh->BoundaryHalfEdgesFromVertex[3],
                           {});  // Vertex 3 is not a boundary, thus empty
-    assert_ordreded_edges(mesh, mesh->BoundaryHalfEdgesFromVertex(4),
+    assert_ordreded_edges(mesh, mesh->BoundaryHalfEdgesFromVertex[4],
                           {{4, 1}, {1, 0}, {0, 2}, {2, 5}, {5, 6}, {6, 4}});
-    assert_ordreded_edges(mesh, mesh->BoundaryHalfEdgesFromVertex(5),
+    assert_ordreded_edges(mesh, mesh->BoundaryHalfEdgesFromVertex[5],
                           {{5, 6}, {6, 4}, {4, 1}, {1, 0}, {0, 2}, {2, 5}});
-    assert_ordreded_edges(mesh, mesh->BoundaryHalfEdgesFromVertex(6),
+    assert_ordreded_edges(mesh, mesh->BoundaryHalfEdgesFromVertex[6],
                           {{6, 4}, {4, 1}, {1, 0}, {0, 2}, {2, 5}, {5, 6}});
 }
 
@@ -364,61 +347,61 @@ TEST(HalfEdgeTriangleMesh, BoundaryHalfEdgesFromVertex_PartialHexagon) {
     EXPECT_FALSE(mesh->IsEmpty());
 
     assert_ordreded_edges(
-            mesh, mesh->BoundaryHalfEdgesFromVertex(0),
+            mesh, mesh->BoundaryHalfEdgesFromVertex[0],
             {{0, 2}, {2, 5}, {5, 6}, {6, 3}, {3, 4}, {4, 1}, {1, 0}});
     assert_ordreded_edges(
-            mesh, mesh->BoundaryHalfEdgesFromVertex(1),
+            mesh, mesh->BoundaryHalfEdgesFromVertex[1],
             {{1, 0}, {0, 2}, {2, 5}, {5, 6}, {6, 3}, {3, 4}, {4, 1}});
     assert_ordreded_edges(
-            mesh, mesh->BoundaryHalfEdgesFromVertex(2),
+            mesh, mesh->BoundaryHalfEdgesFromVertex[2],
             {{2, 5}, {5, 6}, {6, 3}, {3, 4}, {4, 1}, {1, 0}, {0, 2}});
     assert_ordreded_edges(
-            mesh, mesh->BoundaryHalfEdgesFromVertex(3),
+            mesh, mesh->BoundaryHalfEdgesFromVertex[3],
             {{3, 4}, {4, 1}, {1, 0}, {0, 2}, {2, 5}, {5, 6}, {6, 3}});
     assert_ordreded_edges(
-            mesh, mesh->BoundaryHalfEdgesFromVertex(4),
+            mesh, mesh->BoundaryHalfEdgesFromVertex[4],
             {{4, 1}, {1, 0}, {0, 2}, {2, 5}, {5, 6}, {6, 3}, {3, 4}});
     assert_ordreded_edges(
-            mesh, mesh->BoundaryHalfEdgesFromVertex(5),
+            mesh, mesh->BoundaryHalfEdgesFromVertex[5],
             {{5, 6}, {6, 3}, {3, 4}, {4, 1}, {1, 0}, {0, 2}, {2, 5}});
     assert_ordreded_edges(
-            mesh, mesh->BoundaryHalfEdgesFromVertex(6),
+            mesh, mesh->BoundaryHalfEdgesFromVertex[6],
             {{6, 3}, {3, 4}, {4, 1}, {1, 0}, {0, 2}, {2, 5}, {5, 6}});
 }
 
 TEST(HalfEdgeTriangleMesh, BoundaryVerticesFromVertex_TwoTriangles) {
     auto mesh = geometry::CreateHalfEdgeMeshFromMesh(get_mesh_two_triangles());
     EXPECT_FALSE(mesh->IsEmpty());
-    ExpectEQ(mesh->BoundaryVerticesFromVertex(0), {0, 2, 3, 1});
-    ExpectEQ(mesh->BoundaryVerticesFromVertex(1), {1, 0, 2, 3});
-    ExpectEQ(mesh->BoundaryVerticesFromVertex(2), {2, 3, 1, 0});
-    ExpectEQ(mesh->BoundaryVerticesFromVertex(3), {3, 1, 0, 2});
+    ExpectEQ(mesh->BoundaryVerticesFromVertex[0], {0, 2, 3, 1});
+    ExpectEQ(mesh->BoundaryVerticesFromVertex[1], {1, 0, 2, 3});
+    ExpectEQ(mesh->BoundaryVerticesFromVertex[2], {2, 3, 1, 0});
+    ExpectEQ(mesh->BoundaryVerticesFromVertex[3], {3, 1, 0, 2});
 }
 
 TEST(HalfEdgeTriangleMesh, BoundarVerticesFromVertex_Hexagon) {
     auto mesh = geometry::CreateHalfEdgeMeshFromMesh(get_mesh_hexagon());
     EXPECT_FALSE(mesh->IsEmpty());
-    ExpectEQ(mesh->BoundaryVerticesFromVertex(0), {0, 2, 5, 6, 4, 1});
-    ExpectEQ(mesh->BoundaryVerticesFromVertex(1), {1, 0, 2, 5, 6, 4});
-    ExpectEQ(mesh->BoundaryVerticesFromVertex(2), {2, 5, 6, 4, 1, 0});
-    ExpectEQ(mesh->BoundaryVerticesFromVertex(3),
+    ExpectEQ(mesh->BoundaryVerticesFromVertex[0], {0, 2, 5, 6, 4, 1});
+    ExpectEQ(mesh->BoundaryVerticesFromVertex[1], {1, 0, 2, 5, 6, 4});
+    ExpectEQ(mesh->BoundaryVerticesFromVertex[2], {2, 5, 6, 4, 1, 0});
+    ExpectEQ(mesh->BoundaryVerticesFromVertex[3],
              {});  // Vertex 3 is not a boundary, thus empty
-    ExpectEQ(mesh->BoundaryVerticesFromVertex(4), {4, 1, 0, 2, 5, 6});
-    ExpectEQ(mesh->BoundaryVerticesFromVertex(5), {5, 6, 4, 1, 0, 2});
-    ExpectEQ(mesh->BoundaryVerticesFromVertex(6), {6, 4, 1, 0, 2, 5});
+    ExpectEQ(mesh->BoundaryVerticesFromVertex[4], {4, 1, 0, 2, 5, 6});
+    ExpectEQ(mesh->BoundaryVerticesFromVertex[5], {5, 6, 4, 1, 0, 2});
+    ExpectEQ(mesh->BoundaryVerticesFromVertex[6], {6, 4, 1, 0, 2, 5});
 }
 
 TEST(HalfEdgeTriangleMesh, BoundaryVerticesFromVertex_PartialHexagon) {
     auto mesh =
             geometry::CreateHalfEdgeMeshFromMesh(get_mesh_partial_hexagon());
     EXPECT_FALSE(mesh->IsEmpty());
-    ExpectEQ(mesh->BoundaryVerticesFromVertex(0), {0, 2, 5, 6, 3, 4, 1});
-    ExpectEQ(mesh->BoundaryVerticesFromVertex(1), {1, 0, 2, 5, 6, 3, 4});
-    ExpectEQ(mesh->BoundaryVerticesFromVertex(2), {2, 5, 6, 3, 4, 1, 0});
-    ExpectEQ(mesh->BoundaryVerticesFromVertex(3), {3, 4, 1, 0, 2, 5, 6});
-    ExpectEQ(mesh->BoundaryVerticesFromVertex(4), {4, 1, 0, 2, 5, 6, 3});
-    ExpectEQ(mesh->BoundaryVerticesFromVertex(5), {5, 6, 3, 4, 1, 0, 2});
-    ExpectEQ(mesh->BoundaryVerticesFromVertex(6), {6, 3, 4, 1, 0, 2, 5});
+    ExpectEQ(mesh->BoundaryVerticesFromVertex[0], {0, 2, 5, 6, 3, 4, 1});
+    ExpectEQ(mesh->BoundaryVerticesFromVertex[1], {1, 0, 2, 5, 6, 3, 4});
+    ExpectEQ(mesh->BoundaryVerticesFromVertex[2], {2, 5, 6, 3, 4, 1, 0});
+    ExpectEQ(mesh->BoundaryVerticesFromVertex[3], {3, 4, 1, 0, 2, 5, 6});
+    ExpectEQ(mesh->BoundaryVerticesFromVertex[4], {4, 1, 0, 2, 5, 6, 3});
+    ExpectEQ(mesh->BoundaryVerticesFromVertex[5], {5, 6, 3, 4, 1, 0, 2});
+    ExpectEQ(mesh->BoundaryVerticesFromVertex[6], {6, 3, 4, 1, 0, 2, 5});
 }
 
 TEST(HalfEdgeTriangleMesh, GetBoundaries_TwoTriangles) {

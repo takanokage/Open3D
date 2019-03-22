@@ -65,7 +65,7 @@ bool PickingShader::BindGeometry(const geometry::Geometry &geometry,
     UnbindGeometry();
 
     // Prepare data to be passed to GPU
-    std::vector<Eigen::Vector3f> points;
+    std::vector<Vec3f> points;
     std::vector<float> indices;
     if (PrepareBinding(geometry, option, view, points, indices) == false) {
         PrintShaderWarning("Binding failed when preparing data.");
@@ -75,8 +75,8 @@ bool PickingShader::BindGeometry(const geometry::Geometry &geometry,
     // Create buffers and bind the geometry
     glGenBuffers(1, &vertex_position_buffer_);
     glBindBuffer(GL_ARRAY_BUFFER, vertex_position_buffer_);
-    glBufferData(GL_ARRAY_BUFFER, points.size() * sizeof(Eigen::Vector3f),
-                 points.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, points.size() * sizeof(Vec3f), points.data(),
+                 GL_STATIC_DRAW);
     glGenBuffers(1, &vertex_index_buffer_);
     glBindBuffer(GL_ARRAY_BUFFER, vertex_index_buffer_);
     glBufferData(GL_ARRAY_BUFFER, indices.size() * sizeof(float),
@@ -134,7 +134,7 @@ bool PickingShaderForPointCloud::PrepareBinding(
         const geometry::Geometry &geometry,
         const RenderOption &option,
         const ViewControl &view,
-        std::vector<Eigen::Vector3f> &points,
+        std::vector<Vec3f> &points,
         std::vector<float> &indices) {
     if (geometry.GetGeometryType() !=
         geometry::Geometry::GeometryType::PointCloud) {
@@ -150,7 +150,7 @@ bool PickingShaderForPointCloud::PrepareBinding(
     points.resize(pointcloud.points_.size());
     indices.resize(pointcloud.points_.size());
     for (size_t i = 0; i < pointcloud.points_.size(); i++) {
-        const auto &point = pointcloud.points_[i];
+        const auto &point = pointcloud.points_.h_data[i];
         points[i] = point.cast<float>();
         indices[i] = (float)i;
     }
