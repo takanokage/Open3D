@@ -64,8 +64,8 @@ public:
 public:
     double voxel_size_;
     Vec3d origin_;
-    Blob<Vec3i, int>::Type voxels_;
-    Blob<Vec3d, double>::Type colors_;
+    Voxels voxels_;
+    Colors colors_;
 };
 
 std::shared_ptr<VoxelGrid> CreateSurfaceVoxelGridFromPointCloud(

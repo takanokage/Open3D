@@ -91,9 +91,9 @@ public:
     }
 
 public:
-    Blob<Vec3d, double>::Type points_;
-    Blob<Vec3d, double>::Type normals_;
-    Blob<Vec3d, double>::Type colors_;
+    Points points_;
+    Normals normals_;
+    Colors colors_;
 
 #ifdef OPEN3D_USE_CUDA
 

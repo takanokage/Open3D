@@ -627,4 +627,10 @@ typedef Mat14<double> Mat14d;
 
 // 2D 17x4 tensor
 typedef Mat17x4<double> Mat17x4d;
+
+typedef Vec3d Point;
+typedef Vec3d Normal;
+typedef Vec3d Color;
+typedef Vec2i Line;
+typedef Vec3i Voxel;
 }  // namespace open3d
