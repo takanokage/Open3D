@@ -64,7 +64,7 @@ RegistrationResult GetRegistrationResultAndCorrespondences(
         for (int i = 0; i < (int)source.points_.size(); i++) {
             std::vector<int> indices[1];
             std::vector<double> dists[1];
-            const auto &point = source.points_.h_data[i];
+            const auto &point = source.points_[i];
             if (target_kdtree.SearchHybrid(point, max_correspondence_distance,
                                            1, indices, dists) > 0) {
                 error2_private += dists[0];
@@ -108,8 +108,7 @@ RegistrationResult EvaluateRANSACBasedOnCorrespondence(
     double max_dis2 = max_correspondence_distance * max_correspondence_distance;
     for (const auto &c : corres) {
         double dis2 =
-                (source.points_.h_data[c[0]] - target.points_.h_data[c[1]])
-                        .squaredNorm();
+                (source.points_[c[0]] - target.points_[c[1]]).squaredNorm();
         if (dis2 < max_dis2) {
             good++;
             error2 += dis2;
@@ -399,9 +398,9 @@ Mat6d GetInformationMatrixFromPointClouds(const geometry::PointCloud &source,
 #endif
         for (auto c = 0; c < result.correspondence_set_.size(); c++) {
             int t = result.correspondence_set_[c][1];
-            double x = target.points_.h_data[t][0];
-            double y = target.points_.h_data[t][1];
-            double z = target.points_.h_data[t][2];
+            double x = target.points_[t][0];
+            double y = target.points_[t][1];
+            double z = target.points_[t][2];
             G_r_private.setZero();
             G_r_private[1] = z;
             G_r_private[2] = -y;

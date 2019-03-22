@@ -104,20 +104,20 @@ PointCloud &PointCloud::operator+=(const PointCloud &cloud) {
     if ((!HasPoints() || HasNormals()) && cloud.HasNormals()) {
         normals_.h_data.resize(new_vert_num);
         for (size_t i = 0; i < add_vert_num; i++)
-            normals_.h_data[old_vert_num + i] = cloud.normals_.h_data[i];
+            normals_[old_vert_num + i] = cloud.normals_[i];
     } else {
         normals_.h_data.clear();
     }
     if ((!HasPoints() || HasColors()) && cloud.HasColors()) {
         colors_.h_data.resize(new_vert_num);
         for (size_t i = 0; i < add_vert_num; i++)
-            colors_.h_data[old_vert_num + i] = cloud.colors_.h_data[i];
+            colors_[old_vert_num + i] = cloud.colors_[i];
     } else {
         colors_.h_data.clear();
     }
     points_.h_data.resize(new_vert_num);
     for (size_t i = 0; i < add_vert_num; i++)
-        points_.h_data[old_vert_num + i] = cloud.points_.h_data[i];
+        points_[old_vert_num + i] = cloud.points_[i];
     return (*this);
 }
 
@@ -136,8 +136,7 @@ std::vector<double> ComputePointCloudToPointCloudDistance(
     for (int i = 0; i < (int)source.points_.size(); i++) {
         std::vector<int> indices[1];
         std::vector<double> dists[1];
-        if (kdtree.SearchKNN(source.points_.h_data[i], 1, indices, dists) ==
-            0) {
+        if (kdtree.SearchKNN(source.points_[i], 1, indices, dists) == 0) {
             utility::PrintDebug(
                     "[ComputePointCloudToPointCloudDistance] Found a point "
                     "without neighbors.\n");
@@ -215,7 +214,7 @@ std::vector<double> ComputePointCloudMahalanobisDistance(PointCloud &input) {
 #pragma omp parallel for schedule(static)
 #endif
     for (int i = 0; i < (int)input.points_.size(); i++) {
-        Vec3d p = input.points_.h_data[i] - mean;
+        Vec3d p = input.points_[i] - mean;
         mahalanobis[i] = std::sqrt(p.transpose() * cov_inv * p);
     }
     return mahalanobis;
@@ -231,7 +230,7 @@ std::vector<double> ComputePointCloudNearestNeighborDistance(
     for (int i = 0; i < (int)input.points_.size(); i++) {
         std::vector<int> indices[2];
         std::vector<double> dists[2];
-        if (kdtree.SearchKNN(input.points_.h_data[i], 2, indices, dists) <= 1) {
+        if (kdtree.SearchKNN(input.points_[i], 2, indices, dists) <= 1) {
             utility::PrintDebug(
                     "[ComputePointCloudNearestNeighborDistance] Found a point "
                     "without neighbors.\n");

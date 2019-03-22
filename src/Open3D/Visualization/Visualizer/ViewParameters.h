@@ -36,7 +36,6 @@ namespace open3d {
 namespace visualization {
 
 class ViewParameters : public utility::IJsonConvertible {
-
 public:
     ViewParameters() {}
     ~ViewParameters() override {}

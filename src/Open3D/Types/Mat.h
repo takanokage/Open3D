@@ -532,7 +532,7 @@ void BlockCopy(const Vec<T, DST_COLS>::Type &src,
         // the subscript operator handles the out of bounds cases through assert
         src[dst_offset_row][dst_offset_col + c] = dst[c];
 }
-/*/// BlockCopy
+/*/  // BlockCopy
 
 // 1D tensor, row major
 template <typename T, uint COLS>

@@ -152,7 +152,7 @@ bool SimpleShaderForPointCloud::PrepareBinding(
     points.resize(pointcloud.points_.size());
     colors.resize(pointcloud.points_.size());
     for (size_t i = 0; i < pointcloud.points_.size(); i++) {
-        const auto &point = pointcloud.points_.h_data[i];
+        const auto &point = pointcloud.points_[i];
         points[i] = point.cast<float>();
         Vec3d color;
         switch (option.point_color_option_) {
@@ -172,7 +172,7 @@ bool SimpleShaderForPointCloud::PrepareBinding(
             case RenderOption::PointColorOption::Default:
             default:
                 if (pointcloud.HasColors()) {
-                    color = pointcloud.colors_.h_data[i];
+                    color = pointcloud.colors_[i];
                 } else {
                     color = global_color_map.GetColor(
                             view.GetBoundingBox().GetZPercentage(point[2]));
@@ -224,7 +224,7 @@ bool SimpleShaderForLineSet::PrepareBinding(const geometry::Geometry &geometry,
         points[i * 2 + 1] = point_pair.second.cast<float>();
         Vec3d color;
         if (lineset.HasColors()) {
-            color = lineset.colors_.h_data[i];
+            color = lineset.colors_[i];
         } else {
             color = Vec3d::Zero();
         }
@@ -389,8 +389,7 @@ bool SimpleShaderForVoxelGrid::PrepareBinding(
     for (size_t i = 0; i < n_voxels; i++) {
         std::vector<Vec3f> vertex;
         for (size_t d = 0; d < 8; d++)
-            vertex.push_back(voxelgrid.voxels_.h_data[i].cast<float>() +
-                             disp[d]);
+            vertex.push_back(voxelgrid.voxels_[i].cast<float>() + disp[d]);
         Vec3f base_vertex = (vertex[0] * voxelgrid.voxel_size_) +
                             voxelgrid.origin_.cast<float>();
         for (size_t j = 0; j < 6; j++) {
@@ -417,7 +416,7 @@ bool SimpleShaderForVoxelGrid::PrepareBinding(
                         break;
                     case RenderOption::MeshColorOption::Color:
                         if (voxelgrid.HasColors()) {
-                            color = voxelgrid.colors_.h_data[i];
+                            color = voxelgrid.colors_[i];
                             break;
                         }
                     case RenderOption::MeshColorOption::Default:

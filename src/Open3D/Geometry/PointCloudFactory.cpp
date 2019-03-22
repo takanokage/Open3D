@@ -69,7 +69,7 @@ std::shared_ptr<PointCloud> CreatePointCloudFromFloatDepthImage(
                 double y =
                         (i - principal_point.second) * z / focal_length.second;
                 Vec4d point = camera_pose * Vec4d{x, y, z, 1.0};
-                pointcloud->points_.h_data[cnt++] =
+                pointcloud->points_[cnt++] =
                         Vec3d{point[0], point[1], point[2]};
             }
         }
@@ -103,9 +103,8 @@ std::shared_ptr<PointCloud> CreatePointCloudFromRGBDImageT(
                 double y =
                         (i - principal_point.second) * z / focal_length.second;
                 Vec4d point = camera_pose * Vec4d{x, y, z, 1.0};
-                pointcloud->points_.h_data[cnt] =
-                        Vec3d{point[0], point[1], point[2]};
-                pointcloud->colors_.h_data[cnt++] =
+                pointcloud->points_[cnt] = Vec3d{point[0], point[1], point[2]};
+                pointcloud->colors_[cnt++] =
                         Vec3d{pc[0], pc[(NC - 1) / 2], pc[NC - 1]} / scale;
             }
         }

@@ -327,15 +327,16 @@ ScalableTSDFVolume::ExtractTriangleMesh() {
                                     edge_to_index[tri_table[cube_index][i]],
                                     edge_to_index[tri_table[cube_index][i + 2]],
                                     edge_to_index[tri_table[cube_index]
-                                                           [i + 1]]});
-                        }
+                                                           [i + 1]]
+                        });
                     }
                 }
             }
         }
     }
-    return mesh;
 }
+return mesh;
+}  // namespace integration
 
 std::shared_ptr<geometry::PointCloud>
 ScalableTSDFVolume::ExtractVoxelPointCloud() {
@@ -422,5 +423,5 @@ double ScalableTSDFVolume::GetTSDFAt(const Vec3d &p) {
                    r[1] * ((1 - r[2]) * f[2] + r[2] * f[6]));
 }
 
-}  // namespace integration
+}  // namespace open3d
 }  // namespace open3d
