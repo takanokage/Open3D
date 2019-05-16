@@ -280,11 +280,11 @@ TEST(ColorMapOptimization, DISABLED_MakeWarpingFields) {
     // {
     //     EXPECT_EQ(ref_anchor_w, fields[i].anchor_w_);
     //     EXPECT_EQ(ref_anchor_h, fields[i].anchor_h_);
-    //     EXPECT_NEAR(ref_anchor_step, fields[i].anchor_step_, THRESHOLD_1E_6);
+    //     EXPECT_NEAR(ref_anchor_step, fields[i].anchor_step_, THRESHOLD);
 
     //     EXPECT_EQ(ref_flow.size(), fields[i].flow_.size());
     //     for (size_t j = 0; j < fields[i].flow_.size(); j++)
-    //         EXPECT_NEAR(ref_flow[j], fields[i].flow_[j], THRESHOLD_1E_6);
+    //         EXPECT_NEAR(ref_flow[j], fields[i].flow_[j], THRESHOLD);
     // }
 }
 
@@ -353,7 +353,7 @@ TEST(ColorMapOptimization, DISABLED_QueryImageIntensity) {
         //                                                           camid,
         //                                                           0);
         // EXPECT_EQ(ref_bool[i], boolResult);
-        // EXPECT_NEAR(ref_float[i](0, 0), floatResult, THRESHOLD_1E_6);
+        // EXPECT_NEAR(ref_float[i](0, 0), floatResult, THRESHOLD);
 
         // tie(boolResult, floatResult) = QueryImageIntensity<float>(img,
         //                                                           V,
@@ -361,7 +361,7 @@ TEST(ColorMapOptimization, DISABLED_QueryImageIntensity) {
         //                                                           camid,
         //                                                           1);
         // EXPECT_EQ(ref_bool[i], boolResult);
-        // EXPECT_NEAR(ref_float[i](1, 0), floatResult, THRESHOLD_1E_6);
+        // EXPECT_NEAR(ref_float[i](1, 0), floatResult, THRESHOLD);
 
         // tie(boolResult, floatResult) = QueryImageIntensity<float>(img,
         //                                                           V,
@@ -369,7 +369,7 @@ TEST(ColorMapOptimization, DISABLED_QueryImageIntensity) {
         //                                                           camid,
         //                                                           2);
         // EXPECT_EQ(ref_bool[i], boolResult);
-        // EXPECT_NEAR(ref_float[i](2, 0), floatResult, THRESHOLD_1E_6);
+        // EXPECT_NEAR(ref_float[i](2, 0), floatResult, THRESHOLD);
     }
 }
 
@@ -443,7 +443,7 @@ TEST(ColorMapOptimization, DISABLED_QueryImageIntensity_WarpingField) {
         //                                                           camid,
         //                                                           0);
         // EXPECT_EQ(ref_bool[i], boolResult);
-        // EXPECT_NEAR(ref_float[i](0, 0), floatResult, THRESHOLD_1E_6);
+        // EXPECT_NEAR(ref_float[i](0, 0), floatResult, THRESHOLD);
 
         // tie(boolResult, floatResult) = QueryImageIntensity<float>(img,
         //                                                           V,
@@ -451,7 +451,7 @@ TEST(ColorMapOptimization, DISABLED_QueryImageIntensity_WarpingField) {
         //                                                           camid,
         //                                                           1);
         // EXPECT_EQ(ref_bool[i], boolResult);
-        // EXPECT_NEAR(ref_float[i](1, 0), floatResult, THRESHOLD_1E_6);
+        // EXPECT_NEAR(ref_float[i](1, 0), floatResult, THRESHOLD);
 
         // tie(boolResult, floatResult) = QueryImageIntensity<float>(img,
         //                                                           V,
@@ -459,7 +459,7 @@ TEST(ColorMapOptimization, DISABLED_QueryImageIntensity_WarpingField) {
         //                                                           camid,
         //                                                           2);
         // EXPECT_EQ(ref_bool[i], boolResult);
-        // EXPECT_NEAR(ref_float[i](2, 0), floatResult, THRESHOLD_1E_6);
+        // EXPECT_NEAR(ref_float[i](2, 0), floatResult, THRESHOLD);
     }
 }
 
@@ -531,7 +531,7 @@ TEST(ColorMapOptimization, DISABLED_SetProxyIntensityForVertex) {
 
     EXPECT_EQ(ref_proxy_intensity.size(), proxy_intensity.size());
     for (size_t i = 0; i < proxy_intensity.size(); i++)
-        EXPECT_NEAR(ref_proxy_intensity[i], proxy_intensity[i], THRESHOLD_1E_6);
+        EXPECT_NEAR(ref_proxy_intensity[i], proxy_intensity[i], THRESHOLD);
 }
 
 // ----------------------------------------------------------------------------
@@ -613,7 +613,7 @@ TEST(ColorMapOptimization, DISABLED_SetProxyIntensityForVertex_WarpingField) {
 
     EXPECT_EQ(ref_proxy_intensity.size(), proxy_intensity.size());
     for (size_t i = 0; i < proxy_intensity.size(); i++)
-        EXPECT_NEAR(ref_proxy_intensity[i], proxy_intensity[i], THRESHOLD_1E_6);
+        EXPECT_NEAR(ref_proxy_intensity[i], proxy_intensity[i], THRESHOLD);
 }
 // ----------------------------------------------------------------------------
 //
@@ -692,7 +692,7 @@ TEST(ColorMapOptimization, DISABLED_OptimizeImageCoorNonrigid) {
 
     EXPECT_EQ(ref_proxy_intensity.size(), proxy_intensity.size());
     for (size_t i = 0; i < proxy_intensity.size(); i++)
-        EXPECT_NEAR(ref_proxy_intensity[i], proxy_intensity[i], THRESHOLD_1E_6);
+        EXPECT_NEAR(ref_proxy_intensity[i], proxy_intensity[i], THRESHOLD);
 }
 
 // ----------------------------------------------------------------------------
@@ -757,7 +757,7 @@ TEST(ColorMapOptimization, DISABLED_OptimizeImageCoorRigid) {
 
     EXPECT_EQ(ref_proxy_intensity.size(), proxy_intensity.size());
     for (size_t i = 0; i < proxy_intensity.size(); i++)
-        EXPECT_NEAR(ref_proxy_intensity[i], proxy_intensity[i], THRESHOLD_1E_6);
+        EXPECT_NEAR(ref_proxy_intensity[i], proxy_intensity[i], THRESHOLD);
 }
 
 // ----------------------------------------------------------------------------

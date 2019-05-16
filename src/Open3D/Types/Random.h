@@ -24,34 +24,43 @@
 // IN THE SOFTWARE.
 // ----------------------------------------------------------------------------
 
-#include "TestUtility/UnitTest.h"
+#pragma once
 
-// #include "Open3D/ColorMap/ColorMapOptimizationOption.h"
+#include <random>
 
-/* TODO
-As the color_map::ColorMapOptimization subcomponents go back into hiding several
-lines of code had to commented out. Do not remove these lines, they may become
-useful again after a decision has been made about the way to make these
-subcomponents visible to UnitTest.
-*/
+namespace open3d {
+namespace utility {
 
-// ----------------------------------------------------------------------------
-//
-// ----------------------------------------------------------------------------
-TEST(ColorMapOptimizationOption, DISABLED_Constructor) {
-    // open3d::ColorMapOptimizationOption option;
+template <typename T>
+struct Query {};
 
-    // EXPECT_FALSE(option.non_rigid_camera_coordinate_);
+template <>
+struct Query<double> {
+    typedef std::uniform_real_distribution<double> Type;
+};
 
-    // EXPECT_EQ(16, option.number_of_vertical_anchors_);
-    // EXPECT_EQ(3, option.half_dilation_kernel_size_for_discontinuity_map_);
+template <>
+struct Query<float> {
+    typedef std::uniform_real_distribution<float> Type;
+};
 
-    // EXPECT_NEAR(0.316, option.non_rigid_anchor_point_weight_,
-    // unit_test::THRESHOLD); EXPECT_NEAR(300, option.maximum_iteration_,
-    // unit_test::THRESHOLD); EXPECT_NEAR(2.5,
-    // option.maximum_allowable_depth_, unit_test::THRESHOLD);
-    // EXPECT_NEAR(0.03, option.depth_threshold_for_visiblity_check_,
-    // unit_test::THRESHOLD); EXPECT_NEAR(0.1,
-    // option.depth_threshold_for_discontinuity_check_,
-    // unit_test::THRESHOLD);
-}
+template <>
+struct Query<int> {
+    typedef std::uniform_int_distribution<int> Type;
+};
+
+template <typename T>
+class Random {
+private:
+    std::random_device device;
+    std::mt19937 engine;
+    typename Query<T>::Type query;
+
+public:
+    // setup randomness machine
+    Random(const T &min, const T &max) : engine(device()), query(min, max) {}
+    // generate the next random variable
+    T Next() { return query(engine); }
+};
+}  // namespace utility
+}  // namespace open3d

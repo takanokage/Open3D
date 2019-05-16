@@ -24,34 +24,42 @@
 // IN THE SOFTWARE.
 // ----------------------------------------------------------------------------
 
-#include "TestUtility/UnitTest.h"
+#pragma once
 
-// #include "Open3D/ColorMap/ColorMapOptimizationOption.h"
+namespace open3d {
+// This enum is used for managing memory and execution for multiple devices.
+// At them moment, it supports 1xCPU and up to 8xGPUs.
+// We can have at most 1xCPU and 1xGPU simultaneously.
+namespace DeviceID {
+enum Type {
+    GPU_00 = 1 << 0,
+    GPU_01 = 1 << 1,
+    GPU_02 = 1 << 2,
+    GPU_03 = 1 << 3,
+    GPU_04 = 1 << 4,
+    GPU_05 = 1 << 5,
+    GPU_06 = 1 << 6,
+    GPU_07 = 1 << 7,
+    // TODO: 32 GPUs
+    // what if 100 GPUs
+    CPU = 1 << 8
+};
 
-/* TODO
-As the color_map::ColorMapOptimization subcomponents go back into hiding several
-lines of code had to commented out. Do not remove these lines, they may become
-useful again after a decision has been made about the way to make these
-subcomponents visible to UnitTest.
-*/
+inline int GPU_ID(const DeviceID::Type& device_id) {
+    // if present, a GPU id must be greater than zero
+    // a negative value means no GPU was selected
+    int gpu_id = -1;
 
-// ----------------------------------------------------------------------------
-//
-// ----------------------------------------------------------------------------
-TEST(ColorMapOptimizationOption, DISABLED_Constructor) {
-    // open3d::ColorMapOptimizationOption option;
+    if (DeviceID::GPU_00 & device_id) return 0;
+    if (DeviceID::GPU_01 & device_id) return 1;
+    if (DeviceID::GPU_02 & device_id) return 2;
+    if (DeviceID::GPU_03 & device_id) return 3;
+    if (DeviceID::GPU_04 & device_id) return 4;
+    if (DeviceID::GPU_05 & device_id) return 5;
+    if (DeviceID::GPU_06 & device_id) return 6;
+    if (DeviceID::GPU_07 & device_id) return 7;
 
-    // EXPECT_FALSE(option.non_rigid_camera_coordinate_);
-
-    // EXPECT_EQ(16, option.number_of_vertical_anchors_);
-    // EXPECT_EQ(3, option.half_dilation_kernel_size_for_discontinuity_map_);
-
-    // EXPECT_NEAR(0.316, option.non_rigid_anchor_point_weight_,
-    // unit_test::THRESHOLD); EXPECT_NEAR(300, option.maximum_iteration_,
-    // unit_test::THRESHOLD); EXPECT_NEAR(2.5,
-    // option.maximum_allowable_depth_, unit_test::THRESHOLD);
-    // EXPECT_NEAR(0.03, option.depth_threshold_for_visiblity_check_,
-    // unit_test::THRESHOLD); EXPECT_NEAR(0.1,
-    // option.depth_threshold_for_discontinuity_check_,
-    // unit_test::THRESHOLD);
+    return gpu_id;
 }
+}  // namespace DeviceID
+}  // namespace open3d

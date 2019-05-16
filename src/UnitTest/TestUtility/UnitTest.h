@@ -36,13 +36,14 @@
 #include <Eigen/Core>
 #include <vector>
 
+#include "Open3D/Types/Blob.h"
 #include "UnitTest/TestUtility/Print.h"
 #include "UnitTest/TestUtility/Rand.h"
 #include "UnitTest/TestUtility/Sort.h"
 
 namespace unit_test {
 // thresholds for comparing floating point values
-const double THRESHOLD_1E_6 = 1e-6;
+const double THRESHOLD = 1e-6;
 
 // Eigen Zero()
 const Eigen::Vector2d Zero2d = Eigen::Vector2d::Zero();
@@ -58,14 +59,32 @@ template <class T, int M, int N, int A>
 void ExpectEQ(const Eigen::Matrix<T, M, N, A>& v0,
               const Eigen::Matrix<T, M, N, A>& v1) {
     EXPECT_EQ(v0.size(), v1.size());
-    for (int i = 0; i < v0.size(); i++)
-        EXPECT_NEAR(v0.coeff(i), v1.coeff(i), THRESHOLD_1E_6);
+    if (v0.size() == v1.size())
+        for (int i = 0; i < v0.size(); i++)
+            EXPECT_NEAR(v0.coeff(i), v1.coeff(i), THRESHOLD);
 }
 template <class T, int M, int N, int A>
 void ExpectEQ(const std::vector<Eigen::Matrix<T, M, N, A>>& v0,
               const std::vector<Eigen::Matrix<T, M, N, A>>& v1) {
     EXPECT_EQ(v0.size(), v1.size());
-    for (int i = 0; i < v0.size(); i++) ExpectEQ(v0[i], v1[i]);
+    if (v0.size() == v1.size())
+        for (int i = 0; i < v0.size(); i++) ExpectEQ(v0[i], v1[i]);
+}
+template <class T, int M, int N, int A>
+void ExpectEQ(
+        const std::vector<Eigen::Matrix<T, M, N, A>>& v0,
+        const typename open3d::Blob<Eigen::Matrix<T, M, N, A>, T>::Type& v1) {
+    EXPECT_EQ(v0.size(), v1.size());
+    if (v0.size() == v1.size())
+        for (int i = 0; i < v0.size(); i++) ExpectEQ(v0[i], v1.h_data[i]);
+}
+template <class T, int M, int N, int A>
+void ExpectEQ(
+        const typename open3d::Blob<Eigen::Matrix<T, M, N, A>, T>::Type& v0,
+        const typename open3d::Blob<Eigen::Matrix<T, M, N, A>, T>::Type& v1) {
+    EXPECT_EQ(v0.size(), v1.size());
+    if (v0.size() == v1.size())
+        for (int i = 0; i < v0.size(); i++) ExpectEQ(v0[i], v1.h_data[i]);
 }
 
 // Less than or Equal test.
@@ -73,7 +92,8 @@ template <class T, int M, int N, int A>
 void ExpectLE(const Eigen::Matrix<T, M, N, A>& v0,
               const Eigen::Matrix<T, M, N, A>& v1) {
     EXPECT_EQ(v0.size(), v1.size());
-    for (int i = 0; i < v0.size(); i++) EXPECT_LE(v0.coeff(i), v1.coeff(i));
+    if (v0.size() == v1.size())
+        for (int i = 0; i < v0.size(); i++) EXPECT_LE(v0.coeff(i), v1.coeff(i));
 }
 template <class T, int M, int N, int A>
 void ExpectLE(const Eigen::Matrix<T, M, N, A>& v0,
@@ -81,10 +101,25 @@ void ExpectLE(const Eigen::Matrix<T, M, N, A>& v0,
     for (int i = 0; i < v0.size(); i++) ExpectLE(v0, v1[i]);
 }
 template <class T, int M, int N, int A>
+void ExpectLE(
+        const Eigen::Matrix<T, M, N, A>& v0,
+        const typename open3d::Blob<Eigen::Matrix<T, M, N, A>, T>::Type& v1) {
+    for (int i = 0; i < v0.size(); i++) ExpectLE(v0, v1.h_data[i]);
+}
+template <class T, int M, int N, int A>
 void ExpectLE(const std::vector<Eigen::Matrix<T, M, N, A>>& v0,
               const std::vector<Eigen::Matrix<T, M, N, A>>& v1) {
     EXPECT_EQ(v0.size(), v1.size());
-    for (int i = 0; i < v0.size(); i++) ExpectLE(v0[i], v1[i]);
+    if (v0.size() == v1.size())
+        for (int i = 0; i < v0.size(); i++) ExpectLE(v0[i], v1[i]);
+}
+template <class T, int M, int N, int A>
+void ExpectLE(
+        const typename open3d::Blob<Eigen::Matrix<T, M, N, A>, T>::Type& v0,
+        const typename open3d::Blob<Eigen::Matrix<T, M, N, A>, T>::Type& v1) {
+    EXPECT_EQ(v0.size(), v1.size());
+    if (v0.size() == v1.size())
+        for (int i = 0; i < v0.size(); i++) ExpectLE(v0[i], v1.h_data[i]);
 }
 
 // Greater than or Equal test.
@@ -92,7 +127,8 @@ template <class T, int M, int N, int A>
 void ExpectGE(const Eigen::Matrix<T, M, N, A>& v0,
               const Eigen::Matrix<T, M, N, A>& v1) {
     EXPECT_EQ(v0.size(), v1.size());
-    for (int i = 0; i < v0.size(); i++) EXPECT_GE(v0.coeff(i), v1.coeff(i));
+    if (v0.size() == v1.size())
+        for (int i = 0; i < v0.size(); i++) EXPECT_GE(v0.coeff(i), v1.coeff(i));
 }
 template <class T, int M, int N, int A>
 void ExpectGE(const Eigen::Matrix<T, M, N, A>& v0,
@@ -100,10 +136,25 @@ void ExpectGE(const Eigen::Matrix<T, M, N, A>& v0,
     for (int i = 0; i < v1.size(); i++) ExpectGE(v0, v1[i]);
 }
 template <class T, int M, int N, int A>
+void ExpectGE(
+        const Eigen::Matrix<T, M, N, A>& v0,
+        const typename open3d::Blob<Eigen::Matrix<T, M, N, A>, T>::Type& v1) {
+    for (int i = 0; i < v1.size(); i++) ExpectGE(v0, v1.h_data[i]);
+}
+template <class T, int M, int N, int A>
 void ExpectGE(const std::vector<Eigen::Matrix<T, M, N, A>>& v0,
               const std::vector<Eigen::Matrix<T, M, N, A>>& v1) {
     EXPECT_EQ(v0.size(), v1.size());
-    for (int i = 0; i < v0.size(); i++) ExpectGE(v0[i], v1[i]);
+    if (v0.size() == v1.size())
+        for (int i = 0; i < v0.size(); i++) ExpectGE(v0[i], v1[i]);
+}
+template <class T, int M, int N, int A>
+void ExpectGE(
+        const typename open3d::Blob<Eigen::Matrix<T, M, N, A>, T>::Type& v0,
+        const typename open3d::Blob<Eigen::Matrix<T, M, N, A>, T>::Type& v1) {
+    EXPECT_EQ(v0.size(), v1.size());
+    if (v0.size() == v1.size())
+        for (int i = 0; i < v0.size(); i++) ExpectGE(v0[i], v1.h_data[i]);
 }
 
 // Test equality of two arrays of uint8_t.

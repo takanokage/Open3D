@@ -323,9 +323,9 @@ void TriangleMesh::FilterSharpen(int number_of_iterations,
             HasVertexColors();
 
     for (int iter = 0; iter < number_of_iterations; ++iter) {
-        std::vector<Eigen::Vector3d> prev_vertices = vertices_;
-        std::vector<Eigen::Vector3d> prev_vertex_normals = vertex_normals_;
-        std::vector<Eigen::Vector3d> prev_vertex_colors = vertex_colors_;
+        std::vector<Eigen::Vector3d> prev_vertices = vertices_.Read();
+        std::vector<Eigen::Vector3d> prev_vertex_normals = vertex_normals_.Read();
+        std::vector<Eigen::Vector3d> prev_vertex_colors = vertex_colors_.Read();
 
         for (size_t vidx = 0; vidx < vertices_.size(); ++vidx) {
             Eigen::Vector3d vertex_sum(0, 0, 0);
@@ -381,9 +381,9 @@ void TriangleMesh::FilterSmoothSimple(int number_of_iterations,
             HasVertexColors();
 
     for (int iter = 0; iter < number_of_iterations; ++iter) {
-        std::vector<Eigen::Vector3d> prev_vertices = vertices_;
-        std::vector<Eigen::Vector3d> prev_vertex_normals = vertex_normals_;
-        std::vector<Eigen::Vector3d> prev_vertex_colors = vertex_colors_;
+        std::vector<Eigen::Vector3d> prev_vertices = vertices_.Read();
+        std::vector<Eigen::Vector3d> prev_vertex_normals = vertex_normals_.Read();
+        std::vector<Eigen::Vector3d> prev_vertex_colors = vertex_colors_.Read();
 
         for (size_t vidx = 0; vidx < vertices_.size(); ++vidx) {
             Eigen::Vector3d vertex_sum(0, 0, 0);
@@ -436,9 +436,9 @@ void TriangleMesh::FilterSmoothLaplacian(int number_of_iterations,
             HasVertexColors();
 
     for (int iter = 0; iter < number_of_iterations; ++iter) {
-        std::vector<Eigen::Vector3d> prev_vertices = vertices_;
-        std::vector<Eigen::Vector3d> prev_vertex_normals = vertex_normals_;
-        std::vector<Eigen::Vector3d> prev_vertex_colors = vertex_colors_;
+        std::vector<Eigen::Vector3d> prev_vertices = vertices_.Read();
+        std::vector<Eigen::Vector3d> prev_vertex_normals = vertex_normals_.Read();
+        std::vector<Eigen::Vector3d> prev_vertex_colors = vertex_colors_.Read();
 
         for (size_t vidx = 0; vidx < vertices_.size(); ++vidx) {
             Eigen::Vector3d vertex_sum(0, 0, 0);

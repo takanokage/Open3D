@@ -493,11 +493,10 @@ TEST(TriangleMesh, ComputeAdjacencyList) {
     Eigen::Vector3d C(-1, 1, 0);   // 2
     Eigen::Vector3d D(-1, -1, 0);  // 3
     Eigen::Vector3d E(1, -1, 0);   // 4
-    std::vector<Eigen::Vector3d> vertices{A, B, C, D, E};
+    std::vector<Eigen::Vector3d> v{A, B, C, D, E};
 
     geometry::TriangleMesh tm;
-    tm.vertices_.insert(tm.vertices_.end(), std::begin(vertices),
-                        std::end(vertices));
+    tm.vertices_.insert(tm.vertices_.end(), v.begin(), v.end());
     tm.triangles_ = {Eigen::Vector3i(0, 1, 2), Eigen::Vector3i(0, 2, 3),
                      Eigen::Vector3i(0, 3, 4), Eigen::Vector3i(0, 4, 1),
                      Eigen::Vector3i(1, 2, 4), Eigen::Vector3i(2, 3, 4)};
@@ -722,7 +721,7 @@ TEST(TriangleMesh, FilterSharpen) {
     mesh.FilterSharpen(1, 1);
     std::vector<Eigen::Vector3d> ref1 = {
             {0, 0, 0}, {4, 0, 0}, {0, 4, 0}, {-4, 0, 0}, {0, -4, 0}};
-    ExpectEQ(mesh.vertices_, ref1);
+    ExpectEQ(mesh.vertices_.Read(), ref1);
 
     mesh.FilterSharpen(9, 0.1);
     std::vector<Eigen::Vector3d> ref2 = {{0, 0, 0},
@@ -730,7 +729,7 @@ TEST(TriangleMesh, FilterSharpen) {
                                          {0, 42.417997, 0},
                                          {-42.417997, 0, 0},
                                          {0, -42.417997, 0}};
-    ExpectEQ(mesh.vertices_, ref2);
+    ExpectEQ(mesh.vertices_.Read(), ref2);
 }
 
 // ----------------------------------------------------------------------------
@@ -747,7 +746,7 @@ TEST(TriangleMesh, FilterSmoothSimple) {
                                          {0, 0.25, 0},
                                          {-0.25, 0, 0},
                                          {0, -0.25, 0}};
-    ExpectEQ(mesh.vertices_, ref1);
+    ExpectEQ(mesh.vertices_.Read(), ref1);
 
     mesh.FilterSmoothSimple(3);
     std::vector<Eigen::Vector3d> ref2 = {{0, 0, 0},
@@ -755,7 +754,7 @@ TEST(TriangleMesh, FilterSmoothSimple) {
                                          {0, 0.003906, 0},
                                          {-0.003906, 0, 0},
                                          {0, -0.003906, 0}};
-    ExpectEQ(mesh.vertices_, ref2);
+    ExpectEQ(mesh.vertices_.Read(), ref2);
 }
 
 // ----------------------------------------------------------------------------
@@ -769,7 +768,7 @@ TEST(TriangleMesh, FilterSmoothLaplacian) {
     mesh.FilterSmoothLaplacian(1, 0.5);
     std::vector<Eigen::Vector3d> ref1 = {
             {0, 0, 0}, {0.5, 0, 0}, {0, 0.5, 0}, {-0.5, 0, 0}, {0, -0.5, 0}};
-    ExpectEQ(mesh.vertices_, ref1);
+    ExpectEQ(mesh.vertices_.Read(), ref1);
 
     mesh.FilterSmoothLaplacian(10, 0.5);
     std::vector<Eigen::Vector3d> ref2 = {{0, 0, 0},
@@ -777,7 +776,7 @@ TEST(TriangleMesh, FilterSmoothLaplacian) {
                                          {0, 0.000488, 0},
                                          {-0.000488, 0, 0},
                                          {0, -0.000488, 0}};
-    ExpectEQ(mesh.vertices_, ref2);
+    ExpectEQ(mesh.vertices_.Read(), ref2);
 }
 
 // ----------------------------------------------------------------------------
@@ -794,7 +793,7 @@ TEST(TriangleMesh, FilterSmoothTaubin) {
                                          {0, 0.765, 0},
                                          {-0.765, 0, 0},
                                          {0, -0.765, 0}};
-    ExpectEQ(mesh.vertices_, ref1);
+    ExpectEQ(mesh.vertices_.Read(), ref1);
 
     mesh.FilterSmoothTaubin(10, 0.5, 0.53);
     std::vector<Eigen::Vector3d> ref2 = {{0, 0, 0},
@@ -802,7 +801,7 @@ TEST(TriangleMesh, FilterSmoothTaubin) {
                                          {0, 0.052514, 0},
                                          {-0.052514, 0, 0},
                                          {0, -0.052514, 0}};
-    ExpectEQ(mesh.vertices_, ref2);
+    ExpectEQ(mesh.vertices_.Read(), ref2);
 }
 
 // ----------------------------------------------------------------------------
